@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 from pydantic import BaseSettings
+from yarl import URL
 
 
 class LogLevel(str, enum.Enum):  # noqa: WPS600
@@ -51,9 +52,9 @@ class Settings(BaseSettings):
     # Variables for the database
     postgres_host: str = "localhost"
     postgres_port: int = 5432
-    # postgres_user: str
-    # postgres_password: str
-    # postgres_db: str
+    postgres_user: str
+    postgres_password: str
+    postgres_db: str
     postgres_echo: bool = False
 
     # Variables for Redis
@@ -107,22 +108,22 @@ class Settings(BaseSettings):
     # superuser_password: str
     # superuser_full_name: str
 
-    # @property
-    # def db_url(self) -> URL:
-    #     """
-    #     Assemble database URL from settings.
-    #
-    #     :return: database URL.
-    #
-    #     """
-    #     return URL.build(
-    #         scheme="postgres",
-    #         host=self.postgres_host,
-    #         port=self.postgres_port,
-    #         user=self.postgres_user,
-    #         password=self.postgres_password,
-    #         path=f"/{self.postgres_db}",
-    #     )
+    @property
+    def db_url(self) -> URL:
+        """
+        Assemble database URL from settings.
+
+        :return: database URL.
+
+        """
+        return URL.build(
+            scheme="postgres",
+            host=self.postgres_host,
+            port=self.postgres_port,
+            user=self.postgres_user,
+            password=self.postgres_password,
+            path=f"/{self.postgres_db}",
+        )
 
     # @property
     # def redis_url(self) -> URL:

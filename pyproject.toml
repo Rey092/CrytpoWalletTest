@@ -24,6 +24,7 @@ celery = "^5.2.7"
 autoflake = "^1.7.6"
 flake8-pyproject = "^1.1.0.post0"
 aio-pika = "^8.2.4"
+sqlalchemy = "^1.4.42"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1.3"

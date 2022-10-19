@@ -18,38 +18,38 @@ from starlette.status import HTTP_403_FORBIDDEN
 
 
 metadata_tags = [
-    {
-        "name": "Health",
-        "description": "Test health of the project.",
-        "externalDocs": {
-            "description": "Fastapi Docs",
-            "url": "https://fastapi.tiangolo.com/",
-        },
-    },
+    # {
+    #     "name": "Health",
+    #     "description": "Test health of the project.",
+    #     "externalDocs": {
+    #         "description": "Fastapi Docs",
+    #         "url": "https://fastapi.tiangolo.com/",
+    #     },
+    # },
     {
         "name": "Auth",
-        "description": "Roman // Authentication and authorization for crm users.",
+        "description": "Authentication and authorization for users.",
     },
-    {
-        "name": "MobileAuth",
-        "description": "Roman // Authentication and authorization for mobile users.",
-    },
-    {
-        "name": "CRM Superuser",
-        "description": "Roman // Superuser actions. Only for superusers.",
-    },
-    {
-        "name": "CRM Staff Profile",
-        "description": "Roman // Staff actions. For any staff.",
-    },
-    {
-        "name": "CRM Users",
-        "description": "Roman // Users data. For any staff.",
-    },
-    {
-        "name": "Crypto",
-        "description": "Roman // Base Crypto endpoints.",
-    },
+    # {
+    #     "name": "MobileAuth",
+    #     "description": "Roman // Authentication and authorization for mobile users.",
+    # },
+    # {
+    #     "name": "CRM Superuser",
+    #     "description": "Roman // Superuser actions. Only for superusers.",
+    # },
+    # {
+    #     "name": "CRM Staff Profile",
+    #     "description": "Roman // Staff actions. For any staff.",
+    # },
+    # {
+    #     "name": "CRM Users",
+    #     "description": "Roman // Users data. For any staff.",
+    # },
+    # {
+    #     "name": "Crypto",
+    #     "description": "Roman // Base Crypto endpoints.",
+    # },
     # {
     #     "name": "Ethereum",
     #     "description": f"Roman // ETH_API_URL={settings.eth_api_url.split('/')[0]},"
