@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from celery import Celery
-from celery.schedules import crontab
 
 import services  # noqa
+
 # from apps.users.tasks import save_balance_task
 from config.settings import settings
+
+# from celery.schedules import crontab
+
 
 # from config.app import app  # noqa
 

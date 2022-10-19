@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from asgi_lifespan import LifespanManager
+# from asgi_lifespan import LifespanManager
 
-from apps.crypto.enums import AssetCode, AssetNetwork, AssetStandard, AssetType
-from apps.crypto.models import Asset
-from apps.users.models import Staff
-from config.settings import settings
-from config.utils.password_helper import password_helper
+# from apps.crypto.enums import AssetCode, AssetNetwork, AssetStandard, AssetType
+# from apps.crypto.models import Asset
+# from apps.users.models import Staff
+# from config.settings import settings
+# from config.utils.password_helper import password_helper
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,7 @@ class ProjectInitialization:
         # async with LifespanManager(app):
         #     await cls.create_assets()
         #     await cls.create_superuser()
+
 
 #     @classmethod
 #     async def create_assets(cls):

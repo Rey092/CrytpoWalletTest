@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
+# import os
 import pathlib
 from typing import List
 
@@ -11,18 +11,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette import status
 from starlette.responses import Response
-from starlette.staticfiles import StaticFiles
-from tortoise.contrib.fastapi import register_tortoise
 
-from apps.admin.endpoints import documentation, health
+from apps.admin.endpoints import health
 from config.celery_utils import create_celery
 from config.costum_logging import CustomizeLogger
-from config.db import TORTOISE_CONFIG
+
+# from config.db import TORTOISE_CONFIG
 from config.lifetime import register_shutdown_event, register_startup_event
 from config.openapi import metadata_tags
 from config.router import api_router
-from config.settings import settings
+
+# from config.settings import settings
 from config.utils.formatters import camel_case_split
+
+# from starlette.staticfiles import StaticFiles
+# from tortoise.contrib.fastapi import register_tortoise
 
 
 def init_routers(app_: FastAPI) -> None:
