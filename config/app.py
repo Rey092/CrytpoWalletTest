@@ -12,12 +12,12 @@ from fastapi.responses import JSONResponse
 from starlette import status
 from starlette.responses import Response
 
-from apps.admin.endpoints import health
-from config.celery_utils import create_celery
+# from apps.admin.endpoints import health
+# from config.celery_utils import create_celery
 from config.costum_logging import CustomizeLogger
 
 # from config.db import TORTOISE_CONFIG
-from config.lifetime import register_shutdown_event, register_startup_event
+# from config.lifetime import register_shutdown_event, register_startup_event
 from config.openapi import metadata_tags
 from config.router import api_router
 
@@ -29,7 +29,7 @@ from config.utils.formatters import camel_case_split
 
 
 def init_routers(app_: FastAPI) -> None:
-    app_.include_router(health.router, prefix="/health", tags=["Health"])
+    # app_.include_router(health.router, prefix="/health", tags=["Health"])
     app_.include_router(api_router)
 
 
@@ -111,11 +111,11 @@ def create_app() -> FastAPI:
         openapi_tags=metadata_tags,
     )
 
-    app_.celery_app = create_celery()
+    # app_.celery_app = create_celery()
 
     # Adds startup and shutdown events.
-    register_startup_event(app_)
-    register_shutdown_event(app_)
+    # register_startup_event(app_)
+    # register_shutdown_event(app_)
 
     # Initialize other utils.
     init_routers(app_=app_)

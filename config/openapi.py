@@ -13,9 +13,9 @@ from pydantic.fields import ModelField
 from starlette import status
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
-from tortoise.contrib.pydantic import PydanticModel
 
-from config.settings import settings
+# from tortoise.contrib.pydantic import PydanticModel
+
 
 metadata_tags = [
     {
@@ -50,28 +50,28 @@ metadata_tags = [
         "name": "Crypto",
         "description": "Roman // Base Crypto endpoints.",
     },
-    {
-        "name": "Ethereum",
-        "description": f"Roman // ETH_API_URL={settings.eth_api_url.split('/')[0]},"
-        f"ETHERSCAN_API_URL={settings.etherscan_api_url.split('/')[0]}",
-    },
-    {
-        "name": "Tron",
-        "description": f"Roman // TRON_GRID_API_URL={settings.tron_grid_api_url.split('/')[0]}",
-    },
-    {
-        "name": "Bitcoin",
-        "description": f"BLOCKCHAIN_INFO_API={settings.btc_api_url.split('/')[0]}",
-    },
-    {
-        "name": "Litecoin",
-        "description": f"BLOCKCYPHER_API={settings.blockcypher_ltc_api_url.split('/')[0]}",
-    },
-    {
-        "name": "Binance Smart Chain",
-        "description": f"BSCSCAN_API_URL={settings.bsc_scan_api_url.split('/')[0]} "
-        f"BNB_API_URL={settings.bnb_api_url.split('/')[0]}",
-    },
+    # {
+    #     "name": "Ethereum",
+    #     "description": f"Roman // ETH_API_URL={settings.eth_api_url.split('/')[0]},"
+    #     f"ETHERSCAN_API_URL={settings.etherscan_api_url.split('/')[0]}",
+    # },
+    # {
+    #     "name": "Tron",
+    #     "description": f"Roman // TRON_GRID_API_URL={settings.tron_grid_api_url.split('/')[0]}",
+    # },
+    # {
+    #     "name": "Bitcoin",
+    #     "description": f"BLOCKCHAIN_INFO_API={settings.btc_api_url.split('/')[0]}",
+    # },
+    # {
+    #     "name": "Litecoin",
+    #     "description": f"BLOCKCYPHER_API={settings.blockcypher_ltc_api_url.split('/')[0]}",
+    # },
+    # {
+    #     "name": "Binance Smart Chain",
+    #     "description": f"BSCSCAN_API_URL={settings.bsc_scan_api_url.split('/')[0]} "
+    #     f"BNB_API_URL={settings.bnb_api_url.split('/')[0]}",
+    # },
 ]
 
 
@@ -179,9 +179,9 @@ def as_form(cls: Type[BaseModel]):
     return cls
 
 
-class ApiSchema(PydanticModel):
-    class Config:
-        orm_mode = True
-        orig_model = None
-        alias_generator = camelize
-        allow_population_by_field_name = True
+# class ApiSchema(PydanticModel):
+#     class Config:
+#         orm_mode = True
+#         orig_model = None
+#         alias_generator = camelize
+#         allow_population_by_field_name = True
