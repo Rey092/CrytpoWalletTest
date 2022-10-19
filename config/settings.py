@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Optional
 
 from pydantic import BaseSettings
-from yarl import URL
 
 
 class LogLevel(str, enum.Enum):  # noqa: WPS600
@@ -43,7 +42,7 @@ class Settings(BaseSettings):
     # Current environment
     debug: bool = True
     # Secret key for signing jwt tokens
-    jwt_secret: str
+    # jwt_secret: str
     jwt_algorithm: str = "HS256"
     jwt_access_token_name: str = "access_token"
 
@@ -52,9 +51,9 @@ class Settings(BaseSettings):
     # Variables for the database
     postgres_host: str = "localhost"
     postgres_port: int = 5432
-    postgres_user: str
-    postgres_password: str
-    postgres_db: str
+    # postgres_user: str
+    # postgres_password: str
+    # postgres_db: str
     postgres_echo: bool = False
 
     # Variables for Redis
@@ -73,10 +72,10 @@ class Settings(BaseSettings):
     rabbit_vhost: str = "/"
 
     # Variables for SMTP
-    smtp_host: str
+    # smtp_host: str
     smtp_port: int = 587
-    smtp_user: str
-    smtp_pass: str
+    # smtp_user: str
+    # smtp_pass: str
     smtp_use_tls: bool = True
     smtp_use_ssl: bool = False
     smtp_mail_from: str = "test@example.com"
@@ -92,88 +91,88 @@ class Settings(BaseSettings):
     limit_register_seconds: int = 60
 
     # Ethereum settings
-    eth_api_url: str
+    # eth_api_url: str
     eth_api_key: Optional[str] = None
-    etherscan_api_url: str
-    etherscan_api_key: str
+    # etherscan_api_url: str
+    # etherscan_api_key: str
 
     # Digital ocean SPACES
-    spaces_space_name: str
-    spaces_access_key: str
-    spaces_secret_key: str
-    spaces_region_name: str
+    # spaces_space_name: str
+    # spaces_access_key: str
+    # spaces_secret_key: str
+    # spaces_region_name: str
 
     # Superuser settings
-    superuser_email: str
-    superuser_password: str
-    superuser_full_name: str
+    # superuser_email: str
+    # superuser_password: str
+    # superuser_full_name: str
 
-    @property
-    def db_url(self) -> URL:
-        """
-        Assemble database URL from settings.
+    # @property
+    # def db_url(self) -> URL:
+    #     """
+    #     Assemble database URL from settings.
+    #
+    #     :return: database URL.
+    #
+    #     """
+    #     return URL.build(
+    #         scheme="postgres",
+    #         host=self.postgres_host,
+    #         port=self.postgres_port,
+    #         user=self.postgres_user,
+    #         password=self.postgres_password,
+    #         path=f"/{self.postgres_db}",
+    #     )
 
-        :return: database URL.
+    # @property
+    # def redis_url(self) -> URL:
+    #     """
+    #     Assemble REDIS URL from settings.
+    #
+    #     :return: redis URL.
+    #
+    #     """
+    #     path = ""
+    #     if self.redis_base is not None:
+    #         path = f"/{self.redis_base}"
+    #     return URL.build(
+    #         scheme="redis",
+    #         host=self.redis_host,
+    #         port=self.redis_port,
+    #         user=self.redis_user,
+    #         password=self.redis_pass,
+    #         path=path,
+    #     )
 
-        """
-        return URL.build(
-            scheme="postgres",
-            host=self.postgres_host,
-            port=self.postgres_port,
-            user=self.postgres_user,
-            password=self.postgres_password,
-            path=f"/{self.postgres_db}",
-        )
+    # @property
+    # def rabbit_url(self) -> URL:
+    #     """
+    #     Assemble RabbitMQ URL from settings.
+    #
+    #     :return: rabbit URL.
+    #
+    #     """
+    #     return URL.build(
+    #         scheme="amqp",
+    #         host=self.rabbit_host,
+    #         port=self.rabbit_port,
+    #         user=self.rabbit_user,
+    #         password=self.rabbit_pass,
+    #         path=self.rabbit_vhost,
+    #     )
 
-    @property
-    def redis_url(self) -> URL:
-        """
-        Assemble REDIS URL from settings.
-
-        :return: redis URL.
-
-        """
-        path = ""
-        if self.redis_base is not None:
-            path = f"/{self.redis_base}"
-        return URL.build(
-            scheme="redis",
-            host=self.redis_host,
-            port=self.redis_port,
-            user=self.redis_user,
-            password=self.redis_pass,
-            path=path,
-        )
-
-    @property
-    def rabbit_url(self) -> URL:
-        """
-        Assemble RabbitMQ URL from settings.
-
-        :return: rabbit URL.
-
-        """
-        return URL.build(
-            scheme="amqp",
-            host=self.rabbit_host,
-            port=self.rabbit_port,
-            user=self.rabbit_user,
-            password=self.rabbit_pass,
-            path=self.rabbit_vhost,
-        )
-
-    @property
-    def storage_url(self) -> URL:
-        """
-        Assemble Digital Ocean SPACES URL from settings.
-
-        :return: storage URL.
-
-        """
-        return URL.build(
-            scheme="https",
-            host=f"{self.spaces_space_name}.{self.spaces_region_name}.digitaloceanspaces.com",
-        )
+    # @property
+    # def storage_url(self) -> URL:
+    #     """
+    #     Assemble Digital Ocean SPACES URL from settings.
+    #
+    #     :return: storage URL.
+    #
+    #     """
+    #     return URL.build(
+    #         scheme="https",
+    #         host=f"{self.spaces_space_name}.{self.spaces_region_name}.digitaloceanspaces.com",
+    #     )
 
     class Config:
         """

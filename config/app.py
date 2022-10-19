@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
+# import os
 import pathlib
 from typing import List
 
@@ -11,22 +11,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette import status
 from starlette.responses import Response
-from starlette.staticfiles import StaticFiles
-from tortoise.contrib.fastapi import register_tortoise
 
-from apps.admin.endpoints import documentation, health
-from config.celery_utils import create_celery
+# from apps.admin.endpoints import health
+# from config.celery_utils import create_celery
 from config.costum_logging import CustomizeLogger
-from config.db import TORTOISE_CONFIG
-from config.lifetime import register_shutdown_event, register_startup_event
+
+# from config.db import TORTOISE_CONFIG
+# from config.lifetime import register_shutdown_event, register_startup_event
 from config.openapi import metadata_tags
 from config.router import api_router
-from config.settings import settings
+
+# from config.settings import settings
 from config.utils.formatters import camel_case_split
+
+# from starlette.staticfiles import StaticFiles
+# from tortoise.contrib.fastapi import register_tortoise
 
 
 def init_routers(app_: FastAPI) -> None:
-    app_.include_router(health.router, prefix="/health", tags=["Health"])
+    # app_.include_router(health.router, prefix="/health", tags=["Health"])
     app_.include_router(api_router)
 
 
@@ -108,11 +111,11 @@ def create_app() -> FastAPI:
         openapi_tags=metadata_tags,
     )
 
-    app_.celery_app = create_celery()
+    # app_.celery_app = create_celery()
 
     # Adds startup and shutdown events.
-    register_startup_event(app_)
-    register_shutdown_event(app_)
+    # register_startup_event(app_)
+    # register_shutdown_event(app_)
 
     # Initialize other utils.
     init_routers(app_=app_)
