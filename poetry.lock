@@ -366,6 +366,26 @@ doc = ["mdx-include (>=1.4.1,<2.0.0)", "mkdocs (>=1.1.2,<2.0.0)", "mkdocs-markdo
 test = ["anyio[trio] (>=3.2.1,<4.0.0)", "black (==22.8.0)", "databases[sqlite] (>=0.3.2,<0.7.0)", "email-validator (>=1.1.1,<2.0.0)", "flake8 (>=3.8.3,<6.0.0)", "flask (>=1.1.2,<3.0.0)", "httpx (>=0.23.0,<0.24.0)", "isort (>=5.0.6,<6.0.0)", "mypy (==0.971)", "orjson (>=3.2.1,<4.0.0)", "passlib[bcrypt] (>=1.7.2,<2.0.0)", "peewee (>=3.13.3,<4.0.0)", "pytest (>=7.1.3,<8.0.0)", "pytest-cov (>=2.12.0,<4.0.0)", "python-jose[cryptography] (>=3.3.0,<4.0.0)", "python-multipart (>=0.0.5,<0.0.6)", "pyyaml (>=5.3.1,<7.0.0)", "requests (>=2.24.0,<3.0.0)", "sqlalchemy (>=1.3.18,<1.5.0)", "types-orjson (==3.6.2)", "types-ujson (==5.4.0)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0,<6.0.0)"]
 
 [[package]]
+name = "fastapi-helper"
+version = "0.0.4"
+description = "Package for useful fastapi utils"
+category = "main"
+optional = false
+python-versions = ">=3.7, <4"
+files = [
+    {file = "fastapi-helper-0.0.4.tar.gz", hash = "sha256:f34566ce55410a261520c7d46cda1525a1f603825b5ac51838922563dea106ba"},
+    {file = "fastapi_helper-0.0.4-py3-none-any.whl", hash = "sha256:3c0b406fabd548800ad5de8c530aa7857c849a961d65da90d50a11f8d9b3b6f0"},
+]
+
+[package.dependencies]
+fastapi = "*"
+pydantic = "*"
+
+[package.extras]
+dev = ["check-manifest"]
+test = ["coverage"]
+
+[[package]]
 name = "flake8"
 version = "5.0.4"
 description = "the modular source code checker: pep8 pyflakes and co"
@@ -1267,4 +1287,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "0f80b9f9b6830af1cfe231b0c2a438d91ab7ab23abd7bfd135405e38627af4cc"
+content-hash = "d71e942380b8ad76078374c61d38b7119e2ae9311e8b2f9ec64a186f882a558e"
