@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
-# TODO: fastapi_helper base schema
-from pydantic import BaseModel
+from uuid import UUID
+
+from fastapi_helper.schemas.camel_schema import ApiSchema
 
 
-class UserLogin(BaseModel):
+class UserRegister(ApiSchema):
     email: str
-    password: str
+    username: str
+    password1: str
+    password2: str
+
+    class Config:
+        orm_mode = False
 
 
-class UserRegister(BaseModel):
+class UserResponse(ApiSchema):
+    id: UUID
     email: str
-    password: str
+    username: str
