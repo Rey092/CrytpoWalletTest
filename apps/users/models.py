@@ -27,6 +27,6 @@ class Permission(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     has_access_chat = Column(Boolean, default=True)
-    user_id = Column(Integer, ForeignKey("user.id"))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
 
     user = relationship("User", back_populates="permission")

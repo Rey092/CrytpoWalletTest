@@ -9,11 +9,15 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi_helper import DefaultHTTPException
 from starlette import status
 from starlette.responses import Response
 
+from apps.users import models
+
 # from config.celery_utils import create_celery
 from config.costum_logging import CustomizeLogger
+from config.db import engine
 
 # from config.db import TORTOISE_CONFIG
 # from config.lifetime import register_shutdown_event, register_startup_event
@@ -53,15 +57,8 @@ def init_validation_handler(app_: FastAPI) -> None:
         )
 
 
-def init_database(app_: FastAPI) -> None:
-    # TODO: implement
-    pass
-    # register_tortoise(
-    #     app_,
-    #     config=TORTOISE_CONFIG,
-    #     add_exception_handlers=True,
-    #     generate_schemas=False,
-    # )
+def init_database() -> None:
+    models.Base.metadata.create_all(bind=engine)
 
 
 def make_middleware() -> List[Middleware]:
@@ -118,7 +115,7 @@ def create_app() -> FastAPI:
     # Initialize other utils.
     init_routers(app_=app_)
     init_validation_handler(app_=app_)
-    init_database(app_=app_)
+    init_database()
 
     init_cache()
     init_logging()
@@ -127,3 +124,11 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+@app.exception_handler(DefaultHTTPException)
+async def http_exception_accept_handler(request: Request, exc: DefaultHTTPException) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=[{"code": exc.code, "type": exc.type, "message": exc.message}],
+    )

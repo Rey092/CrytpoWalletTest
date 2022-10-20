@@ -117,7 +117,7 @@ class Settings(BaseSettings):
 
         """
         return URL.build(
-            scheme="postgres",
+            scheme="postgresql",
             host=self.postgres_host,
             port=self.postgres_port,
             user=self.postgres_user,
