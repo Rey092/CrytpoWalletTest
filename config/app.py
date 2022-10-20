@@ -12,7 +12,6 @@ from fastapi.responses import JSONResponse
 from starlette import status
 from starlette.responses import Response
 
-# from apps.admin.endpoints import health
 # from config.celery_utils import create_celery
 from config.costum_logging import CustomizeLogger
 
@@ -29,7 +28,6 @@ from config.utils.formatters import camel_case_split
 
 
 def init_routers(app_: FastAPI) -> None:
-    # app_.include_router(health.router, prefix="/health", tags=["Health"])
     app_.include_router(api_router)
 
 
@@ -105,7 +103,7 @@ def create_app() -> FastAPI:
         title=poetry_data["name"],
         description=poetry_data["description"],
         version=poetry_data["version"],
-        docs_url="/",
+        docs_url="/docs",
         redoc_url="/redoc",
         middleware=make_middleware(),
         openapi_tags=metadata_tags,
