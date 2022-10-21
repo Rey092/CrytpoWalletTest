@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+from fastapi_helper import DefaultHTTPException
 from starlette import status
 
 # from apps.users.api_errors import UsersApiErrors
 # from config.openapi import ApiError
-from config.utils.exceptions import AuthEmailException
 
 
 def generate_nested_schema_for_code(responses, error_code):
@@ -12,7 +12,10 @@ def generate_nested_schema_for_code(responses, error_code):
     responses[error_code]["content"]["application/json"] = {}
 
 
-def error_responses(*args: AuthEmailException, auth=False) -> dict:
+def error_responses(*args: DefaultHTTPException, auth: bool = False) -> dict:
+    # TODO: fix (try classes)
+    # TODO: exceptions for (401, 403)
+
     error_codes = {error.status_code for error in args}
     responses = {}
 
@@ -47,17 +50,14 @@ def change_422_validation_schema(responses):
     example = {
         "validation_errors": {
             "summary": "Validation Error",
-            "value": {
-                "detail": [
-                    {
-                        "code": "validation-error",
-                        "type": "string",
-                        "message": "string",
-                        "location": "(body, query, path, header)",
-                        "field": "string",
-                    },
-                ],
-            },
+            "value": [
+                {
+                    "code": "validation-error",
+                    "type": "string",
+                    "message": "string",
+                    "field": "string",
+                },
+            ],
         },
     }
     responses[status.HTTP_422_UNPROCESSABLE_ENTITY]["content"]["application/json"]["examples"] = example
