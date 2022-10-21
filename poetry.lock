@@ -367,14 +367,14 @@ test = ["anyio[trio] (>=3.2.1,<4.0.0)", "black (==22.8.0)", "databases[sqlite] (
 
 [[package]]
 name = "fastapi-helper"
-version = "0.0.6"
+version = "0.0.7"
 description = "Package for useful fastapi utils"
 category = "main"
 optional = false
 python-versions = ">=3.7, <4"
 files = [
-    {file = "fastapi-helper-0.0.6.tar.gz", hash = "sha256:b5839499f7e35b3d3e5f752cec8c43ceb6b8a8f789f9e7f0a4d0c69629608180"},
-    {file = "fastapi_helper-0.0.6-py3-none-any.whl", hash = "sha256:26bd33caa0de88ab6696c4c31e0be39ccaf8e209525713103591ffd7231b40c0"},
+    {file = "fastapi-helper-0.0.7.tar.gz", hash = "sha256:35aa79cee66dae9c7549ce66bedfff2ded87b464002b481f4d464405f0707a53"},
+    {file = "fastapi_helper-0.0.7-py3-none-any.whl", hash = "sha256:7591dc7023f90e75e165e0f07873c3654360935e47f30006bc246eecb49f8b3b"},
 ]
 
 [package.dependencies]
@@ -1326,4 +1326,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "89711230eb262b970fb0720a37fea4490a55f22f139fd1b5dfe499bb01e0fdc6"
+content-hash = "80d7ddfd23227386dc1a2a72eb7723fa76b3b6cd4848a050e90a3a0d1dc47399"

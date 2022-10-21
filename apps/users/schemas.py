@@ -10,9 +10,6 @@ class UserRegister(ApiSchema):
     password1: str
     password2: str
 
-    class Config:
-        orm_mode = False
-
 
 class UserResponse(ApiSchema):
     id: UUID
