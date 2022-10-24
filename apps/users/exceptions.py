@@ -3,34 +3,6 @@ from fastapi_helper.exceptions.http_exceptions import DefaultHTTPException
 from starlette import status
 
 
-class UnauthorizedException(DefaultHTTPException):
-    code = "bearer-001"
-    type = "UNAUTHORIZED"
-    message = "Credentials were not provided."
-    status_code = status.HTTP_401_UNAUTHORIZED
-
-
-class InvalidCredentialsException(DefaultHTTPException):
-    code = "bearer-002"
-    type = "LOGIN_BAD_CREDENTIALS"
-    message = "Invalid credentials."
-    status_code = status.HTTP_401_UNAUTHORIZED
-
-
-class BadCredentialsException(DefaultHTTPException):
-    code = "auth-003"
-    type = "INVALID_CREDENTIALS"
-    message = "Invalid email or password."
-    status_code = status.HTTP_401_UNAUTHORIZED
-
-
-class InsufficientRightsException(DefaultHTTPException):
-    code = "auth-004"
-    type = "INSUFFICIENT_RIGHTS"
-    message = "Insufficient rights to perform this action."
-    status_code = status.HTTP_403_FORBIDDEN
-
-
 class EmailInvalidException(DefaultHTTPException):
     code = "email_error"
     type = "Email Invalid"

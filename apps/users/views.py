@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Depends
+from fastapi_helper.schemas.examples import examples_generate
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from starlette import status
 
 from apps.users import crud, schemas
 from apps.users.exceptions import (
@@ -13,7 +15,6 @@ from apps.users.exceptions import (
 )
 from apps.users.utils.validators import validate_email_, validate_password, validate_username
 from config.db import SessionLocal
-from config.utils.examples_gen import error_responses
 
 auth_router = APIRouter()
 
@@ -39,13 +40,14 @@ async def login(user: User):
 
 @auth_router.post(
     "/register",
-    response_model=schemas.UserResponse,
-    responses=error_responses(
-        EmailInvalidException(),
-        EmailAlreadyExistException(),
-        PasswordMismatchException(),
-        PasswordInvalidException(),
-        UsernameInvalidException(),
+    status_code=status.HTTP_201_CREATED,
+    response_model=schemas.UserRegisterResponse,
+    responses=examples_generate.get_error_responses(
+        EmailInvalidException,
+        EmailAlreadyExistException,
+        PasswordMismatchException,
+        PasswordInvalidException,
+        UsernameInvalidException,
     ),
 )
 async def register(user: schemas.UserRegister, db: Session = Depends(get_db)):
