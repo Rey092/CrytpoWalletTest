@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import enum
 from pathlib import Path
 from typing import Optional
@@ -42,10 +43,12 @@ class Settings(BaseSettings):
     reload: bool = True
     # Current environment
     debug: bool = True
+
     # Secret key for signing jwt tokens
-    # jwt_secret: str
+    jwt_secret: str
     jwt_algorithm: str = "HS256"
     jwt_access_token_name: str = "access_token"
+    jwt_access_expiration: Optional[datetime.timedelta] = datetime.timedelta(seconds=15)
 
     log_level: LogLevel = LogLevel.INFO
 
@@ -125,25 +128,25 @@ class Settings(BaseSettings):
             path=f"/{self.postgres_db}",
         )
 
-    # @property
-    # def redis_url(self) -> URL:
-    #     """
-    #     Assemble REDIS URL from settings.
-    #
-    #     :return: redis URL.
-    #
-    #     """
-    #     path = ""
-    #     if self.redis_base is not None:
-    #         path = f"/{self.redis_base}"
-    #     return URL.build(
-    #         scheme="redis",
-    #         host=self.redis_host,
-    #         port=self.redis_port,
-    #         user=self.redis_user,
-    #         password=self.redis_pass,
-    #         path=path,
-    #     )
+    @property
+    def redis_url(self) -> URL:
+        """
+        Assemble REDIS URL from settings.
+
+        :return: redis URL.
+
+        """
+        path = ""
+        if self.redis_base is not None:
+            path = f"/{self.redis_base}"
+        return URL.build(
+            scheme="redis",
+            host=self.redis_host,
+            port=self.redis_port,
+            user=self.redis_user,
+            password=self.redis_pass,
+            path=path,
+        )
 
     # @property
     # def rabbit_url(self) -> URL:

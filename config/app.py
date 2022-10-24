@@ -10,7 +10,7 @@ from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi_helper import DefaultHTTPException
-from starlette import status
+from fastapi_helper.exceptions.validation_exceptions import base_validation_exception_handler
 from starlette.responses import Response
 
 from apps.users import models
@@ -25,7 +25,6 @@ from config.openapi import metadata_tags
 from config.router import api_router
 
 # from config.settings import settings
-from config.utils.formatters import camel_case_split
 
 # from starlette.staticfiles import StaticFiles
 # from tortoise.contrib.fastapi import register_tortoise
@@ -36,25 +35,9 @@ def init_routers(app_: FastAPI) -> None:
 
 
 def init_validation_handler(app_: FastAPI) -> None:
-    # TODO: FIX
     @app_.exception_handler(RequestValidationError)
-    async def http_exception_accept_handler(request: Request, exc: RequestValidationError) -> Response:
-        data = [
-            {
-                "code": "validation-error",
-                "type": exception["type"],
-                "message": f"{camel_case_split(exception['loc'][1])}: {exception['msg']}"
-                if exception["type"] != "value_error.jsondecode"
-                else exception["msg"],
-                "location": exception["loc"][0],
-                "field": exception["loc"][1],
-            }
-            for exception in exc.errors()
-        ]
-        return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content={"detail": data},
-        )
+    async def request_validation_exception_handler(request: Request, exc: RequestValidationError) -> Response:
+        return base_validation_exception_handler(request, exc)
 
 
 def init_database() -> None:
