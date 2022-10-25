@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter
-from fastapi import APIRouter, Depends
+import time
+
+from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi_helper.schemas.examples import examples_generate
 from pydantic import BaseModel
 from starlette import status
@@ -34,11 +35,19 @@ class User(BaseModel):
     password: str
 
 
+def write_notification():
+    time.sleep(5)
+    print("ok")
+
+
 @auth_router.post("/login")
 async def login(
     user: schemas.UserLogin,
+    background_tasks: BackgroundTasks,
     user_manager: UserManager = Depends(get_user_manager),
 ):
+    background_tasks.add_task(write_notification)
+
     return await user_manager.login(user)
 
 
@@ -56,6 +65,7 @@ async def login(
 )
 async def register(
     user: schemas.UserRegister,
+    background_tasks: BackgroundTasks,
     user_manager: UserManager = Depends(get_user_manager),
 ):
-    return await user_manager.create(user)
+    return await user_manager.create(user, background_tasks)

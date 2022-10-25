@@ -29,6 +29,7 @@ psycopg2 = "^2.9.4"
 passlib = "^1.7.4"
 fastapi-helper = "^0.0.8"
 pyjwt = "^2.6.0"
+fastapi-mail = "^1.2.0"
 
 
 [tool.poetry.group.dev.dependencies]

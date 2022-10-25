@@ -75,14 +75,14 @@ class Settings(BaseSettings):
     rabbit_vhost: str = "/"
 
     # Variables for SMTP
-    # smtp_host: str
-    smtp_port: int = 587
-    # smtp_user: str
-    # smtp_pass: str
-    smtp_use_tls: bool = True
-    smtp_use_ssl: bool = False
-    smtp_mail_from: str = "test@example.com"
-    display_name: str = "AuthX"
+    smtp_host: str
+    smtp_port: int
+    smtp_user: str
+    smtp_pass: str
+    smtp_use_tls: bool
+    smtp_use_ssl: bool
+    smtp_mail_from: str
+    display_name: str
 
     rabbit_pool_size: int = 2
     rabbit_channel_pool_size: int = 10
