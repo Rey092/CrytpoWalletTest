@@ -5,13 +5,11 @@ from typing import List
 
 import toml
 from fastapi import FastAPI, Request
-from fastapi.exceptions import RequestValidationError
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi_helper import DefaultHTTPException
-from fastapi_helper.exceptions.validation_exceptions import base_validation_exception_handler
-from starlette.responses import Response
+from fastapi_helper.exceptions.validation_exceptions import init_validation_handler
 
 from apps.users import models
 
@@ -32,12 +30,6 @@ from config.router import api_router
 
 def init_routers(app_: FastAPI) -> None:
     app_.include_router(api_router)
-
-
-def init_validation_handler(app_: FastAPI) -> None:
-    @app_.exception_handler(RequestValidationError)
-    async def request_validation_exception_handler(request: Request, exc: RequestValidationError) -> Response:
-        return base_validation_exception_handler(request, exc)
 
 
 def init_database() -> None:
@@ -97,7 +89,7 @@ def create_app() -> FastAPI:
 
     # Initialize other utils.
     init_routers(app_=app_)
-    init_validation_handler(app_=app_)
+    init_validation_handler(app=app_)
     init_database()
 
     init_cache()
