@@ -11,6 +11,11 @@ class UserRegister(ApiSchema):
     password2: str
 
 
+class UserLogin(ApiSchema):
+    email: str
+    password: str
+
+
 class UserResponse(ApiSchema):
     id: UUID
     email: str

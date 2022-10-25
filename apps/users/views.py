@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 
-from apps.users import crud, schemas
+from apps.users import schemas
 from apps.users.exceptions import (
     EmailAlreadyExistException,
     EmailInvalidException,
@@ -11,7 +10,7 @@ from apps.users.exceptions import (
     PasswordMismatchException,
     UsernameInvalidException,
 )
-from apps.users.utils.validators import validate_email_, validate_password, validate_username
+from apps.users.manager import get_user_manager
 from config.db import SessionLocal
 from config.utils.examples_gen import error_responses
 
@@ -33,8 +32,9 @@ class User(BaseModel):
 
 
 @auth_router.post("/login")
-async def login(user: User):
-    return user
+async def login(user: schemas.UserLogin):
+    manager = await get_user_manager()
+    return await manager.login(user)
 
 
 @auth_router.post(
@@ -48,20 +48,6 @@ async def login(user: User):
         UsernameInvalidException(),
     ),
 )
-async def register(user: schemas.UserRegister, db: Session = Depends(get_db)):
-    result = await validate_email_(user.email)
-    if result.get("email"):
-        if crud.get_user_by_email(db, email=user.email):
-            raise EmailAlreadyExistException()
-    else:
-        raise EmailInvalidException(message=result.get("message"))
-
-    if not await validate_password(user.password1):
-        raise PasswordInvalidException()
-    if user.password1 != user.password2:
-        raise PasswordMismatchException()
-
-    if not await validate_username(user.username):
-        raise UsernameInvalidException()
-
-    return crud.create_user(db=db, user=user)
+async def register(user: schemas.UserRegister):
+    manager = await get_user_manager()
+    return await manager.create(user)
