@@ -14,6 +14,6 @@ class UserLogin(ApiSchema):
     email: str
     password: str
 
-      
+
 class UserRegisterResponse(ApiSchema):
     detail: str = "Success! Welcome letter sent by email."

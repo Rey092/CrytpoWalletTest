@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter
-from pydantic import BaseModel
-
 from fastapi_helper.schemas.examples import examples_generate
-from sqlalchemy.orm import Session
+from pydantic import BaseModel
 from starlette import status
 
 from apps.users import schemas

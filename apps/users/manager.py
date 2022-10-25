@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from async_lru import alru_cache
+from fastapi.encoders import jsonable_encoder
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
 from pydantic import UUID4
 
@@ -17,6 +18,7 @@ from .exceptions import (
     PasswordMismatchException,
     UsernameInvalidException,
 )
+from .jwt_backend import JWTBackend, get_jwt_backend
 from .models import Permission, User
 from .schemas import UserLogin, UserRegister
 from .utils.validators import validate_email_, validate_password, validate_username
@@ -28,19 +30,12 @@ class UserManager:
     def __init__(
         self,
         database: UserDatabase,
+        jwt_backend: JWTBackend,
         pass_helper: PasswordHelper,
     ):
         self.user_db = database
+        self.jwt_backend = jwt_backend
         self.password_helper = pass_helper
-
-    @staticmethod
-    async def on_after_register(user: User):
-        """
-
-        :param user: User
-        :return: print user id
-        """
-        print(f"User {user.id} has registered.")
 
     async def get_user(self, id: UUID4):
         """
@@ -55,7 +50,7 @@ class UserManager:
         self,
         user_create: UserRegister,
         safe: bool = False,
-    ) -> tuple[dict, dict]:
+    ) -> tuple[dict, str]:
         """
         Create a user in database.
 
@@ -80,20 +75,13 @@ class UserManager:
             raise PasswordMismatchException()
         if not await validate_username(user_create.username):
             raise UsernameInvalidException()
-
         user_create.password1 = self.password_helper.hash(user_create.password1)
-
         created_user = await self.user_db.create(user_create)
+        user_data = jsonable_encoder(created_user)
+        access_token = self.jwt_backend.create_access_token(user_data)
+        return created_user, access_token
 
-        await self.on_after_register(created_user)
-
-        # payload = UserPayload.from_orm(created_user)
-        # user_data = jsonable_encoder(payload)
-        # tokens = self.jwt_backend.create_tokens(user_data)
-
-        return created_user
-
-    async def login(self, user_login: UserLogin) -> tuple[dict, dict]:
+    async def login(self, user_login: UserLogin) -> tuple[dict, str]:
         """
 
         :param user_login:
@@ -102,33 +90,15 @@ class UserManager:
         user = await self.user_db.get_user_by_email(email=user_login.email)
         if user is None:
             raise InvalidCredentialsException()
-
         is_valid, needs_update = self.password_helper.verify_and_update(user_login.password, user.password)
         if not is_valid:
             raise InvalidCredentialsException()
-
-        # payload = UserPayload.from_orm(user)
-        # user_data = jsonable_encoder(payload)
-        # tokens = self.jwt_backend.create_tokens(user_data)
-
-        return user
-
-    # async def refresh_access_token(self, refresh_token: str) -> str:
-    #     refresh_token_payload = await self.jwt_backend.decode_token(refresh_token)
-    #     if refresh_token_payload is None or refresh_token_payload.get("type") != "refresh":
-    #         raise AuthApiErrors.INVALID_CREDENTIALS.exception
-    #
-    #     user = await self.user_db.get(refresh_token_payload.get("id"))
-    #     if user is None or not user.is_active:
-    #         raise AuthApiErrors.INVALID_CREDENTIALS.exception
-    #
-    #     payload = UserPayload.from_orm(user)
-    #     user_data = jsonable_encoder(payload)
-    #     access_token = self.jwt_backend.create_access_token(user_data)
-    #
-    #     return access_token
+        user_data = jsonable_encoder(user)
+        access_token = self.jwt_backend.create_access_token(user_data)
+        return user, access_token
 
 
 @alru_cache()
 async def get_user_manager() -> UserManager:
-    return UserManager(user_db, password_helper)
+    jwt_backend = await get_jwt_backend()
+    return UserManager(user_db, jwt_backend, password_helper)
