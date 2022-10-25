@@ -6,7 +6,7 @@ from pydantic import UUID4
 
 # from config.utils import EmailSchema
 # from config.utils.email_client import create_email_client
-from config.utils.password_helper import PasswordHelper, password_helper
+from config.utils.password_helper import PasswordHelper
 
 from .database import UserDatabase
 
@@ -98,7 +98,4 @@ class UserManager:
         return user, access_token
 
 
-@alru_cache()
-async def get_user_manager() -> UserManager:
-    jwt_backend = await get_jwt_backend()
-    return UserManager(user_db, jwt_backend, password_helper)
+
