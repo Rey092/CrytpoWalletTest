@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
 import enum
 from pathlib import Path
 from typing import Optional
@@ -48,7 +47,7 @@ class Settings(BaseSettings):
     jwt_secret: str
     jwt_algorithm: str = "HS256"
     jwt_access_token_name: str = "access_token"
-    jwt_access_expiration: Optional[datetime.timedelta] = datetime.timedelta(seconds=15)
+    jwt_access_expiration: int = 15
 
     log_level: LogLevel = LogLevel.INFO
 

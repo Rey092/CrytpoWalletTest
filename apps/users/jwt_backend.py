@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import jwt
-from aioredis import Redis
 from async_lru import alru_cache
 
 from config.settings import settings
@@ -14,8 +13,7 @@ class JWTBackend:
     Set up the JWT Backend with the given cache backend and private key.
     """
 
-    def __init__(self, cache_backend: Redis, access_expiration: int) -> None:
-        self._cache = cache_backend
+    def __init__(self, access_expiration: int) -> None:
         self._access_expiration = access_expiration
 
     @staticmethod
@@ -57,9 +55,6 @@ async def get_jwt_backend() -> JWTBackend:
     """
     Get the JWT Backend for the given request.
     """
-    from config.app import app
-
     return JWTBackend(
-        app.state.redis,
         settings.jwt_access_expiration,
     )

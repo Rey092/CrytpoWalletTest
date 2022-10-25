@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from fastapi import APIRouter
 from fastapi import APIRouter, Depends
 from fastapi_helper.schemas.examples import examples_generate
 from pydantic import BaseModel
