@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import jwt
-from async_lru import alru_cache
 
 from config.settings import settings
 
@@ -48,13 +47,3 @@ class JWTBackend:
 
     def create_access_token(self, payload: dict) -> str:
         return self._create_token(payload, self._access_expiration)
-
-
-@alru_cache()
-async def get_jwt_backend() -> JWTBackend:
-    """
-    Get the JWT Backend for the given request.
-    """
-    return JWTBackend(
-        settings.jwt_access_expiration,
-    )

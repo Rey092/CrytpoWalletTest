@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
-from async_lru import alru_cache
 from fastapi.encoders import jsonable_encoder
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
 from pydantic import UUID4
+from starlette.background import BackgroundTasks
 
-# from config.utils import EmailSchema
-# from config.utils.email_client import create_email_client
+from config.utils.email_client import EmailSchema, create_email_client
 from config.utils.password_helper import PasswordHelper
 
 from .database import UserDatabase
-
-# from .jwt_backend import JWTBackend, get_jwt_backend
 from .exceptions import (
     EmailAlreadyExistException,
     EmailInvalidException,
@@ -18,12 +15,9 @@ from .exceptions import (
     PasswordMismatchException,
     UsernameInvalidException,
 )
-from .jwt_backend import JWTBackend, get_jwt_backend
-from .models import Permission, User
+from .jwt_backend import JWTBackend
 from .schemas import UserLogin, UserRegister
 from .utils.validators import validate_email_, validate_password, validate_username
-
-user_db = UserDatabase(User, Permission)
 
 
 class UserManager:
@@ -49,18 +43,14 @@ class UserManager:
     async def create(
         self,
         user_create: UserRegister,
-        safe: bool = False,
+        background_tasks: BackgroundTasks,
     ) -> tuple[dict, str]:
         """
         Create a user in database.
 
-        Triggers the on_after_register handler on success.
-
-        :param user_create: The UserCreateSchema to create.
-        :param safe: If True, sensitive values like is_superuser or is_verified
-        will be ignored during the creation, defaults to False.
-        :raises UserAlreadyExists: A user already exists with the same e-mail.
-        :return: A new user.
+        :param user_create:
+        :param background_tasks:
+        :return: New user
 
         """
         result = await validate_email_(user_create.email)
@@ -79,6 +69,14 @@ class UserManager:
         created_user = await self.user_db.create(user_create)
         user_data = jsonable_encoder(created_user)
         access_token = self.jwt_backend.create_access_token(user_data)
+        email_client = create_email_client()
+        background_tasks.add_task(
+            email_client.send_email_to_new_user,
+            EmailSchema(
+                email=created_user.email,
+                username=created_user.username,
+            ),
+        )
         return created_user, access_token
 
     async def login(self, user_login: UserLogin) -> tuple[dict, str]:
@@ -96,6 +94,3 @@ class UserManager:
         user_data = jsonable_encoder(user)
         access_token = self.jwt_backend.create_access_token(user_data)
         return user, access_token
-
-
-
