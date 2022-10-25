@@ -2,7 +2,7 @@
 import time
 
 from fastapi import APIRouter, BackgroundTasks, Depends
-from fastapi_helper.schemas.examples import examples_generate
+from fastapi_helper.schemas.examples_generate import examples_generate
 from pydantic import BaseModel
 from starlette import status
 

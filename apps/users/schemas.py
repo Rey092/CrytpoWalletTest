@@ -11,7 +11,7 @@ class UserRegister(ApiSchema):
 
 
 class UserLogin(ApiSchema):
-    email: str
+    email: EmailStr
     password: str
 
 
