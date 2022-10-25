@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter
-from pydantic import BaseModel
-
+from fastapi import APIRouter, Depends
 from fastapi_helper.schemas.examples import examples_generate
-from sqlalchemy.orm import Session
+from pydantic import BaseModel
 from starlette import status
 
 from apps.users import schemas
+from apps.users.dependencies import get_user_manager
 from apps.users.exceptions import (
     EmailAlreadyExistException,
     EmailInvalidException,
@@ -14,7 +13,7 @@ from apps.users.exceptions import (
     PasswordMismatchException,
     UsernameInvalidException,
 )
-from apps.users.manager import get_user_manager
+from apps.users.manager import UserManager
 from config.db import SessionLocal
 
 auth_router = APIRouter()
@@ -35,9 +34,11 @@ class User(BaseModel):
 
 
 @auth_router.post("/login")
-async def login(user: schemas.UserLogin):
-    manager = await get_user_manager()
-    return await manager.login(user)
+async def login(
+    user: schemas.UserLogin,
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    return await user_manager.login(user)
 
 
 @auth_router.post(
@@ -52,6 +53,8 @@ async def login(user: schemas.UserLogin):
         UsernameInvalidException,
     ),
 )
-async def register(user: schemas.UserRegister):
-    manager = await get_user_manager()
-    return await manager.create(user)
+async def register(
+    user: schemas.UserRegister,
+    user_manager: UserManager = Depends(get_user_manager),
+):
+    return await user_manager.create(user)

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from async_lru import alru_cache
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
 from pydantic import UUID4
 
 # from config.utils import EmailSchema
 # from config.utils.email_client import create_email_client
-from config.utils.password_helper import PasswordHelper, password_helper
+from config.utils.password_helper import PasswordHelper
 
 from .database import UserDatabase
 
@@ -127,8 +126,3 @@ class UserManager:
     #     access_token = self.jwt_backend.create_access_token(user_data)
     #
     #     return access_token
-
-
-@alru_cache()
-async def get_user_manager() -> UserManager:
-    return UserManager(user_db, password_helper)
