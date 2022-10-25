@@ -367,14 +367,14 @@ test = ["anyio[trio] (>=3.2.1,<4.0.0)", "black (==22.8.0)", "databases[sqlite] (
 
 [[package]]
 name = "fastapi-helper"
-version = "0.0.7"
+version = "0.0.8"
 description = "Package for useful fastapi utils"
 category = "main"
 optional = false
 python-versions = ">=3.7, <4"
 files = [
-    {file = "fastapi-helper-0.0.7.tar.gz", hash = "sha256:35aa79cee66dae9c7549ce66bedfff2ded87b464002b481f4d464405f0707a53"},
-    {file = "fastapi_helper-0.0.7-py3-none-any.whl", hash = "sha256:7591dc7023f90e75e165e0f07873c3654360935e47f30006bc246eecb49f8b3b"},
+    {file = "fastapi-helper-0.0.8.tar.gz", hash = "sha256:2cb0aab3220ed852ac454d8c64d2fd2b16cf238b453538fd12339ef0c2a337cd"},
+    {file = "fastapi_helper-0.0.8-py3-none-any.whl", hash = "sha256:602eb5c5bcdabeda2d20921fa212bb60f4add8adc1c00609c5fedb0915c6c1c7"},
 ]
 
 [package.dependencies]
@@ -938,6 +938,24 @@ files = [
 ]
 
 [[package]]
+name = "pyjwt"
+version = "2.6.0"
+description = "JSON Web Token implementation in Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "PyJWT-2.6.0-py3-none-any.whl", hash = "sha256:d83c3d892a77bbb74d3e1a2cfa90afaadb60945205d1095d9221f04466f64c14"},
+    {file = "PyJWT-2.6.0.tar.gz", hash = "sha256:69285c7e31fc44f68a1feb309e948e0df53259d579295e6cfe2b1792329f05fd"},
+]
+
+[package.extras]
+crypto = ["cryptography (>=3.4.0)"]
+dev = ["coverage[toml] (==5.0.4)", "cryptography (>=3.4.0)", "pre-commit", "pytest (>=6.0.0,<7.0.0)", "sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
+docs = ["sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
+tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
+
+[[package]]
 name = "pyparsing"
 version = "3.0.9"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -1326,4 +1344,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "80d7ddfd23227386dc1a2a72eb7723fa76b3b6cd4848a050e90a3a0d1dc47399"
+content-hash = "37e9d117ab81c48c0481d12e16e71314a91f11d429062a935c4c144695fbf1aa"
