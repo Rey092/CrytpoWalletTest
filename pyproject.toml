@@ -30,6 +30,7 @@ passlib = "^1.7.4"
 fastapi-helper = "^0.0.9"
 pyjwt = "^2.6.0"
 fastapi-mail = "^1.2.0"
+web3 = "^5.31.1"
 
 
 [tool.poetry.group.dev.dependencies]
