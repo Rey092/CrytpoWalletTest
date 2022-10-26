@@ -6,10 +6,10 @@ import random
 from typing import Type, TypeVar
 
 from pydantic import UUID4
+from sqlalchemy.orm import Session
 
 from apps.users.models import Permission, User
 from apps.users.schemas import UserRegister
-from config.db import SessionLocal
 
 # from fastapi_users.db import BaseUserDatabase
 
@@ -30,28 +30,31 @@ class UserDatabase:
     def __init__(self, user_model: Type[User], permission_model: Type[Permission]):
         self.model = user_model
         self.permission = permission_model
-        self.db = SessionLocal()
 
-    async def get(self, id: UUID4) -> User:
-        return self.db.query(self.model).filter(self.model.id == id).first()
+    async def get(self, user_id: UUID4, db: Session) -> User:
+        return db.query(self.model).filter(self.model.id == user_id).first()
 
-    async def get_user_by_email(self, email: str) -> User:
-        return self.db.query(self.model).filter(self.model.email == email).first()
+    async def get_user_by_email(self, email: str, db: Session) -> User:
+        return db.query(self.model).filter(self.model.email == email).first()
 
-    async def create(self, user: UserRegister) -> User:
+    async def create(self, user: UserRegister, db: Session) -> User:
         db_user = self.model(email=user.email, username=user.username, password=user.password1)
-        self.db.add(db_user)
-        self.db.commit()
-        self.db.refresh(db_user)
-        await self.create_user_permission(db_user.id)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        await self.create_user_permission(db_user.id, db)
         return db_user
 
-    async def create_user_permission(self, user_id: UUID4) -> Permission:
+    async def create_user_permission(self, user_id: UUID4, db: Session) -> Permission:
         db_permission = self.permission(has_access_chat=False, user_id=user_id)
-        self.db.add(db_permission)
-        self.db.commit()
-        self.db.refresh(db_permission)
+        db.add(db_permission)
+        db.commit()
+        db.refresh(db_permission)
         return db_permission
+
+    async def change_access_chat_permission(self, user_id: UUID4, db: Session):
+        db.query(self.permission).filter(self.permission.user_id == user_id).update({"has_access_chat": True})
+        db.commit()
 
     async def generate_nickname_number(self, nickname: str) -> str:
         query = self.model.filter(nickname__iexact=nickname).values("nickname_number")

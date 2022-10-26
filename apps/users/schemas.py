@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from uuid import UUID
+
 from fastapi_helper.schemas.camel_schema import ApiSchema
 from pydantic import EmailStr
 
@@ -10,10 +12,17 @@ class UserRegister(ApiSchema):
     password2: str
 
 
+class UserRegisterResponse(ApiSchema):
+    id: UUID
+    access_token: str
+    message: str = "Success! Welcome letter sent by email."
+
+
 class UserLogin(ApiSchema):
     email: EmailStr
     password: str
 
 
-class UserRegisterResponse(ApiSchema):
-    detail: str = "Success! Welcome letter sent by email."
+class UserLoginResponse(ApiSchema):
+    id: UUID
+    access_token: str

@@ -20,6 +20,7 @@ class User(Base):
     count_messages = Column(Integer)
 
     permission = relationship("Permission", back_populates="user", uselist=False)
+    wallets = relationship("Wallet", back_populates="user")
 
 
 class Permission(Base):
