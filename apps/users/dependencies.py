@@ -6,7 +6,16 @@ from apps.users.database import UserDatabase
 from apps.users.jwt_backend import JWTBackend
 from apps.users.manager import UserManager
 from apps.users.models import Permission, User
+from config.db import SessionLocal
 from config.settings import settings
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @alru_cache()
