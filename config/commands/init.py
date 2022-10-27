@@ -21,8 +21,9 @@ class ProjectInitialization:
     async def start(cls, db: Session):
         await cls.create_assets(db)
 
-    @staticmethod
-    async def create_assets(db: Session):
+    @classmethod
+    async def create_assets(cls, db: Session):
+        print("gi")
         create_asset(db)
 
 

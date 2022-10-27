@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 import secrets
 from abc import abstractmethod
+from typing import List
 
 from eth_account import Account
 from sqlalchemy.orm import Session
 
 from ..users.jwt_backend import JWTBackend
 from .database import BaseCryptoDatabase
-from .exceptions import WalletAlreadyExistException
-from .models import Wallet
+from .exceptions import InvalidPrivateKeyException, WalletAlreadyExistException
+from .models import Transaction, Wallet
 from .schemas import WalletCreate
+from .web3_client import EtherscanClient, InfuraClient
 
 
 class BaseCryptoManager:
@@ -17,9 +19,13 @@ class BaseCryptoManager:
         self,
         database: BaseCryptoDatabase,
         jwt_backend: JWTBackend,
+        etherscan_client: EtherscanClient,
+        infura_client: InfuraClient,
     ):
         self.ethereum_db = database
         self.jwt_backend = jwt_backend
+        self.etherscan_client = etherscan_client
+        self.infura_client = infura_client
 
     async def generate_private_key(self, wallet: WalletCreate) -> WalletCreate:
         hex_string = secrets.token_hex(32)
@@ -29,36 +35,40 @@ class BaseCryptoManager:
 
     @staticmethod
     async def get_wallet_address(private_key, wallet: WalletCreate) -> WalletCreate:
-        account = Account.from_key(private_key)
-        wallet.wallet_address = account.address
+        try:
+            account = Account.from_key(private_key)
+            wallet.address = account.address
+        except Exception as ex:
+            raise InvalidPrivateKeyException(message=str(ex))
         return wallet
 
     @abstractmethod
     async def create_new_wallet(self, db: Session, data: dict) -> Wallet:
-        """
-
-        :param db:
-        :param data:
-        :return:
-        """
+        pass
 
     @abstractmethod
-    async def import_existing_wallet(self, db: Session, wallet: WalletCreate):
-        """
-
-        :param db:
-        :param wallet:
-        :return:
-        """
+    async def import_existing_wallet(self, db: Session, wallet: WalletCreate) -> Wallet:
+        pass
 
 
 class EthereumManager(BaseCryptoManager):
     async def create_new_wallet(self, db: Session, wallet: WalletCreate) -> Wallet:
-        wallet = await self.generate_private_key(wallet)
-        return await self.ethereum_db.create_wallet(wallet, db)
+        generated_wallet = await self.generate_private_key(wallet)
+        return await self.ethereum_db.create_wallet(db, generated_wallet)
 
     async def import_existing_wallet(self, db: Session, wallet: WalletCreate) -> Wallet:
-        if await self.ethereum_db.get_wallet_by_private_key(wallet.private_key, db):
+        if await self.ethereum_db.get_wallet(db, wallet.private_key, wallet.user_id):
             raise WalletAlreadyExistException()
-        wallet = await self.get_wallet_address(wallet.private_key, wallet)
-        return await self.ethereum_db.create_wallet(wallet, db)
+        generated_wallet = await self.get_wallet_address(wallet.private_key, wallet)
+        generated_wallet.balance = await self.infura_client.get_balance(generated_wallet.address)
+        created_wallet = await self.ethereum_db.create_wallet(db, generated_wallet)
+        transactions = await self.etherscan_client.get_list_transactions(created_wallet.address)
+        if transactions:
+            await self.ethereum_db.create_transaction(db, transactions)
+        return created_wallet
+
+    async def get_all_users_wallets(self, db: Session, user_id: str) -> List[Wallet]:
+        return await self.ethereum_db.get_wallets(db, user_id)
+
+    async def get_transactions_by_wallet_address(self, db: Session, address: str) -> List[Transaction]:
+        return await self.ethereum_db.get_transactions(db, address)

@@ -16,3 +16,7 @@ class AssetType(enum.Enum):
 
 class AssetStandard(enum.Enum):
     pass
+
+
+class TransactionFee(enum.Enum):
+    CRYPTOCURRENCY = "CRYPTOCURRENCY"
