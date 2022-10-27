@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi_helper.schemas.examples_generate import examples_generate
 from sqlalchemy.orm import Session
 from starlette import status
@@ -51,9 +51,11 @@ async def register(
 )
 async def login(
     user: schemas.UserLogin,
+    response: Response,
     user_manager: UserManager = Depends(get_user_manager),
     db: Session = Depends(get_db),
 ):
     result = await user_manager.login(user, db)
     result[0]["access_token"] = result[-1]
+    response.set_cookie(key="Authorization", value=f'Bearer {result[0]["access_token"]}')
     return result[0]

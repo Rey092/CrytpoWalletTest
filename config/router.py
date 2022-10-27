@@ -2,8 +2,8 @@
 from fastapi.routing import APIRouter
 
 from apps.crypto.views import ethereum_router
-from apps.users.profile_views import profile_router
-from apps.users.views import auth_router
+from apps.users.views_auth import auth_router
+from apps.users.views_profile import profile_router
 
 api_router = APIRouter(prefix="/api")
 

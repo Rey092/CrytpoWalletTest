@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from typing import Any
 from uuid import UUID
 
 from fastapi_helper.schemas.camel_schema import ApiSchema
@@ -26,3 +27,11 @@ class UserLogin(ApiSchema):
 class UserLoginResponse(ApiSchema):
     id: UUID
     access_token: str
+
+
+class UserDetail(ApiSchema):
+    id: UUID
+    email: EmailStr
+    username: str
+    avatar: Any
+    count_messages: Any

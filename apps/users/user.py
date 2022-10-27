@@ -1,65 +1,42 @@
-# # -*- coding: utf-8 -*-
-# from typing import Optional
-#
-# from fastapi import Depends
-#
-# from apps.users.api_errors import AuthApiErrors
-# from apps.users.jwt_backend import get_jwt_backend
-# from apps.users.models import User
-# from apps.users.schemas import UserPayload
-# from config.openapi import jwt_http_bearer, jwt_http_bearer_no_error
-#
-# # async def get_authenticated_user(
-# #         request: Request,
-# #         token: str = Depends(oauth2_scheme),
-# #         jwt_backend=Depends(get_jwt_backend),
-# # ) -> User:
-# #     print(token)
-# #     result = await jwt_backend.decode_token(token)
-# #     if not result:
-# #         raise AuthApiErrors.INVALID_CREDENTIALS.http_exception()
-# #     user = await User.get(id=result["id"], email=result["email"])
-# #     if not user:
-# #         raise Exception("User not found")
-# #
-# #     return user
-#
-#
-# async def get_user_payload(
-#     jwt_backend=Depends(get_jwt_backend),
-#     bearer: Optional[str] = Depends(jwt_http_bearer_no_error),
-# ) -> Optional[UserPayload]:
-#     if bearer:
-#         if token := bearer.credentials:  # noqa
-#             if data := await jwt_backend.decode_token(token):
-#                 return UserPayload(**data)
-#             raise AuthApiErrors.INVALID_CREDENTIALS.http_exception()
-#
-#     return None
-#
-#
-# async def get_user(
-#     user_payload: Optional[UserPayload] = Depends(get_user_payload),
-# ) -> Optional[User]:
-#     if user_payload:
-#         return await user_payload.get_instance()
-#
-#     return None
-#
-#
-# async def get_authenticated_user_payload(
-#     jwt_backend=Depends(get_jwt_backend),
-#     bearer: str = Depends(jwt_http_bearer),
-# ) -> UserPayload:
-#     if token := bearer.credentials:  # noqa
-#         if data := await jwt_backend.decode_token(token):
-#             return UserPayload(**data)
-#         raise AuthApiErrors.INVALID_CREDENTIALS.http_exception()
-#     raise AuthApiErrors.NOT_AUTHENTICATED.http_exception()
-#
-#
-# async def get_authenticated_user(
-#     user_payload: UserPayload = Depends(get_authenticated_user_payload),
-# ) -> User:
-#     user = await user_payload.get_instance()
-#     return user
+# -*- coding: utf-8 -*-
+from typing import Optional
+
+from fastapi import Depends
+from fastapi.security import OAuth2
+from fastapi.security.utils import get_authorization_scheme_param
+from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException, UnauthorizedException
+from starlette.requests import Request
+
+from apps.users.dependencies import get_jwt_backend
+from apps.users.jwt_backend import JWTBackend
+from apps.users.schemas import UserDetail
+
+
+class OAuth2PasswordBearerCookie(OAuth2):
+    async def __call__(self, request: Request) -> Optional[str]:
+        cookie_authorization: str = request.cookies.get("Authorization")
+        cookie_scheme, cookie_param = get_authorization_scheme_param(
+            cookie_authorization,
+        )
+        if not cookie_authorization or cookie_scheme.lower() != "bearer":
+            if self.auto_error:
+                raise UnauthorizedException()
+            else:
+                return None
+        return cookie_param
+
+
+auth_bearer = OAuth2PasswordBearerCookie()
+
+
+async def get_current_user(
+    token: str = Depends(auth_bearer),
+    jwt_backend: JWTBackend = Depends(get_jwt_backend),
+) -> UserDetail:
+    try:
+        payload = await jwt_backend.decode_token(token)
+        if payload is None:
+            raise InvalidCredentialsException()
+        return UserDetail(**payload)
+    except Exception:
+        raise InvalidCredentialsException()

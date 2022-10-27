@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import inspect
-from dataclasses import dataclass
 from typing import Optional, Type
 
 from fastapi import Form
@@ -10,7 +9,6 @@ from fastapi.security.utils import get_authorization_scheme_param
 from humps import camelize  # noqa
 from pydantic import BaseModel
 from pydantic.fields import ModelField
-from starlette import status
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
@@ -75,47 +73,6 @@ metadata_tags = [
 ]
 
 
-@dataclass
-class ApiError:
-    code: str
-    type: str
-    message: str
-    exception: Type[Exception]
-    status_code: Optional[int] = status.HTTP_400_BAD_REQUEST
-
-    def example(self):
-        example = {
-            "summary": self.type,
-            "value": {
-                "detail": [
-                    {
-                        "code": self.code,
-                        "type": self.type,
-                        "message": self.message,
-                    },
-                ],
-            },
-        }
-        return example
-
-    def http_exception(self, message=None, headers=None):
-
-        data = {
-            "status_code": self.status_code,
-            "detail": [
-                {
-                    "code": self.code,
-                    "type": self.type,
-                    "message": str(message) if message is not None and str(message) else self.message,
-                },
-            ],
-        }
-        return HTTPException(**data, headers=headers)
-
-    def __hash__(self):
-        return hash(self.code + self.type + self.message + str(self.status_code))
-
-
 class JwtHTTPBearer(HTTPBearer):
     async def __call__(
         self,
@@ -147,7 +104,7 @@ class JwtHTTPBearer(HTTPBearer):
                 )
             else:
                 return None
-        return HTTPAuthorizationCredentials(scheme=scheme, credentials=credentials)
+        return None
 
 
 jwt_http_bearer = JwtHTTPBearer()
