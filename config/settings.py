@@ -94,10 +94,10 @@ class Settings(BaseSettings):
     limit_register_seconds: int = 60
 
     # Ethereum settings
-    # eth_api_url: str
-    eth_api_key: Optional[str] = None
-    # etherscan_api_url: str
-    # etherscan_api_key: str
+    infura_api_url: str
+    infura_api_key: str
+    etherscan_api_url: str
+    etherscan_api_key: str
 
     # Digital ocean SPACES
     # spaces_space_name: str
