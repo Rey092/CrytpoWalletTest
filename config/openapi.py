@@ -30,6 +30,10 @@ metadata_tags = [
         "name": "Auth",
         "description": "Authentication and authorization for users.",
     },
+    {
+        "name": "Ethereum",
+        "description": "Create and import wallets. Get all wallets. Get transactions by wallet. Send transaction",
+    },
     # {
     #     "name": "MobileAuth",
     #     "description": "Roman // Authentication and authorization for mobile users.",

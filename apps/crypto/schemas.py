@@ -14,10 +14,17 @@ class AssetCreate(ApiSchema):
     is_currency: bool
 
 
+class Wallet(ApiSchema):
+    id: UUID
+    address: str
+    balance: float
+
+
 class WalletCreate(ApiSchema):
-    wallet_address: str = None
     private_key: str = None
+    address: str = None
     user_id: str
+    balance: float = 0
 
 
 class WalletImport(ApiSchema):
@@ -25,8 +32,20 @@ class WalletImport(ApiSchema):
 
 
 class WalletCreateResponse(ApiSchema):
+    address: str
     message: str = "The new wallet has been successfully created."
 
 
 class WalletImportResponse(WalletCreateResponse):
+    address: str
     message: str = "The wallet has been successfully imported."
+
+
+class Transaction(ApiSchema):
+    txn_hash: str
+    address_from: str
+    address_to: str
+    value: float
+    age: int
+    txn_fee: str
+    status: bool
