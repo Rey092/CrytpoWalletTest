@@ -5,7 +5,7 @@ from fastapi_helper.schemas.examples_generate import ExamplesGenerate
 from apps.crypto.database import EthereumDatabase
 from apps.crypto.manager import EthereumManager
 from apps.crypto.models import Asset, Transaction, Wallet
-from apps.crypto.web3_client import EtherscanClient, InfuraClient
+from apps.crypto.web3_clients import EtherscanClient, InfuraClient
 from apps.users.dependencies import get_jwt_backend
 from config.db import SessionLocal
 

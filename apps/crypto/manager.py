@@ -8,10 +8,15 @@ from sqlalchemy.orm import Session
 
 from ..users.jwt_backend import JWTBackend
 from .database import BaseCryptoDatabase
-from .exceptions import InvalidPrivateKeyException, WalletAlreadyExistException
+from .exceptions import (
+    InvalidPrivateKeyException,
+    InvalidSenderException,
+    InvalidValueException,
+    WalletAlreadyExistException,
+)
 from .models import Transaction, Wallet
-from .schemas import WalletCreate
-from .web3_client import EtherscanClient, InfuraClient
+from .schemas import TransactionCreate, WalletCreate
+from .web3_clients import EtherscanClient, InfuraClient
 
 
 class BaseCryptoManager:
@@ -57,7 +62,7 @@ class EthereumManager(BaseCryptoManager):
         return await self.ethereum_db.create_wallet(db, generated_wallet)
 
     async def import_existing_wallet(self, db: Session, wallet: WalletCreate) -> Wallet:
-        if await self.ethereum_db.get_wallet(db, wallet.private_key, wallet.user_id):
+        if await self.ethereum_db.get_wallet_by_private_key(db, wallet.private_key, wallet.user_id):
             raise WalletAlreadyExistException()
         generated_wallet = await self.get_wallet_address(wallet.private_key, wallet)
         generated_wallet.balance = await self.infura_client.get_balance(generated_wallet.address)
@@ -72,3 +77,17 @@ class EthereumManager(BaseCryptoManager):
 
     async def get_transactions_by_wallet_address(self, db: Session, address: str) -> List[Transaction]:
         return await self.ethereum_db.get_transactions(db, address)
+
+    async def send_transaction(self, db: Session, transaction_create: TransactionCreate) -> dict:
+        if transaction_create.value < 0:
+            raise InvalidValueException(message="The value cannot be less than zero.")
+        wallet_from = await self.ethereum_db.get_wallet_by_address(db, transaction_create.address_from)
+        if not wallet_from:
+            raise InvalidSenderException()
+        if (wallet_from.balance - 0.001) < transaction_create.value:
+            raise InvalidValueException(message="The value exceeds the balance of the wallet.")
+        txn_hash = await self.infura_client.send_raw_transaction(transaction_create, wallet_from)
+        return {"txn_hash": txn_hash}
+
+    async def check_transactions_in_block(self, db: Session, block_hash: str):
+        pass

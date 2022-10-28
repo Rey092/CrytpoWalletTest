@@ -25,7 +25,11 @@ class BaseCryptoDatabase(ABC):
         pass
 
     @abstractmethod
-    async def get_wallet(self, db: Session, private_key: str, user_id: str) -> Wallet:
+    async def get_wallet_by_private_key(self, db: Session, private_key: str, user_id: str) -> Wallet:
+        pass
+
+    @abstractmethod
+    async def get_wallet_by_address(self, db: Session, address: str) -> Wallet:
         pass
 
     @abstractmethod
@@ -56,7 +60,7 @@ class EthereumDatabase(BaseCryptoDatabase):
         db.refresh(db_wallet)
         return db_wallet
 
-    async def get_wallet(self, db: Session, private_key: str, user_id: str) -> Wallet:
+    async def get_wallet_by_private_key(self, db: Session, private_key: str, user_id: str) -> Wallet:
         return (
             db.query(self.wallet)
             .filter(
@@ -65,6 +69,9 @@ class EthereumDatabase(BaseCryptoDatabase):
             )
             .first()
         )
+
+    async def get_wallet_by_address(self, db: Session, address: str) -> Wallet:
+        return db.query(self.wallet).filter(self.wallet.address == address).first()
 
     async def get_wallets(self, db: Session, user_id: str) -> List[Wallet]:
         return db.query(self.wallet).filter(self.wallet.user_id == user_id).all()
@@ -95,10 +102,8 @@ class EthereumDatabase(BaseCryptoDatabase):
             db.query(self.transaction)
             .order_by(desc(self.transaction.block_number))
             .filter(
-                (self.transaction.address_from == address) | (self.transaction.address_to == address),
+                (self.transaction.address_from == address.lower()) | (self.transaction.address_to == address.lower()),
             )
             .all()
         )
-        for transaction in transactions:
-            transaction.txn_fee = format(float(transaction.txn_fee), ".8f")
         return transactions

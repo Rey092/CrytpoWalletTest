@@ -22,45 +22,8 @@
 #                 message = await asyncio.wait_for(websocket.recv(), timeout=2)
 #                 response = json.loads(message)
 #                 block_number = response["params"]["result"]["number"]
-#                 await get_transactions_by_block(block_number)
-#             except:
+#             except Exception:
 #                 pass
-#
-#
-# def get_transaction():
-#     url = "https://eth.getblock.io/sepolia/?api_key=96057970-171d-440d-a450-c5b0053600b3"
-#     with httpx.Client() as client:
-#         json = {
-#             "jsonrpc": "2.0",
-#             "method": "eth_getBlockByHash",
-#             "params": ["0x28576d589227244fd15b86296d63a905e4033b8da3808bef81ce64bf011f453a", True],
-#             "id": "etblock.io",
-#         }
-#         response = client.post(url, json=json)
-#     return response.text
-#
-#
-# async def get_transactions_by_block(block_hash):
-#     try:
-#         transactions = w3.eth.get_block(block_hash, True)["transactions"]
-#     except:
-#         print("Возникла какая-то ошибка...")
-#         return
-#
-#     if transactions:
-#         for transaction in transactions:
-#             print(f'Address from: {transaction["from"]}')
-#             print(f'Address to: {transaction["to"]}')
-#             if (
-#                 transaction["to"] == "0x71Df913fab8083A7ed2529fd02eebEcB066E7549"
-#                 or transaction["from"] == "0x71Df913fab8083A7ed2529fd02eebEcB066E7549"
-#             ):
-#                 print(f'Ура, есть совпадение! Вот нужная транзакция: {transaction.get("hash").hex()}')
-#             else:
-#                 print("Совпадений нет =(")
-#             print("------------------------------------------------------------")
-#     else:
-#         print("Транзакций в блоке нет!")
 #
 #
 # if __name__ == "__main__":
