@@ -29,6 +29,10 @@ class UserLoginResponse(ApiSchema):
     access_token: str
 
 
+class UserLogoutResponse(ApiSchema):
+    message: str = "Success!"
+
+
 class UserDetail(ApiSchema):
     id: UUID
     email: EmailStr

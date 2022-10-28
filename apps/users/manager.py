@@ -34,7 +34,6 @@ class UserManager:
 
     async def get_user(self, user_id: UUID4, db: Session):
         """
-
         :param user_id:
         :param db:
         :return:
@@ -69,12 +68,8 @@ class UserManager:
             raise UsernameInvalidException()
         user_create.password1 = self.password_helper.hash(user_create.password1)
         created_user = await self.user_db.create(user_create, db=db)
-        payload = {
-            "id": str(created_user.id),
-            "username": created_user.username,
-            "avatar": created_user.avatar,
-        }
-        access_token = self.jwt_backend.create_access_token(payload)
+        user_data = jsonable_encoder(created_user)
+        access_token = self.jwt_backend.create_access_token(user_data)
         email_client = create_email_client()
         background_tasks.add_task(
             email_client.send_email_to_new_user,
@@ -83,14 +78,14 @@ class UserManager:
                 username=created_user.username,
             ),
         )
-        return payload, access_token
+        return user_data, access_token
 
     async def login(self, user_login: UserLogin, db: Session) -> tuple[dict, str]:
         """
 
         :param user_login:
         :param db:
-        :return:
+        :return: user data and access token
         """
         user = await self.user_db.get_user_by_email(email=user_login.email, db=db)
         if user is None:

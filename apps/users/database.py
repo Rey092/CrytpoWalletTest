@@ -11,17 +11,14 @@ from sqlalchemy.orm import Session
 from apps.users.models import Permission, User
 from apps.users.schemas import UserRegister
 
-# from fastapi_users.db import BaseUserDatabase
-
-
 UD = TypeVar("UD")
 
 
 class UserDatabase:
     """
-    Database adapter for SQLAlchemy ORM.
 
     :param user_model: user model.
+    :param permission_model: permission_model
 
     """
 
@@ -43,7 +40,7 @@ class UserDatabase:
         db.commit()
         db.refresh(db_user)
         await self.create_user_permission(db_user.id, db)
-        return db_user
+        return db.query(self.model).filter(self.model.email == db_user.email).first()
 
     async def create_user_permission(self, user_id: UUID4, db: Session) -> Permission:
         db_permission = self.permission(has_access_chat=False, user_id=user_id)

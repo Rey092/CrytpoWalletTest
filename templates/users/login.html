@@ -1,4 +1,4 @@
-{% extends "base_auth.html" %}
+{% extends "elements/base_auth.html" %}
 
 {% block title %}
 Login
@@ -10,8 +10,10 @@ Login
         <div class="brand-logo">
             <h2 class="brand-text text-dark ms-1">Вход</h2>
         </div>
+        <div class="form-error text-center" style="color: red;">
 
-        <form class="auth-login-form mt-2" method="POST"
+        </div>
+        <form class="auth-login-form mt-2" id="login-form" method="POST"
               novalidate="novalidate">
             <div class="mb-1">
                 <label for="login-email" class="form-label">Email</label>
@@ -44,14 +46,14 @@ Login
                     <label class="form-check-label" for="remember-me">Запомнить меня</label>
                 </div>
             </div>
-            <button id="login" class="btn btn-primary w-100 waves-effect waves-float waves-light" tabindex="4">
+            <a id="login" class="btn btn-primary w-100 waves-effect waves-float waves-light" tabindex="4">
                 Войти
-            </button>
+            </a>
         </form>
 
         <p class="text-center mt-2">
             <span>Впервые на нашей платформе?</span>
-            <a href="/auth/registration">
+            <a href="/front/auth/registration">
                 <span>Завести аккаунт</span>
             </a>
         </p>
@@ -61,16 +63,18 @@ Login
 
 {% block scripts %}
 <script>
+
     $("#login").on('click', function () {
         const email = $('#login-email').val()
         const password = $('#login-password').val()
         ajax_login(email, password)
     });
 
+
     function ajax_login(email, password) {
         $.ajax({
             type: "POST",
-            url: "/login/",
+            url: "/api/auth/login",
             dataType: "json",
             contentType: "application/json",
             data: JSON.stringify({
@@ -78,13 +82,45 @@ Login
                 password: password
             }),
             success: function (response) {
-                console.log(response)
-                location.reload()
+                if ('id' in response) {
+                    location.reload()
+                }
             },
             error: function (response) {
-                console.log(response.error)
+                if (response.status === 401) {
+                    console.log(response.status + ' ' + response.statusText);
+                    $(".form-error").append(
+                        '<span id="login-password-error" class="error">' + response.statusText + '</span>'
+                    )
+                }
             }
         })
     }
+
+    $("#login-form").validate({
+        rules: {
+            'login-email': {
+                required: true,
+                email: true
+            },
+
+            'login-password': {
+                required: true,
+            },
+
+        },
+        messages: {
+            'login-email': {
+                required: "Это поле обязательно к заполнению.",
+                email: "Пожалуйста, введите действительный адрес электронной почты."
+            },
+            'login-password': {
+                required: "Это поле обязательно к заполнению.",
+            },
+
+        }
+    });
 </script>
+
+
 {% endblock %}
