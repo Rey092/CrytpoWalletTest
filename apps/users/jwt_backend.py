@@ -39,7 +39,7 @@ class JWTBackend:
         if expiration_delta:
             exp = datetime.utcnow() + timedelta(seconds=expiration_delta)
         else:
-            exp = datetime.utcnow() + timedelta(seconds=15)
+            exp = datetime.utcnow() + timedelta(days=1)
         payload |= {"iat": iat, "exp": exp}
         token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
