@@ -24,9 +24,17 @@ class UserLogin(ApiSchema):
     password: str
 
 
+class UserUpdate(ApiSchema):
+    username: str
+
+
 class UserLoginResponse(ApiSchema):
     id: UUID
     access_token: str
+
+
+class UserLogoutResponse(ApiSchema):
+    message: str = "Success!"
 
 
 class UserDetail(ApiSchema):

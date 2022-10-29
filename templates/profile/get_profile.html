@@ -1,0 +1,24 @@
+{% extends 'elements/base.html' %}
+
+
+{% block scripts %}
+<script>
+    $("#logout").on('click', function () {
+        ajax_logout()
+    });
+
+    function ajax_logout() {
+        $.ajax({
+            type: "GET",
+            url: "/api/auth/logout",
+            success: function (response) {
+                console.log(response)
+                location.reload()
+            },
+            error: function (response) {
+            }
+        })
+    }
+</script>
+
+{% endblock %}

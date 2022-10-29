@@ -10,7 +10,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi_helper import DefaultHTTPException
 from fastapi_helper.exceptions.validation_exceptions import init_validation_handler
+from starlette.staticfiles import StaticFiles
 
+from apps.front.router import front_router
 from apps.users import models
 
 # from config.celery_utils import create_celery
@@ -30,6 +32,7 @@ from config.router import api_router
 
 def init_routers(app_: FastAPI) -> None:
     app_.include_router(api_router)
+    app_.include_router(front_router)
 
 
 def init_database() -> None:
@@ -99,6 +102,7 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.exception_handler(DefaultHTTPException)

@@ -1,4 +1,4 @@
-{% extends "base_auth.html" %}
+{% extends "elements/base_auth.html" %}
 
 {% block title %}
 Registration
@@ -12,7 +12,7 @@ Registration
         </div>
 
 
-        <form class="auth-register-form mt-2" action="#" method="POST" novalidate="novalidate">
+        <form class="auth-register-form mt-2" id="register-form" method="POST" novalidate="novalidate">
             <div class="mb-1">
                 <label for="register-email" class="form-label">Email</label>
                 <input type="text" class="form-control" id="register-email" name="register-email"
@@ -42,11 +42,11 @@ Registration
                 </div>
             </div>
             <div class="mb-1">
-                <label for="register-password" class="form-label">Password</label>
+                <label for="register-password2" class="form-label">Confirm password</label>
 
                 <div class="input-group input-group-merge form-password-toggle">
-                    <input type="password" class="form-control form-control-merge" id="register-password"
-                           name="register-password" placeholder="············" aria-describedby="register-password"
+                    <input type="password" class="form-control form-control-merge" id="register-password2"
+                           name="register-password2" placeholder="············" aria-describedby="register-password"
                            tabindex="3">
                     <span class="input-group-text cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="14"
                                                                        height="14" viewBox="0 0 24 24" fill="none"
@@ -57,13 +57,13 @@ Registration
                                                                                             r="3"></circle></svg></span>
                 </div>
             </div>
-            <button class="btn btn-primary w-100 waves-effect waves-float waves-light" tabindex="5">
+            <a class="btn btn-primary w-100 waves-effect waves-float waves-light" id="register" tabindex="5">
                 Зарегистрироваться
-            </button>
+            </a>
         </form>
         <p class="text-center mt-2">
             <span>У вас уже есть аккаунт?</span>
-            <a href="/auth/login">
+            <a href="/front/auth/login">
                 <span>Войти</span>
             </a>
         </p>
@@ -72,4 +72,82 @@ Registration
 {% endblock %}
 
 {% block scripts %}
+<script>
+
+    $("#register").on('click', function () {
+
+        const email = $('#register-email').val()
+        const username = $('#register-username').val()
+        const password1 = $('#register-password').val()
+        const password2 = $('#register-password2').val()
+        ajax_register(email, password1, password2, username)
+
+    });
+
+
+    function ajax_register(email, password1, password2, username) {
+        $.ajax({
+            type: "POST",
+            url: "/api/auth/register",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify({
+                email: email,
+                password1: password1,
+                password2: password2,
+                username: username
+
+            }),
+            success: function (response) {
+                if ('id' in response) {
+                    location.reload()
+                }
+            },
+            error: function (response) {
+                console.log(response.status + ' ' + response.statusText);
+                if (response.status === 401) {
+                    console.log(response.status + ' ' + response.statusText);
+                    $(".form-error").append(
+                        '<span id="login-password-error" class="error">' + response.statusText + '</span>'
+                    )
+                }
+            }
+        })
+    }
+
+    $("#register-form").validate({
+        rules: {
+            'register-email': {
+                required: true,
+                email: true
+            },
+            'register-username': {
+                required: true,
+            },
+            'register-password': {
+                required: true,
+            },
+            'register-password2': {
+                required: true,
+            },
+        },
+        messages: {
+            'login-email': {
+                required: "Это поле обязательно к заполнению.",
+                email: "Пожалуйста, введите действительный адрес электронной почты."
+            },
+            'login-username': {
+                required: "Это поле обязательно к заполнению.",
+            },
+            'login-password': {
+                required: "Это поле обязательно к заполнению.",
+            },
+            'login-password2': {
+                required: "Это поле обязательно к заполнению.",
+            },
+
+
+        }
+    });
+</script>
 {% endblock %}

@@ -2,26 +2,22 @@
 """
 FastAPI Users database adapter for SQLAlchemy ORM.
 """
-import random
 from typing import Type, TypeVar
 
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from apps.users.models import Permission, User
-from apps.users.schemas import UserRegister
-
-# from fastapi_users.db import BaseUserDatabase
-
+from apps.users.schemas import UserRegister, UserUpdate
 
 UD = TypeVar("UD")
 
 
 class UserDatabase:
     """
-    Database adapter for SQLAlchemy ORM.
 
     :param user_model: user model.
+    :param permission_model: permission_model
 
     """
 
@@ -43,7 +39,7 @@ class UserDatabase:
         db.commit()
         db.refresh(db_user)
         await self.create_user_permission(db_user.id, db)
-        return db_user
+        return db.query(self.model).filter(self.model.email == db_user.email).first()
 
     async def create_user_permission(self, user_id: UUID4, db: Session) -> Permission:
         db_permission = self.permission(has_access_chat=False, user_id=user_id)
@@ -56,36 +52,12 @@ class UserDatabase:
         db.query(self.permission).filter(self.permission.user_id == user_id).update({"has_access_chat": True})
         db.commit()
 
-    async def generate_nickname_number(self, nickname: str) -> str:
-        query = self.model.filter(nickname__iexact=nickname).values("nickname_number")
-        nickname_numbers = list(await query)
-        while True:
-            nickname_number = random.randint(0, 9999)
-            if nickname_number not in nickname_numbers:
-                break
-        return str(nickname_number).zfill(4)
-
-    async def update(self, user: UD) -> UD:
-        raise NotImplementedError
-        # user_dict = user.dict()
-        # user_dict.pop("id")  # Tortoise complains if we pass the PK again
-        # oauth_accounts = user_dict.pop("oauth_accounts", None)
-        #
-        # model = await self.model.get(id=user.id)
-        # for field in user_dict:
-        #     setattr(model, field, user_dict[field])
-        # await model.save()
-        #
-        # if oauth_accounts and self.oauth_account_model:
-        #     await model.oauth_accounts.all().delete()  # type: ignore
-        #     oauth_account_objects = []
-        #     for oauth_account in oauth_accounts:
-        #         oauth_account_objects.append(
-        #             self.oauth_account_model(user=model, **oauth_account),
-        #         )
-        #     await self.oauth_account_model.bulk_create(oauth_account_objects)
-        #
-        # return user
+    async def update(self, user_id: UUID4, user_data: UserUpdate, db: Session):
+        db.query(self.model).filter(self.model.id == user_id).update(
+            {"username": user_data.username},
+        )
+        db.commit()
+        return db.query(self.model).filter(self.model.id == user_id).first()
 
     async def delete(self, user: UD) -> None:
         await self.model.filter(id=user.id).delete()
