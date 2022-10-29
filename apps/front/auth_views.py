@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Request
-from pydantic import BaseModel
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
@@ -18,9 +17,6 @@ async def login(request: Request):
 
 @auth_front_router.get("/registration", response_class=HTMLResponse)
 async def registration(request: Request):
+    if request.cookies.get("Authorization"):
+        return RedirectResponse("/front/profile/get")
     return templates.TemplateResponse("users/registration.html", {"request": request})
-
-
-class User(BaseModel):
-    email: str
-    password: str

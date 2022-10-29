@@ -17,7 +17,7 @@ from .exceptions import (
     UsernameInvalidException,
 )
 from .jwt_backend import JWTBackend
-from .schemas import UserLogin, UserRegister
+from .schemas import UserLogin, UserRegister, UserUpdate
 from .utils.validators import validate_email_, validate_password, validate_username
 
 
@@ -96,6 +96,16 @@ class UserManager:
         user_data = jsonable_encoder(user)
         access_token = self.jwt_backend.create_access_token(user_data)
         return user_data, access_token
+
+    async def update(self, user_id: UUID4, user_data: UserUpdate, db: Session):
+        """
+        :param user_id:
+        :param user_data:
+        :param db:
+        :return:
+        """
+        user = await self.user_db.update(user_id=user_id, user_data=user_data, db=db)
+        return user
 
     async def update_permission(self, user_id: UUID4, db: Session):
         """

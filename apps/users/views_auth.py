@@ -36,6 +36,7 @@ auth_router = APIRouter()
 )
 async def register(
     user: schemas.UserRegister,
+    response: Response,
     background_tasks: BackgroundTasks,
     user_manager: UserManager = Depends(get_user_manager),
     db: Session = Depends(get_db),
@@ -43,6 +44,7 @@ async def register(
     result = await user_manager.create(user, db, background_tasks)
     result[0]["access_token"] = result[-1]
     background_tasks.add_task(update_permission, result[0]["id"], db, user_manager)
+    response.set_cookie(key="Authorization", value=f'Bearer {result[0]["access_token"]}')
     return result[0]
 
 
