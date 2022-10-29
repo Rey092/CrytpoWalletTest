@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decimal import Decimal
 from uuid import UUID
 
 from fastapi_helper.schemas.camel_schema import ApiSchema
@@ -14,6 +15,7 @@ class AssetCreate(ApiSchema):
     is_currency: bool
 
 
+# region Wallets
 class Wallet(ApiSchema):
     id: UUID
     address: str
@@ -41,11 +43,29 @@ class WalletImportResponse(WalletCreateResponse):
     message: str = "The wallet has been successfully imported."
 
 
+# endregion Wallets
+
+
+# region Transactions
 class Transaction(ApiSchema):
     txn_hash: str
     address_from: str
     address_to: str
     value: float
     age: int
-    txn_fee: str
+    txn_fee: Decimal
     status: bool
+
+
+class TransactionCreate(ApiSchema):
+    address_from: str
+    address_to: str
+    value: float
+
+
+class TransactionCreateResponse(ApiSchema):
+    txn_hash: str
+    message: str = "Transaction sent successfully."
+
+
+# endregion Transactions

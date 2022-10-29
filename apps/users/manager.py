@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from typing import Tuple
+
 from fastapi.encoders import jsonable_encoder
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
 from pydantic import UUID4
@@ -46,7 +48,7 @@ class UserManager:
         user_create: UserRegister,
         db: Session,
         background_tasks: BackgroundTasks,
-    ) -> tuple[dict, str]:
+    ) -> Tuple[dict, str]:
         """
 
         :param user_create:
@@ -80,7 +82,7 @@ class UserManager:
         )
         return user_data, access_token
 
-    async def login(self, user_login: UserLogin, db: Session) -> tuple[dict, str]:
+    async def login(self, user_login: UserLogin, db: Session) -> Tuple[dict, str]:
         """
 
         :param user_login:
