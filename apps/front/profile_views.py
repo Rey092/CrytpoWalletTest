@@ -13,7 +13,7 @@ templates = Jinja2Templates(directory="templates")
 async def get(request: Request):
     if request.cookies.get("Authorization"):
         return templates.TemplateResponse("profile/get_profile.html", {"request": request})
-    return RedirectResponse("/front/auth/login")
+    return RedirectResponse("/auth/login")
 
 
 class User(BaseModel):

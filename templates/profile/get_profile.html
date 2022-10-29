@@ -1,15 +1,228 @@
 {% extends 'elements/base.html' %}
 
 
+{% block content %}
+<div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0">
+        <div class="content-body">
+            <div class="row">
+                <div class="col-12">
+                    <!-- profile -->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">Профиль</h4>
+                        </div>
+                        <div class="card-body py-2 my-25">
+                            <!-- header section -->
+                            <div class="d-flex">
+                                <a href="#" class="me-25">
+                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
+                                         id="account-upload-img" class="uploadedAvatar rounded me-50"
+                                         alt="profile image" height="100" width="100">
+                                </a>
+                                <!-- upload and reset button -->
+                                <div class="d-flex align-items-end mt-75 ms-1">
+                                    <div>
+                                        <label for="account-upload"
+                                               class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Загрузить</label>
+                                        <input type="file" id="account-upload" hidden="" accept="image/*">
+                                        <button type="button" id="account-reset"
+                                                class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Удалить
+                                        </button>
+                                        <p class="mb-0">Допустимые типы файлов: png, jpg, jpeg.</p>
+                                    </div>
+                                </div>
+                                <!--/ upload and reset button -->
+                            </div>
+                            <!--/ header section -->
+
+                            <!-- form -->
+                            <form class="validate-form mt-2 pt-50" id="profile_update" novalidate="novalidate">
+                                <div class="row">
+                                    <div class="col-12 col-sm-6 mb-1">
+                                        <label class="form-label" for="username">Имя пользователя</label>
+                                        <input type="text" class="form-control" id="username" name="username"
+                                               placeholder="John" autocomplete="on" data-msg="Username">
+                                    </div>
+                                    <div class="col-12 col-sm-6 mb-1">
+                                        <label class="form-label" for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email"
+                                               placeholder="Email" readonly>
+                                    </div>
+                                    <div class="col-12 col-sm-6 mb-1">
+                                        <label for="new_password" class="form-label">Пароль</label>
+                                        <div class="input-group input-group-merge form-password-toggle">
+                                            <input type="password" class="form-control form-control-merge"
+                                                   id="new_password"
+                                                   autocomplete="new-password"
+                                                   name="new_password" placeholder="············"
+                                                   aria-describedby="password"
+                                                   tabindex="3">
+                                            <span class="input-group-text cursor-pointer"><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="14"
+                                                    height="14" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-eye"><path
+                                                    d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle
+                                                    cx="12" cy="12"
+                                                    r="3"></circle></svg></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 mb-1">
+                                        <label for="new_password2" class="form-label">Повторить пароль</label>
+                                        <div class="input-group input-group-merge form-password-toggle">
+                                            <input type="password" class="form-control form-control-merge"
+                                                   id="new_password2"
+                                                   name="new_password2" placeholder="············"
+                                                   aria-describedby="password"
+                                                   tabindex="3">
+                                            <span class="input-group-text cursor-pointer"><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="14"
+                                                    height="14" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-eye"><path
+                                                    d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle
+                                                    cx="12" cy="12"
+                                                    r="3"></circle></svg></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit"
+                                                class="btn btn-primary mt-1 me-1 waves-effect waves-float waves-light">
+                                            Сохранить изменения
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <!--/ form -->
+                        </div>
+                    </div>
+                    <!--                    end-->
+
+                    <!-- statistics account  -->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">Статистика</h4>
+                        </div>
+                        <div class="card-body py-2 my-25">
+                            <h4 id="messages">Сообщения в чате: 5</h4>
+                            <h4 id="wallets">Кошельки: 5</h4>
+                        </div>
+                    </div>
+                    <!--                    end-->
+                    <!--                    wallet-->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">Управление кошельками</h4>
+                        </div>
+                        <div class="card-body py-2 my-25">
+                            <div class="mt-1">
+                                <img src="{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}"
+                                     alt="avatar" height="40" width="40">
+                                <a href="https://etherscan.io/address/0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+                                   target="_blank">
+                                    0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B
+                                </a>
+                            </div>
+                            <div class="mt-1">
+                                <img src="{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}"
+                                     alt="avatar" height="40" width="40">
+                                <a href="https://etherscan.io/address/0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+                                   target="_blank">
+                                    0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B
+                                </a>
+                            </div>
+                            <div class="col-12 mt-1">
+                                <button class="btn btn-primary mt-1 waves-effect waves-float waves-light"
+                                        data-bs-toggle="modal" data-bs-target="#importWallet">
+                                    Импортировать ETH кошелек
+                                </button>
+                                <button class="btn btn-primary mt-1 waves-effect waves-float waves-light">
+                                    Добавить ETH кошелек
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    end-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="importWallet" tabindex="-1" aria-labelledby="addNewCardTitle" style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-transparent">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-sm-5 mx-50 pb-5">
+                <p class="text-center">Импортировать ETH кошелек</p>
+
+                <!-- form -->
+                <form id="addNewCardValidation" class="row gy-1 gx-2 mt-75" onsubmit="return false"
+                      novalidate="novalidate">
+                    <div class="col-12">
+                        <label class="form-label" for="modalAddCardNumber"></label>
+                        <div class="input-group input-group-merge">
+                            <input id="modalAddCardNumber" name="modalAddCard" class="form-control add-credit-card-mask"
+                                   type="text" placeholder="Enter private key" aria-describedby="modalAddCard2"
+                                   data-msg="Please enter your credit card number">
+                            <span class="input-group-text cursor-pointer p-25" id="modalAddCard2">
+                                                <span class="add-card-type"></span>
+                                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary me-1 mt-1 waves-effect waves-float waves-light">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
 {% block scripts %}
 <script>
+    const username = $("#username")
+    const email = $("#email")
+
+
     $("#logout").on('click', function () {
         ajax_logout()
     });
 
-    function ajax_logout() {
+
+    $(window).on('load', function () {
         $.ajax({
             type: "GET",
+            url: "/api/profile/get",
+            success: function (response) {
+                if ('id' in response) {
+                    username.val(response.username)
+                    email.val(response.email)
+                    $(".user-name").html(response.username)
+                }
+            },
+            error: function (response) {
+            }
+        })
+    });
+
+
+    function ajax_logout() {
+        $.ajax({
+            type: "POST",
             url: "/api/auth/logout",
             success: function (response) {
                 console.log(response)
@@ -19,6 +232,27 @@
             }
         })
     }
+
+    $("#profile_update").submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: "PUT",
+            url: "/api/profile/update",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify({
+                username: username.val(),
+            }),
+            success: function (response) {
+                console.log(response)
+                toastr.success('Данные профиля успешно обновлены', 'Успех')
+
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+    });
 </script>
 
 {% endblock %}

@@ -65,7 +65,7 @@ async def login(
     return result[0]
 
 
-@auth_router.get(
+@auth_router.post(
     "/logout",
     response_model=UserLogoutResponse,
 )

@@ -40,7 +40,7 @@ class JWTBackend:
             exp = datetime.utcnow() + timedelta(seconds=expiration_delta)
         else:
             exp = datetime.utcnow() + timedelta(days=1)
-        payload |= {"iat": iat, "exp": exp}
+        payload.update({"iat": iat, "exp": exp})
         token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
         return token
