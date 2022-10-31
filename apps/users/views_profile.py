@@ -17,7 +17,7 @@ async def get_profile(
     user_manager: UserManager = Depends(get_user_manager),
     db: Session = Depends(get_db),
 ):
-    user = await user_manager.get_user(user.id, db)
+    # user = await user_manager.get_user(user.id, db)
     return user
 
 

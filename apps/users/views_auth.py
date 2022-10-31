@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, BackgroundTasks, Depends, Response
+from fastapi_helper.exceptions.auth_http_exceptions import UnauthorizedException
 from fastapi_helper.schemas.examples_generate import examples_generate
 from sqlalchemy.orm import Session
 from starlette import status
@@ -49,6 +50,19 @@ async def register(
 
 
 @auth_router.post(
+    "/logout",
+    response_model=UserLogoutResponse,
+    responses=examples_generate.get_error_responses(
+        UnauthorizedException,
+        auth=False,
+    ),
+)
+async def logout(response: Response, user: User = Depends(get_current_user)):
+    response.delete_cookie("Authorization")
+    return user
+
+
+@auth_router.post(
     "/login",
     response_model=UserLoginResponse,
     responses=examples_generate.get_error_responses(auth=True),
@@ -63,12 +77,3 @@ async def login(
     result[0]["access_token"] = result[-1]
     response.set_cookie(key="Authorization", value=f'Bearer {result[0]["access_token"]}')
     return result[0]
-
-
-@auth_router.post(
-    "/logout",
-    response_model=UserLogoutResponse,
-)
-async def logout(response: Response, user: User = Depends(get_current_user)):
-    response.delete_cookie("Authorization")
-    return user

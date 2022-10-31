@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import Tuple
 
-from fastapi.encoders import jsonable_encoder
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
 from pydantic import UUID4
 from sqlalchemy.orm import Session
@@ -70,8 +69,12 @@ class UserManager:
             raise UsernameInvalidException()
         user_create.password1 = self.password_helper.hash(user_create.password1)
         created_user = await self.user_db.create(user_create, db=db)
-        user_data = jsonable_encoder(created_user)
-        access_token = self.jwt_backend.create_access_token(user_data)
+        payload = {
+            "id": str(created_user.id),
+            "username": created_user.username,
+            "avatar": created_user.avatar,
+        }
+        access_token = self.jwt_backend.create_access_token(payload)
         email_client = create_email_client()
         background_tasks.add_task(
             email_client.send_email_to_new_user,
@@ -80,7 +83,7 @@ class UserManager:
                 username=created_user.username,
             ),
         )
-        return user_data, access_token
+        return payload, access_token
 
     async def login(self, user_login: UserLogin, db: Session) -> Tuple[dict, str]:
         """
@@ -95,9 +98,13 @@ class UserManager:
         is_valid, needs_update = self.password_helper.verify_and_update(user_login.password, user.password)
         if not is_valid:
             raise InvalidCredentialsException()
-        user_data = jsonable_encoder(user)
-        access_token = self.jwt_backend.create_access_token(user_data)
-        return user_data, access_token
+        payload = {
+            "id": str(user.id),
+            "username": user.username,
+            "avatar": user.avatar,
+        }
+        access_token = self.jwt_backend.create_access_token(payload)
+        return payload, access_token
 
     async def update(self, user_id: UUID4, user_data: UserUpdate, db: Session):
         """

@@ -5,11 +5,13 @@ from fastapi import Depends
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException, UnauthorizedException
+from sqlalchemy.orm import Session
 from starlette.requests import Request
 
-from apps.users.dependencies import get_jwt_backend
+from apps.users.dependencies import get_db, get_jwt_backend, get_user_manager
 from apps.users.jwt_backend import JWTBackend
-from apps.users.schemas import UserDetail
+from apps.users.manager import UserManager
+from apps.users.schemas import User, UserPayload
 
 
 class OAuth2PasswordBearerCookie(OAuth2):
@@ -29,14 +31,30 @@ class OAuth2PasswordBearerCookie(OAuth2):
 auth_bearer = OAuth2PasswordBearerCookie()
 
 
-async def get_current_user(
+async def get_current_user_payload(
     token: str = Depends(auth_bearer),
     jwt_backend: JWTBackend = Depends(get_jwt_backend),
-) -> UserDetail:
+) -> UserPayload:
     try:
         payload = await jwt_backend.decode_token(token)
         if payload is None:
             raise InvalidCredentialsException()
-        return UserDetail(**payload)
+        return UserPayload(**payload)
     except Exception:
         raise InvalidCredentialsException()
+
+
+async def get_current_user(
+    payload: UserPayload = Depends(get_current_user_payload),
+    manager: UserManager = Depends(get_user_manager),
+    db: Session = Depends(get_db),
+) -> User:
+    user = await manager.get_user(user_id=payload.id, db=db)
+    permission = user.permission.has_access_chat
+    return User(
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        avatar=user.avatar,
+        has_access_chat=permission,
+    )
