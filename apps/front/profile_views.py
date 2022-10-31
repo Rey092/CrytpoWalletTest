@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from fastapi import APIRouter, Request
-from pydantic import BaseModel
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
@@ -14,8 +13,3 @@ async def get(request: Request):
     if request.cookies.get("Authorization"):
         return templates.TemplateResponse("profile/get_profile.html", {"request": request})
     return RedirectResponse("/auth/login")
-
-
-class User(BaseModel):
-    email: str
-    password: str

@@ -36,7 +36,6 @@ class ProjectInitialization:
         return db_asset
 
 
-#
 #     @classmethod
 #     async def create_superuser(cls):
 #         staff, created = await Staff.update_or_create(

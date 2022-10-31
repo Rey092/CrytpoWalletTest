@@ -6,7 +6,6 @@ from apps.crypto.database import EthereumDatabase
 from apps.crypto.manager import EthereumManager
 from apps.crypto.models import Asset, Transaction, Wallet
 from apps.crypto.web3_clients import EtherscanClient, InfuraClient
-from apps.users.dependencies import get_jwt_backend
 from config.db import SessionLocal
 
 
@@ -38,8 +37,7 @@ async def get_infura_client() -> InfuraClient:
 
 @alru_cache()
 async def get_ethereum_manager() -> EthereumManager:
-    jwt_backend = await get_jwt_backend()
     ethereum_db = await get_ethereum_db()
     etherscan_client = await get_etherscan_client()
     infura_client = await get_infura_client()
-    return EthereumManager(ethereum_db, jwt_backend, etherscan_client, infura_client)
+    return EthereumManager(ethereum_db, etherscan_client, infura_client)

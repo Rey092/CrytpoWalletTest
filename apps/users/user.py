@@ -2,6 +2,7 @@
 from typing import Optional
 
 from fastapi import Depends
+from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException, UnauthorizedException
@@ -11,7 +12,7 @@ from starlette.requests import Request
 from apps.users.dependencies import get_db, get_jwt_backend, get_user_manager
 from apps.users.jwt_backend import JWTBackend
 from apps.users.manager import UserManager
-from apps.users.schemas import User, UserPayload
+from apps.users.schemas import UserGet, UserPayload
 
 
 class OAuth2PasswordBearerCookie(OAuth2):
@@ -48,13 +49,7 @@ async def get_current_user(
     payload: UserPayload = Depends(get_current_user_payload),
     manager: UserManager = Depends(get_user_manager),
     db: Session = Depends(get_db),
-) -> User:
+) -> UserGet:
     user = await manager.get_user(user_id=payload.id, db=db)
-    permission = user.permission.has_access_chat
-    return User(
-        id=user.id,
-        email=user.email,
-        username=user.username,
-        avatar=user.avatar,
-        has_access_chat=permission,
-    )
+    has_access_chat = user.permission.has_access_chat
+    return UserGet(**jsonable_encoder(user), has_access_chat=has_access_chat)

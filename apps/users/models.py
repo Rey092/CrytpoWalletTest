@@ -19,8 +19,8 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     count_messages = Column(Integer)
 
-    permission = relationship("Permission", back_populates="user", uselist=False)
-    wallets = relationship("Wallet", back_populates="user")
+    permission = relationship("Permission", backref="user", uselist=False)
+    wallets = relationship("Wallet", backref="user")
 
 
 class Permission(Base):
@@ -29,5 +29,3 @@ class Permission(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     has_access_chat = Column(Boolean, default=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
-
-    user = relationship("User", back_populates="permission")

@@ -16,17 +16,17 @@ from apps.crypto.exceptions import (
 )
 from apps.crypto.manager import EthereumManager
 from apps.crypto.schemas import (
-    Transaction,
     TransactionCreate,
     TransactionCreateResponse,
-    Wallet,
+    TransactionDetail,
     WalletCreate,
     WalletCreateResponse,
+    WalletDetail,
     WalletImport,
     WalletImportResponse,
 )
 from apps.users.models import User
-from apps.users.user import get_current_user
+from apps.users.user import get_current_user_payload
 
 ethereum_router = APIRouter()
 
@@ -38,7 +38,7 @@ ethereum_router = APIRouter()
     response_model=WalletCreateResponse,
 )
 async def create_wallet(
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_payload),
     db: Session = Depends(get_db),
     ethereum_manager: EthereumManager = Depends(get_ethereum_manager),
 ):
@@ -62,7 +62,7 @@ async def create_wallet(
 )
 async def import_wallet(
     wallet_import: WalletImport,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_payload),
     db: Session = Depends(get_db),
     ethereum_manager: EthereumManager = Depends(get_ethereum_manager),
 ):
@@ -80,10 +80,10 @@ async def import_wallet(
 @ethereum_router.get(
     "/wallets",
     responses=examples_generate.get_error_responses(auth=True),
-    response_model=List[Wallet],
+    response_model=List[WalletDetail],
 )
 async def get_wallets(
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_user_payload),
     db: Session = Depends(get_db),
     ethereum_manager: EthereumManager = Depends(get_ethereum_manager),
 ):
@@ -97,11 +97,11 @@ async def get_wallets(
 @ethereum_router.get(
     "/transactions/{wallet_address}",
     responses=examples_generate.get_error_responses(auth=True),
-    response_model=List[Transaction],
+    response_model=List[TransactionDetail],
 )
 async def get_transactions(
     wallet_address: str,
-    user: User = Depends(get_current_user),  # noqa
+    user: User = Depends(get_current_user_payload),  # noqa
     db: Session = Depends(get_db),
     ethereum_manager: EthereumManager = Depends(get_ethereum_manager),
 ):
@@ -125,7 +125,7 @@ async def get_transactions(
 )
 async def send_transaction(
     transaction: TransactionCreate,
-    user: User = Depends(get_current_user),  # noqa
+    user: User = Depends(get_current_user_payload),  # noqa
     db: Session = Depends(get_db),
     ethereum_manager: EthereumManager = Depends(get_ethereum_manager),
 ):
