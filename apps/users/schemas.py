@@ -43,7 +43,7 @@ class UserPayload(ApiSchema):
     avatar: Any
 
 
-class User(ApiSchema):
+class UserGet(ApiSchema):
     id: UUID4
     email: EmailStr
     username: str

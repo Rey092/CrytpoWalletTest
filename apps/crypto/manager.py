@@ -6,7 +6,6 @@ from typing import List
 from eth_account import Account
 from sqlalchemy.orm import Session
 
-from ..users.jwt_backend import JWTBackend
 from .database import BaseCryptoDatabase
 from .exceptions import (
     InvalidPrivateKeyException,
@@ -23,12 +22,10 @@ class BaseCryptoManager:
     def __init__(
         self,
         database: BaseCryptoDatabase,
-        jwt_backend: JWTBackend,
         etherscan_client: EtherscanClient,
         infura_client: InfuraClient,
     ):
         self.ethereum_db = database
-        self.jwt_backend = jwt_backend
         self.etherscan_client = etherscan_client
         self.infura_client = infura_client
 
