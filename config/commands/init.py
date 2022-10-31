@@ -3,7 +3,7 @@ import logging
 
 from sqlalchemy.orm import Session
 
-from apps.crypto.crud import create_asset
+from apps.crypto.models import Asset
 
 # from asgi_lifespan import LifespanManager
 
@@ -23,8 +23,17 @@ class ProjectInitialization:
 
     @classmethod
     async def create_assets(cls, db: Session):
-        print("gi")
-        create_asset(db)
+        db_asset = Asset(
+            code="ETH",
+            network="ETHEREUM",
+            type="CURRENCY",
+            decimals=10**18,
+            is_currency=True,
+        )
+        db.add(db_asset)
+        db.commit()
+        db.refresh(db_asset)
+        return db_asset
 
 
 #
