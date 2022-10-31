@@ -11,12 +11,12 @@ templates = Jinja2Templates(directory="templates")
 @auth_front_router.get("/login", response_class=HTMLResponse)
 async def login(request: Request):
     if request.cookies.get("Authorization"):
-        return RedirectResponse("/front/profile/get")
+        return RedirectResponse("/profile/get")
     return templates.TemplateResponse("users/login.html", {"request": request})
 
 
 @auth_front_router.get("/registration", response_class=HTMLResponse)
 async def registration(request: Request):
     if request.cookies.get("Authorization"):
-        return RedirectResponse("/front/profile/get")
+        return RedirectResponse("/profile/get")
     return templates.TemplateResponse("users/registration.html", {"request": request})

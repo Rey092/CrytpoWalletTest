@@ -12,10 +12,10 @@
           rel="stylesheet">
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', path='/app-assets/vendors/css/vendors.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/extensions/toastr.min.css') }}">
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', path='/app-assets/vendors/css/charts/apexcharts.css') }}">
-    <link rel="stylesheet" type="text/css"
-          href="{{ url_for('static', path='/app-assets/vendors/css/extensions/toastr.min.css') }}">
+
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/bootstrap.css') }}">
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', path='/app-assets/css/bootstrap-extended.css') }}">
@@ -36,6 +36,7 @@
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', path='/app-assets/css/plugins/extensions/ext-component-toastr.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/assets/css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/plugins/extensions/ext-component-toastr.css') }}">
     <title>{% block title %}Crypto Wallet{% endblock %}</title>
     <style type="text/css">.apexcharts-canvas {
         position: relative;
@@ -698,7 +699,8 @@
     .contract-trigger:before {
         width: 200%;
         height: 200%;
-    }</style>
+    }
+    </style>
 </head>
 <!-- END: Head-->
 
@@ -750,6 +752,7 @@
 <script src="{{ url_for('static', path='/app-assets/vendors/js/extensions/toastr.min.js') }}"></script>
 <script src="{{ url_for('static', path='/app-assets/js/core/app-menu.js') }}"></script>
 <script src="{{ url_for('static', path='/app-assets/js/core/app.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-toastr.js') }}"></script>
 
 <script>
     $(window).on('load', function () {

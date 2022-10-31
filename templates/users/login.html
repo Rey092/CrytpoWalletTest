@@ -13,8 +13,7 @@ Login
         <div class="form-error text-center" style="color: red;">
 
         </div>
-        <form class="auth-login-form mt-2" id="login-form" method="POST"
-              novalidate="novalidate">
+        <form class="auth-login-form mt-2" id="login_form" method="post" novalidate="novalidate">
             <div class="mb-1">
                 <label for="login-email" class="form-label">Email</label>
                 <input type="text" class="form-control" id="login-email" name="login-email"
@@ -24,20 +23,22 @@ Login
 
             <div class="mb-1">
                 <div class="d-flex justify-content-between">
-                    <label class="form-label" for="login-password">Password</label>
+                    <label class="form-label" for="login-password">Пароль</label>
                 </div>
                 <div class="input-group input-group-merge form-password-toggle">
                     <input type="password" class="form-control form-control-merge"
                            id="login-password" name="login-password" tabindex="2"
-                           placeholder="············" aria-describedby="login-password">
-                    <span class="input-group-text cursor-pointer"><svg
-                            xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-eye"><path
-                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12"
-                                                                                            cy="12"
-                                                                                            r="3"></circle></svg></span>
+                           placeholder="············" autocomplete="on" aria-describedby="login-password">
+                    <span class="input-group-text cursor-pointer">
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-eye"><path
+                                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </span>
                 </div>
             </div>
             <div class="mb-1">
@@ -46,14 +47,14 @@ Login
                     <label class="form-check-label" for="remember-me">Запомнить меня</label>
                 </div>
             </div>
-            <a id="login" class="btn btn-primary w-100 waves-effect waves-float waves-light" tabindex="4">
+            <button type="submit" class="btn btn-primary w-100 waves-effect waves-float waves-light" tabindex="4">
                 Войти
-            </a>
+            </button>
         </form>
 
         <p class="text-center mt-2">
             <span>Впервые на нашей платформе?</span>
-            <a href="/front/auth/registration">
+            <a href="/auth/registration">
                 <span>Завести аккаунт</span>
             </a>
         </p>
@@ -64,14 +65,15 @@ Login
 {% block scripts %}
 <script>
 
-    $("#login").on('click', function () {
-        const email = $('#login-email').val()
-        const password = $('#login-password').val()
-        ajax_login(email, password)
+    window.addEventListener('error', function (e) {
+        var error = e.error;
+        console.log(error)
     });
 
-
-    function ajax_login(email, password) {
+    $("#login_form").submit(function (e) {
+        const email = $('#login-email').val()
+        const password = $('#login-password').val()
+        e.preventDefault()
         $.ajax({
             type: "POST",
             url: "/api/auth/login",
@@ -90,14 +92,14 @@ Login
                 if (response.status === 401) {
                     console.log(response.status + ' ' + response.statusText);
                     $(".form-error").append(
-                        '<span id="login-password-error" class="error">' + response.statusText + '</span>'
+                        '<span id="login-email-error" class="error">Пожалуйста, введите действительный адрес электронной почты.</span>'
                     )
                 }
             }
         })
-    }
+    })
 
-    $("#login-form").validate({
+    $("#login_form").validate({
         rules: {
             'login-email': {
                 required: true,
@@ -117,7 +119,6 @@ Login
             'login-password': {
                 required: "Это поле обязательно к заполнению.",
             },
-
         }
     });
 </script>

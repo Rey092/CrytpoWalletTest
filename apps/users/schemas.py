@@ -3,7 +3,7 @@ from typing import Any
 from uuid import UUID
 
 from fastapi_helper.schemas.camel_schema import ApiSchema
-from pydantic import EmailStr
+from pydantic import UUID4, EmailStr
 
 
 class UserRegister(ApiSchema):
@@ -37,9 +37,15 @@ class UserLogoutResponse(ApiSchema):
     message: str = "Success!"
 
 
-class UserDetail(ApiSchema):
-    id: UUID
+class UserPayload(ApiSchema):
+    id: UUID4
+    username: str
+    avatar: Any
+
+
+class User(ApiSchema):
+    id: UUID4
     email: EmailStr
     username: str
     avatar: Any
-    count_messages: Any
+    has_access_chat: bool

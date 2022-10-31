@@ -4,7 +4,7 @@ from fastapi.routing import APIRouter
 from apps.front.auth_views import auth_front_router
 from apps.front.profile_views import profile_front_router
 
-front_router = APIRouter(prefix="/front")
+front_router = APIRouter()
 
 
 # Users
