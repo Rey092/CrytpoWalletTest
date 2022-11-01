@@ -6,6 +6,8 @@ from typing import List
 from eth_account import Account
 from sqlalchemy.orm import Session
 
+from config.web3_clients import EthereumProviderClient, EtherscanClient
+
 from .database import BaseCryptoDatabase
 from .exceptions import (
     InvalidPrivateKeyException,
@@ -15,7 +17,6 @@ from .exceptions import (
 )
 from .models import Transaction, Wallet
 from .schemas import TransactionCreate, WalletCreate
-from .web3_clients import EtherscanClient, InfuraClient
 
 
 class BaseCryptoManager:
@@ -23,11 +24,11 @@ class BaseCryptoManager:
         self,
         database: BaseCryptoDatabase,
         etherscan_client: EtherscanClient,
-        infura_client: InfuraClient,
+        ethereum_provider: EthereumProviderClient,
     ):
         self.ethereum_db = database
         self.etherscan_client = etherscan_client
-        self.infura_client = infura_client
+        self.ethereum_provider = ethereum_provider
 
     async def generate_private_key(self, wallet: WalletCreate) -> WalletCreate:
         hex_string = secrets.token_hex(32)
@@ -62,7 +63,7 @@ class EthereumManager(BaseCryptoManager):
         if await self.ethereum_db.get_wallet_by_private_key(db, wallet.private_key, wallet.user_id):
             raise WalletAlreadyExistException()
         generated_wallet = await self.get_wallet_address(wallet.private_key, wallet)
-        generated_wallet.balance = await self.infura_client.get_balance(generated_wallet.address)
+        generated_wallet.balance = await self.ethereum_provider.get_balance(generated_wallet.address)
         created_wallet = await self.ethereum_db.create_wallet(db, generated_wallet)
         transactions = await self.etherscan_client.get_list_transactions(created_wallet.address)
         if transactions:
@@ -83,7 +84,7 @@ class EthereumManager(BaseCryptoManager):
             raise InvalidSenderException()
         if (wallet_from.balance - 0.001) < transaction_create.value:
             raise InvalidValueException(message="The value exceeds the balance of the wallet.")
-        txn_hash = await self.infura_client.send_raw_transaction(transaction_create, wallet_from)
+        txn_hash = await self.ethereum_provider.send_raw_transaction(transaction_create, wallet_from)
         return {"txn_hash": txn_hash}
 
     async def check_transactions_in_block(self, db: Session, block_hash: str):

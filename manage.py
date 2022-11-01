@@ -3,8 +3,8 @@ import asyncio
 
 import click
 
+from config.app import app
 from config.commands.init import ProjectInitialization
-from config.db import SessionLocal
 
 
 @click.group()
@@ -15,7 +15,7 @@ def commands():
 @click.command()
 def init():
     loop = asyncio.new_event_loop()
-    loop.run_until_complete(ProjectInitialization.start(SessionLocal()))
+    loop.run_until_complete(ProjectInitialization.start(app))
 
 
 commands.add_command(init)

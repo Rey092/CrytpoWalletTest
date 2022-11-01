@@ -78,7 +78,6 @@ class EthereumDatabase(BaseCryptoDatabase):
 
     async def create_transaction(self, db: Session, transactions: List[dict]) -> None:
         asset_id = db.query(self.asset).filter(self.asset.code == AssetCode.ETH).first().id
-        # TODO: update_or_create
         for txn in transactions:
             db_transaction = self.transaction(
                 txn_hash=txn.get("txn_hash"),

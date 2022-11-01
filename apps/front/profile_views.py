@@ -8,7 +8,7 @@ profile_front_router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@profile_front_router.get("/get", response_class=HTMLResponse)
+@profile_front_router.get("/get", response_class=HTMLResponse, include_in_schema=False)
 async def get(request: Request):
     if request.cookies.get("Authorization"):
         return templates.TemplateResponse("profile/get_profile.html", {"request": request})
