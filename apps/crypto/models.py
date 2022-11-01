@@ -34,7 +34,9 @@ class Wallet(Base):
     asset_id = Column(UUID(as_uuid=True), ForeignKey("asset.id"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
 
-    table_args = (UniqueConstraint("user_id", "private_key"),)
+    products = relationship("Product", backref="wallet")
+
+    __table_args__ = (UniqueConstraint("user_id", "private_key"),)
 
 
 class Transaction(Base):

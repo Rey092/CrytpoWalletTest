@@ -5,18 +5,8 @@ from uuid import UUID
 from fastapi_helper.schemas.camel_schema import ApiSchema
 
 
-class AssetCreate(ApiSchema):
-    id: UUID
-    code: str
-    network: str
-    type: str
-    standard: str = None
-    decimals: int
-    is_currency: bool
-
-
 # region Wallets
-class Wallet(ApiSchema):
+class WalletDetail(ApiSchema):
     id: UUID
     address: str
     balance: float
@@ -47,7 +37,7 @@ class WalletImportResponse(WalletCreateResponse):
 
 
 # region Transactions
-class Transaction(ApiSchema):
+class TransactionDetail(ApiSchema):
     txn_hash: str
     address_from: str
     address_to: str

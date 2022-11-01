@@ -39,7 +39,7 @@ class BaseClient(ABC):
         return format(float(self.provider.fromWei(int(value), "ether")), ".8f")
 
 
-class InfuraClient(BaseClient, BaseDecoder):
+class EthereumProviderClient(BaseClient, BaseDecoder):
     async def get_balance(self, address: str):
         return self.from_wei_to_eth(self.provider.eth.get_balance(address))
 

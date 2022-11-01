@@ -94,6 +94,7 @@ class EthereumDatabase(BaseCryptoDatabase):
             db.add(db_transaction)
             try:
                 db.commit()
+                db.refresh(db_transaction)
             except Exception:
                 db.rollback()
 
