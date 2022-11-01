@@ -20,23 +20,21 @@ class Asset(Base):
     decimals = Column(BigInteger)
     is_currency = Column(Boolean)
 
-    wallets = relationship("Wallet", back_populates="asset")
-    transactions = relationship("Transaction", back_populates="asset")
+    wallets = relationship("Wallet", backref="asset")
+    transactions = relationship("Transaction", backref="asset")
 
 
 class Wallet(Base):
     __tablename__ = "wallet"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
-    user = relationship("User", back_populates="wallets")
     private_key = Column(String)
     address = Column(String)
     balance = Column(Float, default=0)
     asset_id = Column(UUID(as_uuid=True), ForeignKey("asset.id"))
-    asset = relationship("Asset", back_populates="wallets")
+    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
 
-    __table_args__ = (UniqueConstraint("user_id", "private_key"),)
+    table_args = (UniqueConstraint("user_id", "private_key"),)
 
 
 class Transaction(Base):
@@ -52,4 +50,3 @@ class Transaction(Base):
     status = Column(Boolean)
     fee = Column(Enum(TransactionFee))
     asset_id = Column(UUID(as_uuid=True), ForeignKey("asset.id"))
-    asset = relationship("Asset", back_populates="transactions")
