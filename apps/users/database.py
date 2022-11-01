@@ -3,8 +3,8 @@
 FastAPI Users database adapter for SQLAlchemy ORM.
 """
 from typing import Type, TypeVar
+from uuid import UUID
 
-from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from apps.users.models import Permission, User
@@ -27,7 +27,7 @@ class UserDatabase:
         self.model = user_model
         self.permission = permission_model
 
-    async def get(self, user_id: UUID4, db: Session) -> User:
+    async def get(self, user_id: UUID, db: Session) -> User:
         return db.query(self.model).filter(self.model.id == user_id).first()
 
     async def get_user_by_email(self, email: str, db: Session) -> User:
@@ -41,18 +41,19 @@ class UserDatabase:
         await self.create_user_permission(db_user.id, db)
         return db.query(self.model).filter(self.model.email == db_user.email).first()
 
-    async def create_user_permission(self, user_id: UUID4, db: Session) -> Permission:
+    async def create_user_permission(self, user_id: UUID, db: Session) -> Permission:
         db_permission = self.permission(has_access_chat=False, user_id=user_id)
         db.add(db_permission)
         db.commit()
         db.refresh(db_permission)
         return db_permission
 
-    async def change_access_chat_permission(self, user_id: UUID4, db: Session):
+    async def change_access_chat_permission(self, user_id: UUID, db: Session):
         db.query(self.permission).filter(self.permission.user_id == user_id).update({"has_access_chat": True})
         db.commit()
 
-    async def update(self, user_id: UUID4, user_data: UserUpdate, db: Session):
+    async def update(self, user_id: UUID, user_data: UserUpdate, db: Session):
+
         db.query(self.model).filter(self.model.id == user_id).update(
             {"username": user_data.username},
         )

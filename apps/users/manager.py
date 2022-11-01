@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from typing import Tuple
+from typing import Tuple, Union
+from uuid import UUID
 
+from fastapi import UploadFile
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
-from pydantic import UUID4
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
 
+from config.storage import SqlAlchemyStorage
 from config.utils.email_client import EmailSchema, create_email_client
 from config.utils.password_helper import PasswordHelper
 
@@ -28,12 +30,14 @@ class UserManager:
         database: UserDatabase,
         jwt_backend: JWTBackend,
         pass_helper: PasswordHelper,
+        storage: SqlAlchemyStorage,
     ):
         self.user_db = database
         self.jwt_backend = jwt_backend
         self.password_helper = pass_helper
+        self.storage = storage
 
-    async def get_user(self, user_id: UUID4, db: Session):
+    async def get_user(self, user_id: UUID, db: Session):
         """
         :param user_id:
         :param db:
@@ -106,17 +110,35 @@ class UserManager:
         access_token = self.jwt_backend.create_access_token(payload)
         return payload, access_token
 
-    async def update(self, user_id: UUID4, user_data: UserUpdate, db: Session):
+    async def update(
+        self,
+        user_id: UUID,
+        user_data: UserUpdate,
+        db: Session,
+        profile_image: Union[UploadFile, None] = None,
+    ):
         """
+
         :param user_id:
         :param user_data:
         :param db:
+        :param profile_image:
         :return:
         """
-        user = await self.user_db.update(user_id=user_id, user_data=user_data, db=db)
+        profile_image = user_data.profile_image
+        if profile_image:
+            a = await self.storage.get_image(profile_image)
+            print(a)
+
+        user = await self.user_db.update(
+            user_id=user_id,
+            user_data=user_data,
+            db=db,
+        )
+
         return user
 
-    async def update_permission(self, user_id: UUID4, db: Session):
+    async def update_permission(self, user_id: UUID, db: Session):
         """
 
         :param user_id:

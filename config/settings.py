@@ -100,10 +100,10 @@ class Settings(BaseSettings):
     etherscan_api_key: str
 
     # Digital ocean SPACES
-    # spaces_space_name: str
-    # spaces_access_key: str
-    # spaces_secret_key: str
-    # spaces_region_name: str
+    spaces_space_name: str
+    spaces_access_key: str
+    spaces_secret_key: str
+    spaces_region_name: str
 
     # Superuser settings
     # superuser_email: str
@@ -164,18 +164,18 @@ class Settings(BaseSettings):
     #         path=self.rabbit_vhost,
     #     )
 
-    # @property
-    # def storage_url(self) -> URL:
-    #     """
-    #     Assemble Digital Ocean SPACES URL from settings.
-    #
-    #     :return: storage URL.
-    #
-    #     """
-    #     return URL.build(
-    #         scheme="https",
-    #         host=f"{self.spaces_space_name}.{self.spaces_region_name}.digitaloceanspaces.com",
-    #     )
+    @property
+    def storage_url(self) -> URL:
+        """
+        Assemble Digital Ocean SPACES URL from settings.
+
+        :return: storage URL.
+
+        """
+        return URL.build(
+            scheme="https",
+            host=f"{self.spaces_region_name}.digitaloceanspaces.com",
+        )
 
     class Config:
         """
