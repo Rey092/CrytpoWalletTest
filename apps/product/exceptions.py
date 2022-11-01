@@ -15,3 +15,17 @@ class InvalidWalletException(DefaultHTTPException):
     type = "Invalid Wallet ID"
     message = "Wallet id is invalid."
     status_code = status.HTTP_400_BAD_REQUEST
+
+
+class InvalidBalanceException(DefaultHTTPException):
+    code = "balance_error"
+    type = "Invalid Balance"
+    message = "Insufficient funds on the wallet."
+    status_code = status.HTTP_400_BAD_REQUEST
+
+
+class InvalidProductException(DefaultHTTPException):
+    code = "product_error"
+    type = "Invalid Product ID"
+    message = "Product id is invalid."
+    status_code = status.HTTP_400_BAD_REQUEST

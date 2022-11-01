@@ -5,8 +5,8 @@ from fastapi_helper.schemas.examples_generate import ExamplesGenerate
 from apps.crypto.database import EthereumDatabase
 from apps.crypto.manager import EthereumManager
 from apps.crypto.models import Asset, Transaction, Wallet
-from apps.crypto.web3_clients import EtherscanClient, InfuraClient
 from config.db import SessionLocal
+from config.web3_clients import EthereumProviderClient, EtherscanClient
 
 
 def get_db():
@@ -31,13 +31,13 @@ async def get_etherscan_client() -> EtherscanClient:
 
 
 @alru_cache()
-async def get_infura_client() -> InfuraClient:
-    return InfuraClient()
+async def get_ethereum_provider_client() -> EthereumProviderClient:
+    return EthereumProviderClient()
 
 
 @alru_cache()
 async def get_ethereum_manager() -> EthereumManager:
     ethereum_db = await get_ethereum_db()
     etherscan_client = await get_etherscan_client()
-    infura_client = await get_infura_client()
-    return EthereumManager(ethereum_db, etherscan_client, infura_client)
+    ethereum_provider = await get_ethereum_provider_client()
+    return EthereumManager(ethereum_db, etherscan_client, ethereum_provider)

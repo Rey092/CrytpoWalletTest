@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import uuid
 
 from sqlalchemy import Boolean, Column, DateTime, Enum, Float, ForeignKey, String
@@ -26,9 +27,8 @@ class Order(Base):
     __tablename__ = "order"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    has_access_chat = Column(Boolean, default=True)
     txn_hash = Column(String)
-    date = Column(DateTime)
+    date = Column(DateTime, default=datetime.datetime.now())
     status = Column(Enum(OrderStatus), default=OrderStatus.NEW)
-    txn_hash_return = Column(String)
+    txn_hash_return = Column(String, nullable=True)
     product_id = Column(UUID(as_uuid=True), ForeignKey("product.id"))

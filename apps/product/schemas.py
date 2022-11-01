@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
 from uuid import UUID
 
 from fastapi_helper.schemas.camel_schema import ApiSchema
 
 
 # region Product
+class WalletDetail(ApiSchema):
+    id: UUID
+    address: str
+
+
 class ProductCreate(ApiSchema):
     wallet_id: UUID
     title: str
@@ -12,20 +18,15 @@ class ProductCreate(ApiSchema):
     price: float
 
 
-class ProductCreateResponse(ApiSchema):
+class BaseProduct(ApiSchema):
     id: UUID
     image: str
     title: str
-    address: str
-    price: float
+    price: str
 
 
-class ProductDetail(ApiSchema):
-    id: UUID
-    image: str
-    title: str
-    address: str
-    price: float
+class ProductDetail(BaseProduct):
+    wallet: WalletDetail
 
 
 # endregion Product
@@ -34,6 +35,16 @@ class ProductDetail(ApiSchema):
 # region Order
 class OrderCreate(ApiSchema):
     wallet_id: UUID
+    product_id: UUID
+
+
+class OrderDetail(ApiSchema):
+    id: UUID
+    product: BaseProduct
+    txn_hash: str
+    date: str
+    status: Enum
+    txn_hash_return: str = None
 
 
 # endregion Order

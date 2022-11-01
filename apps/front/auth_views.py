@@ -8,14 +8,14 @@ auth_front_router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@auth_front_router.get("/login", response_class=HTMLResponse)
+@auth_front_router.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def login(request: Request):
     if request.cookies.get("Authorization"):
         return RedirectResponse("/profile/get")
     return templates.TemplateResponse("users/login.html", {"request": request})
 
 
-@auth_front_router.get("/registration", response_class=HTMLResponse)
+@auth_front_router.get("/registration", response_class=HTMLResponse, include_in_schema=False)
 async def registration(request: Request):
     if request.cookies.get("Authorization"):
         return RedirectResponse("/profile/get")
