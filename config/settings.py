@@ -147,22 +147,22 @@ class Settings(BaseSettings):
             path=path,
         )
 
-    # @property
-    # def rabbit_url(self) -> URL:
-    #     """
-    #     Assemble RabbitMQ URL from settings.
-    #
-    #     :return: rabbit URL.
-    #
-    #     """
-    #     return URL.build(
-    #         scheme="amqp",
-    #         host=self.rabbit_host,
-    #         port=self.rabbit_port,
-    #         user=self.rabbit_user,
-    #         password=self.rabbit_pass,
-    #         path=self.rabbit_vhost,
-    #     )
+    @property
+    def rabbit_url(self) -> URL:
+        """
+        Assemble RabbitMQ URL from settings.
+
+        :return: rabbit URL.
+
+        """
+        return URL.build(
+            scheme="amqp",
+            host=self.rabbit_host,
+            port=self.rabbit_port,
+            user=self.rabbit_user,
+            password=self.rabbit_pass,
+            path=self.rabbit_vhost,
+        )
 
     @property
     def storage_url(self) -> URL:

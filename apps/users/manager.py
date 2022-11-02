@@ -4,12 +4,12 @@ from uuid import UUID
 
 from fastapi import UploadFile
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
+from fastapi_helper.utilities.password_helper import PasswordHelper
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
 
 from config.storage import SqlAlchemyStorage
 from config.utils.email_client import EmailSchema, create_email_client
-from config.utils.password_helper import PasswordHelper
 
 from .database import UserDatabase
 from .exceptions import (

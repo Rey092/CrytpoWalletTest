@@ -997,14 +997,14 @@ test = ["anyio[trio] (>=3.2.1,<4.0.0)", "black (==22.8.0)", "databases[sqlite] (
 
 [[package]]
 name = "fastapi-helper"
-version = "0.0.11"
+version = "0.0.12"
 description = "Package for useful fastapi utils"
 category = "main"
 optional = false
 python-versions = ">=3.7, <4"
 files = [
-    {file = "fastapi-helper-0.0.11.tar.gz", hash = "sha256:5422c454b4d3564c31c95d344dbc16b97e830489b3434d86cb9d4867a93a2a43"},
-    {file = "fastapi_helper-0.0.11-py3-none-any.whl", hash = "sha256:a040c006c00138f937d518edebefc3ff6b25b47e0203b3fd9704f78807d46572"},
+    {file = "fastapi-helper-0.0.12.tar.gz", hash = "sha256:6e54444834ed745e3e6d01977612556fd969063bdb7544a0ef79d93b0c89b90a"},
+    {file = "fastapi_helper-0.0.12-py3-none-any.whl", hash = "sha256:b6999509cef40f7aa00b08b789b7c2269e7b36130e739293b7b1fcc32b32b168"},
 ]
 
 [package.dependencies]
@@ -2846,4 +2846,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "3b99086af5fa65359487798a3d8784eea142f5bd21e1cffb175d114d6c5d6a41"
+content-hash = "60e20f94d082c5174b09233353d212f290801bf2237f56bf22f83c29a3c1333f"
