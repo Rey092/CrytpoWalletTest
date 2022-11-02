@@ -5,3 +5,7 @@ install:
 
 run:
 	uvicorn config.app:app --reload
+
+
+run_parser:
+	python manage.py ethereum-blocks-parser

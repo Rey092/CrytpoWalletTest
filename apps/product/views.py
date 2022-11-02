@@ -49,7 +49,7 @@ async def get_products(
     response_model=ProductDetail,
 )
 async def create_product(
-    product: ProductCreate,
+    product: ProductCreate = Depends(ProductCreate.as_form),
     user: User = Depends(get_current_user_payload),  # noqa
     db: Session = Depends(get_db),
     product_manager: ProductManager = Depends(get_product_manager),
