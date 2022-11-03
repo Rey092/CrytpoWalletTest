@@ -17,7 +17,7 @@ class User(Base):
     password = Column(String)
     avatar = Column(String)
     is_active = Column(Boolean, default=True)
-    count_messages = Column(Integer)
+    count_messages = Column(Integer, default=0)
 
     permission = relationship("Permission", backref="user", uselist=False)
     wallets = relationship("Wallet", backref="user")

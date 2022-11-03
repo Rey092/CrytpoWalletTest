@@ -1,35 +1,14 @@
 # -*- coding: utf-8 -*-
-from typing import Optional
-
 from fastapi import Depends
-from fastapi.security import OAuth2
-from fastapi.security.utils import get_authorization_scheme_param
-from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException, UnauthorizedException
+from fastapi_helper.authorization.cookies_jwt_http_bearer import auth_bearer
+from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
 from sqlalchemy.orm import Session
-from starlette.requests import Request
 
 from apps.users.dependencies import get_db, get_jwt_backend, get_user_manager
 from apps.users.jwt_backend import JWTBackend
 from apps.users.manager import UserManager
 from apps.users.models import User
 from apps.users.schemas import UserPayload
-
-
-class OAuth2PasswordBearerCookie(OAuth2):
-    async def __call__(self, request: Request) -> Optional[str]:
-        cookie_authorization: str = request.cookies.get("Authorization")
-        cookie_scheme, cookie_param = get_authorization_scheme_param(
-            cookie_authorization,
-        )
-        if not cookie_authorization or cookie_scheme.lower() != "bearer":
-            if self.auto_error:
-                raise UnauthorizedException()
-            else:
-                return None
-        return cookie_param
-
-
-auth_bearer = OAuth2PasswordBearerCookie()
 
 
 async def get_current_user_payload(

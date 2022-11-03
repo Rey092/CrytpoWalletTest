@@ -4,12 +4,12 @@ from uuid import UUID
 
 from fastapi import UploadFile
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
+from fastapi_helper.utilities.password_helper import PasswordHelper
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
 
 from config.storage import SqlAlchemyStorage
 from config.utils.email_client import EmailSchema, create_email_client
-from config.utils.password_helper import PasswordHelper
 
 from .database import UserDatabase
 from .exceptions import (
@@ -127,8 +127,13 @@ class UserManager:
         """
         profile_image = user_data.profile_image
         if profile_image:
-            a = await self.storage.get_image(profile_image)
-            print(a)
+            path = await self.storage.upload(
+                file=profile_image,
+                upload_to="profile",
+                sizes=(100, 100),
+                content_types=["png", "jpg", "jpeg"],
+            )
+            user_data.profile_image = path
 
         user = await self.user_db.update(
             user_id=user_id,

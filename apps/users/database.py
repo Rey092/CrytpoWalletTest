@@ -55,7 +55,7 @@ class UserDatabase:
     async def update(self, user_id: UUID, user_data: UserUpdate, db: Session):
 
         db.query(self.model).filter(self.model.id == user_id).update(
-            {"username": user_data.username},
+            {"username": user_data.username, "avatar": user_data.profile_image},
         )
         db.commit()
         return db.query(self.model).filter(self.model.id == user_id).first()

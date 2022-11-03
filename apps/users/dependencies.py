@@ -32,7 +32,7 @@ async def get_user_db() -> UserDatabase:
 
 
 @alru_cache()
-async def get_s3_client() -> Session:
+async def get_s3_client():
     session = Session()
     return session.client(
         "s3",
@@ -47,7 +47,7 @@ async def get_s3_client() -> Session:
 @alru_cache()
 async def get_storage() -> SqlAlchemyStorage:
     s3_client = await get_s3_client()
-    return SqlAlchemyStorage(s3_client)
+    return SqlAlchemyStorage(s3_client, settings.spaces_space_name)
 
 
 @alru_cache()
