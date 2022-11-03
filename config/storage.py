@@ -11,14 +11,14 @@ from starlette import status
 
 class ValidateFormatException(DefaultHTTPException):
     code = "format_error"
-    type = "validate_image"
+    type = "VALIDATE_IMAGE"
     message = "Format is not valid"
     status_code = status.HTTP_400_BAD_REQUEST
 
 
 class StorageException(DefaultHTTPException):
     code = "storage_error"
-    type = "storage"
+    type = "DISCONNECTED_STORAGE"
     message = "An error occurred while trying to connect to the DO Spaces"
     status_code = status.HTTP_400_BAD_REQUEST
 

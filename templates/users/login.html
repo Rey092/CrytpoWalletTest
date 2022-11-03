@@ -43,7 +43,7 @@ Login
             </div>
             <div class="mb-1">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="remember-me" tabindex="3">
+                    <input class="form-check-input" type="checkbox" id="remember-me" tabindex="3" checked>
                     <label class="form-check-label" for="remember-me">Запомнить меня</label>
                 </div>
             </div>
@@ -73,7 +73,9 @@ Login
     $("#login_form").submit(function (e) {
         const email = $('#login-email').val()
         const password = $('#login-password').val()
+        const remember_me = $("input[type='checkbox']").prop('checked')
         e.preventDefault()
+        console.log(remember_me)
         $.ajax({
             type: "POST",
             url: "/api/auth/login",
@@ -81,7 +83,8 @@ Login
             contentType: "application/json",
             data: JSON.stringify({
                 email: email,
-                password: password
+                password: password,
+                rememberMe: remember_me
             }),
             success: function (response) {
                 if ('id' in response) {

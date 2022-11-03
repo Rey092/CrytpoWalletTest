@@ -33,6 +33,7 @@ class UserRegisterResponse(ApiSchema):
 class UserLogin(ApiSchema):
     email: EmailStr
     password: str
+    remember_me: bool
 
 
 class UserLoginResponse(ApiSchema):

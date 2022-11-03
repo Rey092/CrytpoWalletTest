@@ -48,43 +48,23 @@ class UserDatabase:
         db.refresh(db_permission)
         return db_permission
 
-    async def change_access_chat_permission(self, user_id: UUID, db: Session):
+    async def change_access_chat_permission(self, user_id: UUID, db: Session) -> None:
         db.query(self.permission).filter(self.permission.user_id == user_id).update({"has_access_chat": True})
         db.commit()
 
-    async def update(self, user_id: UUID, user_data: UserUpdate, db: Session):
+    async def update(self, user_id: UUID, user_data: UserUpdate, db: Session) -> User:
+        user = db.query(self.model).filter(self.model.id == user_id)
+        if user_data.password:
+            await self.new_password(user_id, user_data.password, db)
+        if user_data.delete is True or user_data.profile_image is not None:
+            user.update({"username": user_data.username, "avatar": user_data.profile_image})
+        else:
+            user.update({"username": user_data.username})
+        db.commit()
+        return user.first()
 
+    async def new_password(self, user_id: UUID, password, db: Session) -> None:
         db.query(self.model).filter(self.model.id == user_id).update(
-            {"username": user_data.username, "avatar": user_data.profile_image},
+            {"password": password},
         )
         db.commit()
-        return db.query(self.model).filter(self.model.id == user_id).first()
-
-    async def delete(self, user: UD) -> None:
-        await self.model.filter(id=user.id).delete()
-
-    # async def request_new_password(self, email: str, token_hash: str, new_password: str) -> str:
-    #     new_password_token, created = await self.new_password_token_model.request_new_password(
-    #         email=email,
-    #         token_hash=token_hash,
-    #         new_password=new_password,
-    #     )
-    #     return new_password_token.new_password
-
-    # async def get_confirm_new_password_user(self, token_hash: str) -> Tuple[Optional[User], Optional[str]]:
-    #     query = self.new_password_token_model.filter(token_hash=token_hash)
-    #     new_password_token = await query.first()
-    #
-    #     if new_password_token:
-    #         email = new_password_token.email
-    #         user = await self.model.filter(email=email).first()
-    #         await new_password_token.delete()
-    #         return user, new_password_token.new_password
-    #
-    #     else:
-    #         return None, None
-
-    @staticmethod
-    async def set_new_password(user: User, new_password: str) -> None:
-        user.hashed_password = new_password
-        await user.save()

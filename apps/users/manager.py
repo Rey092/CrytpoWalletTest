@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from typing import Tuple, Union
+from typing import Tuple
 from uuid import UUID
 
-from fastapi import UploadFile
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
 from fastapi_helper.utilities.password_helper import PasswordHelper
 from sqlalchemy.orm import Session
@@ -13,6 +12,8 @@ from config.utils.email_client import EmailSchema, create_email_client
 
 from .database import UserDatabase
 from .exceptions import (
+    DeleteImageInvalidException,
+    DeleteNotImageInvalidException,
     EmailAlreadyExistException,
     EmailInvalidException,
     PasswordInvalidException,
@@ -37,11 +38,24 @@ class UserManager:
         self.password_helper = pass_helper
         self.storage = storage
 
+    @staticmethod
+    async def get_payload(user_data):
+        """
+        :param user_data:
+        :return: payload:
+        """
+        payload = {
+            "id": str(user_data.id),
+            "username": user_data.username,
+            "avatar": user_data.avatar,
+        }
+        return payload
+
     async def get_user(self, user_id: UUID, db: Session):
         """
         :param user_id:
         :param db:
-        :return:
+        :return: User:
         """
         user = await self.user_db.get(user_id, db)
         return user
@@ -57,7 +71,7 @@ class UserManager:
         :param user_create:
         :param db:
         :param background_tasks:
-        :return:
+        :return: payload and access_token:
         """
         result = await validate_email_(user_create.email)
         if result.get("email"):
@@ -73,12 +87,8 @@ class UserManager:
             raise UsernameInvalidException()
         user_create.password1 = self.password_helper.hash(user_create.password1)
         created_user = await self.user_db.create(user_create, db=db)
-        payload = {
-            "id": str(created_user.id),
-            "username": created_user.username,
-            "avatar": created_user.avatar,
-        }
-        access_token = self.jwt_backend.create_access_token(payload)
+        payload = await self.get_payload(created_user)
+        access_token = self.jwt_backend.create_access_token(payload, False)
         email_client = create_email_client()
         background_tasks.add_task(
             email_client.send_email_to_new_user,
@@ -94,7 +104,7 @@ class UserManager:
 
         :param user_login:
         :param db:
-        :return: user data and access token
+        :return: user data and access token:
         """
         user = await self.user_db.get_user_by_email(email=user_login.email, db=db)
         if user is None:
@@ -102,12 +112,8 @@ class UserManager:
         is_valid, needs_update = self.password_helper.verify_and_update(user_login.password, user.password)
         if not is_valid:
             raise InvalidCredentialsException()
-        payload = {
-            "id": str(user.id),
-            "username": user.username,
-            "avatar": user.avatar,
-        }
-        access_token = self.jwt_backend.create_access_token(payload)
+        payload = await self.get_payload(user)
+        access_token = self.jwt_backend.create_access_token(payload, user_login.remember_me)
         return payload, access_token
 
     async def update(
@@ -115,39 +121,55 @@ class UserManager:
         user_id: UUID,
         user_data: UserUpdate,
         db: Session,
-        profile_image: Union[UploadFile, None] = None,
     ):
         """
-
         :param user_id:
         :param user_data:
         :param db:
-        :param profile_image:
-        :return:
+        :return: user:
         """
-        profile_image = user_data.profile_image
-        if profile_image:
+        if not await validate_username(user_data.username):
+            raise UsernameInvalidException()
+        if user_data.password or user_data.repeat_password:
+            if user_data.password != user_data.repeat_password:
+                raise PasswordMismatchException()
+            else:
+                if not await validate_password(user_data.password):
+                    raise PasswordInvalidException()
+                else:
+                    user_data.password = self.password_helper.hash(user_data.password)
+        if user_data.profile_image and user_data.delete is True:
+            raise DeleteImageInvalidException()
+        user = await self.user_db.get(user_id, db)
+        if user_data.profile_image is not None:
             path = await self.storage.upload(
-                file=profile_image,
+                file=user_data.profile_image,
                 upload_to="profile",
                 sizes=(100, 100),
                 content_types=["png", "jpg", "jpeg"],
             )
             user_data.profile_image = path
-
+            if user.avatar is not None:
+                await self.storage.delete(user.avatar)
+        if user_data.delete is True:
+            if user.avatar is None:
+                raise DeleteNotImageInvalidException()
+            else:
+                await self.storage.delete(user.avatar)
         user = await self.user_db.update(
             user_id=user_id,
             user_data=user_data,
             db=db,
         )
+        payload = await self.get_payload(user)
+        access_token = self.jwt_backend.create_access_token(payload, True)
 
-        return user
+        return user, access_token
 
     async def update_permission(self, user_id: UUID, db: Session):
         """
-
         :param user_id:
         :param db:
-        :return:
+        :return: None
         """
         await self.user_db.change_access_chat_permission(user_id, db)

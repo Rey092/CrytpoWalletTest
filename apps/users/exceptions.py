@@ -39,3 +39,17 @@ class UsernameInvalidException(DefaultHTTPException):
     type = "Username Invalid"
     message = "Username must contain at least: 5 to 40 characters, not special characters"
     status_code = status.HTTP_400_BAD_REQUEST
+
+
+class DeleteImageInvalidException(DefaultHTTPException):
+    code = "delete_error"
+    type = "Delete Image Invalid"
+    message = "You can't delete and update your profile photo at the same time"
+    status_code = status.HTTP_400_BAD_REQUEST
+
+
+class DeleteNotImageInvalidException(DefaultHTTPException):
+    code = "delete_error"
+    type = "No Image To Delete"
+    message = "No image to delete"
+    status_code = status.HTTP_400_BAD_REQUEST

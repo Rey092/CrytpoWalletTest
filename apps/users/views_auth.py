@@ -16,7 +16,7 @@ from apps.users.exceptions import (
 )
 from apps.users.manager import UserManager
 from apps.users.models import User
-from apps.users.schemas import UserLoginResponse, UserLogoutResponse, UserRegisterResponse
+from apps.users.schemas import UserLogin, UserLoginResponse, UserLogoutResponse, UserRegisterResponse
 from apps.users.tasks import update_permission
 from apps.users.user import get_current_user
 
@@ -68,11 +68,15 @@ async def logout(response: Response, user: User = Depends(get_current_user)):
     responses=examples_generate.get_error_responses(auth=True),
 )
 async def login(
-    user: schemas.UserLogin,
+    user: UserLogin,
     response: Response,
     user_manager: UserManager = Depends(get_user_manager),
     db: Session = Depends(get_db),
 ):
+    """
+    Login user in /n param rememberMe: if false access token expiration
+    15 seconds.
+    """
     result = await user_manager.login(user, db)
     result[0]["access_token"] = result[-1]
     response.set_cookie(key="Authorization", value=f'Bearer {result[0]["access_token"]}')

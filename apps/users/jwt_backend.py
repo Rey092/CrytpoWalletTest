@@ -33,17 +33,16 @@ class JWTBackend:
     @staticmethod
     def _create_token(
         payload: dict,
-        expiration_delta: Optional[int] = None,
+        expiration_delta: Optional[int],
     ) -> str:
         iat = datetime.utcnow()
-        if expiration_delta:
-            exp = datetime.utcnow() + timedelta(seconds=expiration_delta)
-        else:
-            exp = datetime.utcnow() + timedelta(days=1)
+        exp = datetime.utcnow() + timedelta(seconds=expiration_delta)
         payload.update({"iat": iat, "exp": exp})
         token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
         return token
 
-    def create_access_token(self, payload: dict) -> str:
+    def create_access_token(self, payload: dict, access_expiration: bool) -> str:
+        if access_expiration is True:
+            return self._create_token(payload, settings.jwt_access_not_expiration)
         return self._create_token(payload, self._access_expiration)
