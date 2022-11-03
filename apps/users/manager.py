@@ -127,8 +127,13 @@ class UserManager:
         """
         profile_image = user_data.profile_image
         if profile_image:
-            a = await self.storage.get_image(profile_image)
-            print(a)
+            path = await self.storage.upload(
+                file=profile_image,
+                upload_to="profile",
+                sizes=(100, 100),
+                content_types=["png", "jpg", "jpeg"],
+            )
+            user_data.profile_image = path
 
         user = await self.user_db.update(
             user_id=user_id,

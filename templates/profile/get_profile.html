@@ -109,8 +109,8 @@
                             <h4 class="card-title">Статистика</h4>
                         </div>
                         <div class="card-body py-2 my-25">
-                            <h4 id="messages">Сообщения в чате: 5</h4>
-                            <h4 id="wallets">Кошельки: 5</h4>
+                            <h4>Сообщения в чате: <span id="messages"></span></h4>
+                            <h4>Кошельки: <span id="wallets"></span></h4>
                         </div>
                     </div>
                     <!--                    end-->
@@ -120,28 +120,16 @@
                             <h4 class="card-title">Управление кошельками</h4>
                         </div>
                         <div class="card-body py-2 my-25">
-                            <div class="mt-1">
-                                <img src="{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}"
-                                     alt="avatar" height="40" width="40">
-                                <a href="https://etherscan.io/address/0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
-                                   target="_blank">
-                                    0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B
-                                </a>
-                            </div>
-                            <div class="mt-1">
-                                <img src="{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}"
-                                     alt="avatar" height="40" width="40">
-                                <a href="https://etherscan.io/address/0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
-                                   target="_blank">
-                                    0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B
-                                </a>
+                            <div id="wallets-list">
+
                             </div>
                             <div class="col-12 mt-1">
                                 <button class="btn btn-primary mt-1 waves-effect waves-float waves-light"
                                         data-bs-toggle="modal" data-bs-target="#importWallet">
                                     Импортировать ETH кошелек
                                 </button>
-                                <button class="btn btn-primary mt-1 waves-effect waves-float waves-light">
+                                <button id="add_wallet"
+                                        class="btn btn-primary mt-1 waves-effect waves-float waves-light">
                                     Добавить ETH кошелек
                                 </button>
                             </div>
@@ -196,11 +184,33 @@
 <script>
     const username = $("#username")
     const email = $("#email")
+    const messages = $("#messages")
+    const wallets = $("#wallets")
+    const user_name = $(".user-name")
+    const profile_image = $("#account-upload")
 
 
     $("#logout").on('click', function () {
         ajax_logout()
     });
+
+
+    function render_wallets(wallets) {
+        if (wallets.length > 0) {
+            for (let wallet of wallets) {
+                $("#wallets-list").append(
+                    "                <div class=\"mt-1\">\n" +
+                    "                                <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                    "                                     alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                    "                                <a href=\"https://etherscan.io/address/" + wallet.address + "\"\n" +
+                    "                                   target=\"_blank\">\n" +
+                    "                                    " + wallet.address + "\n" +
+                    "                                </a>\n" +
+                    "                            </div>"
+                )
+            }
+        }
+    }
 
 
     $(window).on('load', function () {
@@ -209,9 +219,18 @@
             url: "/api/profile/get",
             success: function (response) {
                 if ('id' in response) {
+                    // if (response.avatar){
+                    //     $("#account-upload-img").attr(
+                    //         "src",
+                    //         "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
+                    //     )
+                    // }
                     username.val(response.username)
                     email.val(response.email)
-                    $(".user-name").html(response.username)
+                    messages.html(response.countMessages)
+                    wallets.html(response.wallets.length)
+                    user_name.html(response.username)
+                    render_wallets(response.wallets)
                 }
             },
             error: function (response) {
@@ -235,17 +254,50 @@
 
     $("#profile_update").submit(function (e) {
         e.preventDefault();
+        let fileData = profile_image.prop('files')[0];
+        let format_data = new FormData()
+        format_data.append('username', username.val())
+        if (fileData) {
+            format_data.append('profile_image', fileData)
+        }
         $.ajax({
             type: "PUT",
             url: "/api/profile/update",
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify({
-                username: username.val(),
-            }),
+            enctype: 'multipart/form-data',
+            data: format_data,
             success: function (response) {
-                console.log(response)
+                user_name.html(response.username)
                 toastr.success('Данные профиля успешно обновлены', 'Успех')
+
+            },
+            error: function (response) {
+                console.log(response)
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        })
+    });
+
+    $("#add_wallet").on("click", function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/ethereum/wallets/create",
+            success: function (response) {
+                let count = Number(wallets.text())
+                wallets.html(count + 1)
+                $("#wallets-list").append(
+                    "                <div class=\"mt-1\">\n" +
+                    "                                <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                    "                                     alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                    "                                <a href=\"https://etherscan.io/address/" + response.address + "\"\n" +
+                    "                                   target=\"_blank\">\n" +
+                    "                                    " + response.address + "\n" +
+                    "                                </a>\n" +
+                    "                            </div>"
+                )
+
+                toastr.success('Добавлен новый кошелек', 'Успех')
 
             },
             error: function (response) {
@@ -253,6 +305,7 @@
             }
         })
     });
+
 </script>
 
 {% endblock %}

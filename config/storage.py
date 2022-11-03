@@ -1,109 +1,92 @@
 # -*- coding: utf-8 -*-
+import io
+import uuid
+from typing import List, Tuple, Union
 
-from boto3 import Session
 from fastapi import UploadFile
+from fastapi_helper import DefaultHTTPException
+from PIL import Image, UnidentifiedImageError
+from starlette import status
+
+
+class ValidateFormatException(DefaultHTTPException):
+    code = "format_error"
+    type = "validate_image"
+    message = "Format is not valid"
+    status_code = status.HTTP_400_BAD_REQUEST
+
+
+class StorageException(DefaultHTTPException):
+    code = "storage_error"
+    type = "storage"
+    message = "An error occurred while trying to connect to the DO Spaces"
+    status_code = status.HTTP_400_BAD_REQUEST
 
 
 class SqlAlchemyStorage:
     def __init__(
         self,
-        client: Session,
+        client,
+        bucket: str,
     ):
         self.client = client
+        self.bucket = bucket
 
-    async def get_image(self, image: UploadFile):
-        print(image.file.read())
-        return None
+    async def upload(
+        self,
+        file: UploadFile,
+        upload_to: str,
+        sizes: Union[Tuple[int, int], None],
+        content_types: List[str],
+    ) -> str:
+        try:
+            image = Image.open(file.file)
+        except UnidentifiedImageError:
+            raise ValidateFormatException(
+                message=f"The uploaded file must be in the format {content_types}",
+            )
 
+        await self.validate_image(image, content_types)
+        image_bytes = await self.image_processor(image, sizes)
+        key = f"{upload_to}/image_{uuid.uuid4()}.png"
+        try:
+            self.client.put_object(
+                Bucket=self.bucket,
+                Key=key,
+                Body=image_bytes,
+                ACL="public-read",
+                Metadata={
+                    "Content-Type": "image/png",
+                },
+            )
+            return key
+        except Exception:
+            raise StorageException()
 
-#
-# class Json(TypeDecorator):
-#     impl = Unicode
-#
-#     def process_bind_param(self, value, engine):
-#         return json.dumps(value)
-#
-#     def process_result_value(self, value, engine):
-#         if value is None:
-#             return None
-#
-#         return json.loads(value)
-#
-#
-# class ProfileImage(Image):
-#     __pre_processors__ = [
-#         ImageAnalyzer(),
-#         ImageValidator(
-#             minimum=(80, 80),
-#             maximum=(800, 600),
-#             min_aspect_ratio=1.2,
-#             content_types=['image/jpeg', 'image/png']
-#         ),
-#         ImageProcessor(
-#             fmt='jpeg',
-#             width=120,
-#             crop=dict(
-#                 left='10%',
-#                 top='10%',
-#                 width='80%',
-#                 height='80%',
-#             )
-#         )
-#     ]
-#
-#
-# # class Person(Base):
-# #     __tablename__ = 'person'
-# #
-# #     id = Column(Integer, primary_key=True)
-# #     name = Column(Unicode(100))
-# #     image = Column(ProfileImage.as_mutable(Json))
-# #
-# #     def __repr__(self):
-# #         return "<%s id=%s>" % (self.name, self.id)
-#
-#
-# if __name__ == '__main__':
-#     session = session_factory()
-#
-#     with StoreManager(session):
-#         person1 = Person()
-#         person1.image = ProfileImage.create_from('https://www.python.org/static/img/python-logo@2x.png')
-#         session.add(person1)
-#         session.commit()
-#
-#         print('Content type:', person1.image.content_type)
-#         print('Extension:', person1.image.extension)
-#         print('Length:', person1.image.length)
-#         print('Original filename:', person1.image.original_filename)
-#
-#         thumbnail = person1.image.get_thumbnail(width=32, auto_generate=True)
-#         print(thumbnail.height)
-#         assert exists(join(TEMP_PATH, thumbnail.path))
-#
-#         thumbnail = person1.image.get_thumbnail(ratio=.3, auto_generate=True)
-#         print(thumbnail.width, thumbnail.height)
-#         assert exists(join(TEMP_PATH, thumbnail.path))
-#
-#         person1.image.attach('https://www.python.org/static/img/python-logo.png')
-#         session.commit()
-#
-#         print('Content type:', person1.image.content_type)
-#         print('Extension:', person1.image.extension)
-#         print('Length:', person1.image.length)
-#         print('Original filename:', person1.image.original_filename)
-#
-#     with StoreManager(session, delete_orphan=True):
-#         deleted_filename = join(TEMP_PATH, person1.image.path)
-#         person1.image = None
-#         session.commit()
-#
-#         assert not exists(deleted_filename)
-#
-#         person1.image = ProfileImage.create_from('https://www.python.org/static/img/python-logo.png')
-#         session.commit()
-#
-#         print('Content type:', person1.image.content_type)
-#         print('Extension:', person1.image.extension)
-#         print('Length:', person1.image.length)
-#         print('Original filename:', person1.image.original_filename)
+    async def delete(self, key: str):
+        try:
+            self.client.delete_object(
+                Bucket=self.bucket,
+                Key=key,
+            )
+        except Exception:
+            raise StorageException()
+
+    @staticmethod
+    async def validate_image(image: Image, content_types: List[str]):
+        if image.format.lower() not in content_types:
+            raise ValidateFormatException(
+                message=f"The uploaded file must be in the format {content_types}",
+            )
+
+    @staticmethod
+    async def image_processor(
+        image: Image,
+        sizes: Tuple[int, int],
+    ) -> bytes:
+        if sizes:
+            image = image.resize(sizes)
+        img_byte_arr = io.BytesIO()
+        image.save(img_byte_arr, format="PNG")
+        img_byte_arr = img_byte_arr.getvalue()
+        return img_byte_arr
