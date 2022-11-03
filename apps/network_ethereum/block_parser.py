@@ -3,7 +3,7 @@ import asyncio
 import json
 import logging
 
-import aio_pika
+from aio_pika import DeliveryMode, ExchangeType, Message, connect_robust
 from websockets import connect
 
 from config.settings import settings
@@ -25,16 +25,23 @@ async def get_event():
                 response = json.loads(message)
                 block_number = response["params"]["result"]["number"]
 
-                connection = await aio_pika.connect_robust(
-                    settings.rabbit_url,
-                )
+                connection = await connect_robust("amqp://guest:guest@localhost/")
+
                 async with connection:
-                    routing_key = "new_block"
                     channel = await connection.channel()
 
-                    await channel.default_exchange.publish(
-                        aio_pika.Message(body=f"{block_number}".encode()),
-                        routing_key=routing_key,
+                    new_blocks_exchange = await channel.declare_exchange(
+                        "new_blocks",
+                        ExchangeType.FANOUT,
                     )
+
+                    message = Message(
+                        f"{block_number}".encode(),
+                        delivery_mode=DeliveryMode.PERSISTENT,
+                    )
+
+                    # Sending the message
+                    await new_blocks_exchange.publish(message, routing_key="info")
+
             except Exception:
                 pass
