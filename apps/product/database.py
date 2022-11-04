@@ -67,6 +67,13 @@ class ProductDatabase:
         db.refresh(db_order)
         return format_date(db_order)
 
+    async def update_wallet_balance(self, db: Session, wallet: Wallet, value: float):
+        wallet = db.query(self.wallet).filter(self.wallet.id == wallet.id).first()
+        wallet.balance -= value
+        db.add(wallet)
+        db.commit()
+        db.refresh(wallet)
+
     async def get_orders(self, db: Session, user_id: UUID) -> List[Order]:
         orders = (
             db.query(self.order)

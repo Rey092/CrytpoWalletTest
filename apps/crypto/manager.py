@@ -63,7 +63,7 @@ class EthereumManager(BaseCryptoManager):
         if await self.ethereum_db.get_wallet_by_private_key(db, wallet.private_key, wallet.user_id):
             raise WalletAlreadyExistException()
         generated_wallet = await self.get_wallet_address(wallet.private_key, wallet)
-        generated_wallet.balance = await self.ethereum_provider.get_balance(generated_wallet.address)
+        generated_wallet.balance = await self.parse_wallet_balance(generated_wallet.address)
         created_wallet = await self.ethereum_db.create_wallet(db, generated_wallet)
         transactions = await self.etherscan_client.get_list_transactions(created_wallet.address)
         if transactions:
@@ -90,16 +90,28 @@ class EthereumManager(BaseCryptoManager):
         return {"txn_hash": txn_hash}
 
     async def check_transactions_in_block(self, db: Session, block_hash: str):
-        wallets = await self.ethereum_db.get_wallets(db)
+        wallets = await self.get_all_wallets(db)
         addresses = [wallet.address for wallet in wallets]
         checked_transactions = await self.ethereum_provider.get_transactions_from_block(block_hash, addresses)
         if checked_transactions:
+            # TODO: remove print
+            print(checked_transactions)
             transactions = await self.etherscan_client.get_result({"result": checked_transactions})
+            print(transactions)
             await self.ethereum_db.create_transaction(db, transactions)
             couples_for_update_balance = [
                 (wallet, transaction)
                 for wallet in wallets
                 for transaction in transactions
-                if wallet.address == transaction["address_to"]
+                if wallet.address.lower() == transaction["address_to"].lower()
             ]
             await self.ethereum_db.update_wallet_balance_by_transaction(db, couples_for_update_balance)
+
+    async def get_all_wallets(self, db: Session) -> List[Wallet]:
+        return await self.ethereum_db.get_wallets(db)
+
+    async def parse_wallet_balance(self, address: str):
+        return await self.ethereum_provider.get_balance(address)
+
+    async def update_wallets_balances(self, db: Session, wallets: List[Wallet]):
+        await self.ethereum_db.update_balances(db, wallets)

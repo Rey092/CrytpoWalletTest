@@ -91,7 +91,9 @@ class EtherscanClient(BaseClient, BaseDecoder):
         transactions = [
             {
                 "block_number": transaction.get("blockNumber"),
-                "txn_hash": transaction.get("hash"),
+                "txn_hash": transaction.get("hash")
+                if isinstance(transaction.get("hash"), str)
+                else transaction.get("hash").hex(),
                 "address_from": transaction.get("from"),
                 "address_to": transaction.get("to"),
                 "value": self.from_wei_to_eth(transaction.get("value")),

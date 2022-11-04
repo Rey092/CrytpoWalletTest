@@ -58,6 +58,7 @@ class ProductManager:
         except IndexError:
             raise InvalidWalletException()
 
+        await self.product_db.update_wallet_balance(db, wallet, product.price)
         transaction_create = TransactionCreate(
             address_from=wallet.address,
             address_to=product.wallet.address,
