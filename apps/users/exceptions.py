@@ -4,7 +4,7 @@ from starlette import status
 
 
 class EmailInvalidException(DefaultHTTPException):
-    code = "email_error"
+    code = "email_error_domain"
     type = "Email Invalid"
     message = "The email address is not valid."
     status_code = status.HTTP_400_BAD_REQUEST

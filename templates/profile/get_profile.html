@@ -25,7 +25,7 @@ Crypto Wallet|Profile
                             <!-- header section -->
                             <div class="d-flex">
                                 <a href="#" class="me-25">
-                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
+                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
                                          id="account-upload-img" class="uploadedAvatar rounded me-50"
                                          alt="profile image" height="100" width="100">
                                 </a>
@@ -46,16 +46,23 @@ Crypto Wallet|Profile
                             <!--/ header section -->
 
                             <!-- form -->
-                            <form class="validate-form mt-2 pt-50" id="profile_update" novalidate="novalidate">
+                            <form class="validate-form mt-2 pt-50" id="profile_update" method="post">
                                 <div class="row">
                                     <div class="col-12 col-sm-6 mb-1">
                                         <label class="form-label" for="username">Имя пользователя</label>
-                                        <input type="text" class="form-control" id="username" name="username"
-                                               placeholder="John" autocomplete="on" data-msg="Username">
+                                        <input type="text"
+                                               class="form-control"
+                                               id="username"
+                                               name="username"
+                                               placeholder="John" autocomplete="" data-msg="Username">
                                     </div>
                                     <div class="col-12 col-sm-6 mb-1">
                                         <label class="form-label" for="email">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email"
+                                        <input type="email"
+                                               class="form-control"
+                                               id="email"
+                                               name="email"
+                                               autocomplete=""
                                                placeholder="Email" readonly>
                                     </div>
                                     <div class="col-12 col-sm-6 mb-1">
@@ -64,7 +71,8 @@ Crypto Wallet|Profile
                                             <input type="password" class="form-control form-control-merge"
                                                    id="new_password"
                                                    autocomplete="new-password"
-                                                   name="new_password" placeholder="············"
+                                                   name="new_password"
+                                                   placeholder="············"
                                                    aria-describedby="password"
                                                    tabindex="3">
                                             <span class="input-group-text cursor-pointer"><svg
@@ -83,7 +91,9 @@ Crypto Wallet|Profile
                                         <div class="input-group input-group-merge form-password-toggle">
                                             <input type="password" class="form-control form-control-merge"
                                                    id="new_password2"
-                                                   name="new_password2" placeholder="············"
+                                                   name="new_password2"
+                                                   autocomplete="new-password"
+                                                   placeholder="············"
                                                    aria-describedby="password"
                                                    tabindex="3">
                                             <span class="input-group-text cursor-pointer"><svg
@@ -99,6 +109,7 @@ Crypto Wallet|Profile
                                     </div>
                                     <div class="col-12">
                                         <button type="submit"
+                                                id="profile_save"
                                                 class="btn btn-primary mt-1 me-1 waves-effect waves-float waves-light">
                                             Сохранить изменения
                                         </button>
@@ -218,6 +229,7 @@ Crypto Wallet|Profile
 
 {% block scripts %}
 <script>
+    // initial
     const username = $("#username")
     const email = $("#email")
     const new_password = $("#new_password")
@@ -225,7 +237,12 @@ Crypto Wallet|Profile
     const messages = $("#messages")
     const wallets = $("#wallets")
     const profile_image = $("#account-upload")
+    const profile_image_preload = $("#account-upload-img")
+    var profile_image_def = null
+    //
 
+
+    // load profile data
     $(window).on('load', function () {
         $.ajax({
             type: "GET",
@@ -243,6 +260,8 @@ Crypto Wallet|Profile
                     messages.html(response.countMessages)
                     wallets.html(response.wallets.length)
                     render_wallets(response.wallets)
+                    profile_image_def = $("#account-upload-img").attr('src')
+
                 }
             },
             error: function (response) {
@@ -250,40 +269,82 @@ Crypto Wallet|Profile
         })
         $('.content-wrapper').fadeIn("normal")
     });
+    //
 
-
-    $("#profile_update").submit(function (e) {
-        e.preventDefault();
-        let fileData = profile_image.prop('files')[0];
-        let format_data = new FormData()
-        format_data.append('username', username.val())
-        format_data.append('password', new_password.val())
-        format_data.append('repeat_password', new_password2.val())
-        if (fileData) {
-            format_data.append('profile_image', fileData)
+    // loads preview images
+    $('input[type=file]').on('change', function (element) {
+        if (element.target.files[0]) {
+            profile_image_preload.attr("src", URL.createObjectURL(element.target.files[0]))
+        } else {
+            profile_image_preload.attr("src", profile_image_def);
         }
-        $('.content-wrapper').hide()
-        $('.dropdown-user').hide()
-        $.ajax({
-            type: "PUT",
-            url: "/api/profile/update",
-            enctype: 'multipart/form-data',
-            data: format_data,
-            success: function (response) {
-                $('.content-wrapper').fadeIn("normal")
-                $('.dropdown-user').fadeIn("normal")
-                $(".user-name").html(response.username)
-                toastr.success('Данные профиля успешно обновлены', 'Успех')
+    })
+    // loads preview images end
 
+
+
+    // update profile
+    let validator = $("#profile_update").validate({
+        submitHandler: function (e) {
+            e.preventDefault();
+            let fileData = profile_image.prop('files')[0];
+            let format_data = new FormData()
+            format_data.append('username', username.val())
+            format_data.append('password', new_password.val())
+            format_data.append('repeat_password', new_password2.val())
+            if (fileData) {
+                format_data.append('profile_image', fileData)
+            }
+            $('.content-wrapper').hide()
+            $('.dropdown-user').hide()
+            $.ajax({
+                type: "PUT",
+                url: "/api/profile/update",
+                enctype: 'multipart/form-data',
+                data: format_data,
+                success: function (response) {
+                    $('.content-wrapper').fadeIn("normal")
+                    $('.dropdown-user').fadeIn("normal")
+                    $(".user-name").html(response.username)
+                    toastr.success('Данные профиля успешно обновлены', 'Успех')
+
+                },
+                error: function (response) {
+                    console.log(response)
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+        },
+        rules: {
+            username: {
+                required: true,
+                minlength: 5
             },
-            error: function (response) {
-                console.log(response)
+        },
+        messages: {
+            username: {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 5 символов.",
             },
-            cache: false,
-            contentType: false,
-            processData: false
-        })
+        },
+        errorElement: 'span',
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('error');
+            if ($(element).parent().hasClass('input-group')) {
+                $(element).parent().addClass('is-invalid');
+            }
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('error');
+            if ($(element).parent().hasClass('input-group')) {
+                $(element).parent().removeClass('is-invalid');
+            }
+        }
     });
+    //
+
 
     $("#importWallet").submit(function (e) {
         e.preventDefault();
