@@ -11,9 +11,8 @@ Login
             <h2 class="brand-text text-dark ms-1">Вход</h2>
         </div>
         <div class="form-error text-center" style="color: red;">
-
         </div>
-        <form class="auth-login-form mt-2" id="login_form" method="post" novalidate="novalidate">
+        <form class="auth-login-form mt-2" id="login_form" method="post">
             <div class="mb-1">
                 <label for="login-email" class="form-label">Email</label>
                 <input type="text" class="form-control" id="login-email" name="login-email"
@@ -65,44 +64,36 @@ Login
 {% block scripts %}
 <script>
 
-    window.addEventListener('error', function (e) {
-        var error = e.error;
-        console.log(error)
-    });
-
-    $("#login_form").submit(function (e) {
-        const email = $('#login-email').val()
-        const password = $('#login-password').val()
-        const remember_me = $("input[type='checkbox']").prop('checked')
-        e.preventDefault()
-        console.log(remember_me)
-        $.ajax({
-            type: "POST",
-            url: "/api/auth/login",
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify({
-                email: email,
-                password: password,
-                rememberMe: remember_me
-            }),
-            success: function (response) {
-                if ('id' in response) {
-                    location.reload()
-                }
-            },
-            error: function (response) {
-                if (response.status === 401) {
-                    console.log(response.status + ' ' + response.statusText);
-                    $(".form-error").append(
-                        '<span id="login-email-error" class="error">Пожалуйста, введите действительный адрес электронной почты.</span>'
-                    )
-                }
-            }
-        })
-    })
-
     $("#login_form").validate({
+        submitHandler: function (form) {
+            const email = $('#login-email').val()
+            const password = $('#login-password').val()
+            const remember_me = $("input[type='checkbox']").prop('checked')
+            $.ajax({
+                type: "POST",
+                url: "/api/auth/login",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    email: email,
+                    password: password,
+                    rememberMe: remember_me
+                }),
+                success: function (response) {
+                    if ('id' in response) {
+                        location.reload()
+                    }
+                },
+                error: function (response) {
+                    if (response.status === 401) {
+                        console.log(response.status + ' ' + response.statusText);
+                        $(".form-error").html(
+                            '<span id="login-email-error" class="error">Недействительные учетные данные.</span>'
+                        )
+                    }
+                }
+            })
+        },
         rules: {
             'login-email': {
                 required: true,
@@ -112,7 +103,6 @@ Login
             'login-password': {
                 required: true,
             },
-
         },
         messages: {
             'login-email': {
@@ -122,6 +112,19 @@ Login
             'login-password': {
                 required: "Это поле обязательно к заполнению.",
             },
+        },
+        errorElement: 'span',
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('error');
+            if ($(element).parent().hasClass('input-group')) {
+                $(element).parent().addClass('is-invalid');
+            }
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('error');
+            if ($(element).parent().hasClass('input-group')) {
+                $(element).parent().removeClass('is-invalid');
+            }
         }
     });
 </script>

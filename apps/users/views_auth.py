@@ -74,7 +74,7 @@ async def login(
     db: Session = Depends(get_db),
 ):
     """
-    Login user in /n param rememberMe: if false access token expiration
+    Login user in\n param rememberMe: if false access token expiration
     15 seconds.
     """
     result = await user_manager.login(user, db)

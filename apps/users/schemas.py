@@ -49,6 +49,7 @@ class UserPayload(ApiSchema):
     id: UUID
     username: str
     avatar: Any
+    token: Union[str, None]
 
 
 class UserProfile(ApiSchema):

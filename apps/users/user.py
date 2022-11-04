@@ -19,7 +19,7 @@ async def get_current_user_payload(
         payload = await jwt_backend.decode_token(token)
         if payload is None:
             raise InvalidCredentialsException()
-        return UserPayload(**payload)
+        return UserPayload(**payload, token=token)
     except Exception:
         raise InvalidCredentialsException()
 

@@ -7,6 +7,7 @@ from fastapi_helper.utilities.password_helper import PasswordHelper
 from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
 
+from config.settings import settings
 from config.storage import SqlAlchemyStorage
 from config.utils.email_client import EmailSchema, create_email_client
 
@@ -22,6 +23,7 @@ from .exceptions import (
 )
 from .jwt_backend import JWTBackend
 from .schemas import UserLogin, UserRegister, UserUpdate
+from .utils.decoder import timestamp_to_period
 from .utils.validators import validate_email_, validate_password, validate_username
 
 
@@ -119,14 +121,17 @@ class UserManager:
     async def update(
         self,
         user_id: UUID,
+        user_token: str,
         user_data: UserUpdate,
         db: Session,
     ):
         """
+
         :param user_id:
+        :param user_token:
         :param user_data:
         :param db:
-        :return: user:
+        :return:
         """
         if not await validate_username(user_data.username):
             raise UsernameInvalidException()
@@ -162,8 +167,10 @@ class UserManager:
             db=db,
         )
         payload = await self.get_payload(user)
-        access_token = self.jwt_backend.create_access_token(payload, True)
-
+        old_token = await self.jwt_backend.decode_token(user_token)
+        access_token = self.jwt_backend.create_access_token(payload, False)
+        if timestamp_to_period(old_token.get("iat"), old_token.get("exp")) == settings.jwt_access_not_expiration:
+            access_token = self.jwt_backend.create_access_token(payload, True)
         return user, access_token
 
     async def update_permission(self, user_id: UUID, db: Session):

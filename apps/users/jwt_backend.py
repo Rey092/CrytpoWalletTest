@@ -39,7 +39,6 @@ class JWTBackend:
         exp = datetime.utcnow() + timedelta(seconds=expiration_delta)
         payload.update({"iat": iat, "exp": exp})
         token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
-
         return token
 
     def create_access_token(self, payload: dict, access_expiration: bool) -> str:

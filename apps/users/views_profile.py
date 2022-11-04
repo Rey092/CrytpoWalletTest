@@ -12,9 +12,8 @@ from apps.users.exceptions import (
     UsernameInvalidException,
 )
 from apps.users.manager import UserManager
-from apps.users.models import User
-from apps.users.schemas import UserProfile, UserUpdate
-from apps.users.user import get_current_user
+from apps.users.schemas import UserPayload, UserProfile, UserUpdate
+from apps.users.user import get_current_user, get_current_user_payload
 from config.storage import StorageException, ValidateFormatException
 
 profile_router = APIRouter()
@@ -53,7 +52,7 @@ async def get_profile(
 async def update_profile(
     response: Response,
     user_data: UserUpdate = Depends(UserUpdate.as_form),
-    user: User = Depends(get_current_user),
+    user: UserPayload = Depends(get_current_user_payload),
     user_manager: UserManager = Depends(get_user_manager),
     db: Session = Depends(get_db),
 ):
@@ -63,6 +62,7 @@ async def update_profile(
     """
     result = await user_manager.update(
         user.id,
+        user.token,
         user_data,
         db,
     )
