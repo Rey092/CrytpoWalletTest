@@ -1,11 +1,18 @@
 {% extends 'elements/base.html' %}
 
+{% block title %}
+Crypto Wallet|Profile
+{% endblock %}
+
+{% block style %}
+{% endblock %}
+
 
 {% block content %}
 <div class="app-content content ">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
-    <div class="content-wrapper container-xxl p-0">
+    <div class="content-wrapper container-xxl p-0" style="display: none;">
         <div class="content-body">
             <div class="row">
                 <div class="col-12">
@@ -128,8 +135,8 @@
                                         data-bs-toggle="modal" data-bs-target="#importWallet">
                                     Импортировать ETH кошелек
                                 </button>
-                                <button id="add_wallet"
-                                        class="btn btn-primary mt-1 waves-effect waves-float waves-light">
+                                <button class="btn btn-primary mt-1 waves-effect waves-float waves-light"
+                                        data-bs-toggle="modal" data-bs-target="#addWallet">
                                     Добавить ETH кошелек
                                 </button>
                             </div>
@@ -141,7 +148,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="importWallet" tabindex="-1" aria-labelledby="addNewCardTitle" style="display: none;"
+<div class="modal fade" id="addWallet" tabindex="-1" aria-labelledby="addNewCardTitle" style="display: none;"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -149,10 +156,35 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body px-sm-5 mx-50 pb-5">
-                <p class="text-center">Импортировать ETH кошелек</p>
-
+                <h1 class="text-center mb-1">Добавить ETH кошелек</h1>
+                <p class="text-center">Вы действительно хотите добавить новый кошелек?</p>
+                <form id="addNewWallet" class="row gy-1 gx-2 mt-75" onsubmit="return false"
+                      novalidate="novalidate">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
+                            Добавить
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect" data-bs-dismiss="modal"
+                                aria-label="Close">
+                            Отказаться
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="importWallet" tabindex="-1" aria-labelledby="importNew" style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-transparent">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-sm-5 mx-50 pb-5">
+                <h1 class="text-center mb-1">Импортировать ETH кошелек</h1>
                 <!-- form -->
-                <form id="addNewCardValidation" class="row gy-1 gx-2 mt-75" onsubmit="return false"
+                <form id="importNewWallet" class="row gy-1 gx-2 mt-75" onsubmit="return false"
                       novalidate="novalidate">
                     <div class="col-12">
                         <label class="form-label" for="modalAddCardNumber"></label>
@@ -167,8 +199,12 @@
                     </div>
 
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-1 mt-1 waves-effect waves-float waves-light">
-                            Save
+                        <button type="submit" class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
+                            Импортировать
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect" data-bs-dismiss="modal"
+                                aria-label="Close">
+                            Отказаться
                         </button>
                     </div>
                 </form>
@@ -184,34 +220,11 @@
 <script>
     const username = $("#username")
     const email = $("#email")
+    const new_password = $("#new_password")
+    const new_password2 = $("#new_password2")
     const messages = $("#messages")
     const wallets = $("#wallets")
-    const user_name = $(".user-name")
     const profile_image = $("#account-upload")
-
-
-    $("#logout").on('click', function () {
-        ajax_logout()
-    });
-
-
-    function render_wallets(wallets) {
-        if (wallets.length > 0) {
-            for (let wallet of wallets) {
-                $("#wallets-list").append(
-                    "                <div class=\"mt-1\">\n" +
-                    "                                <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
-                    "                                     alt=\"avatar\" height=\"40\" width=\"40\">\n" +
-                    "                                <a href=\"https://etherscan.io/address/" + wallet.address + "\"\n" +
-                    "                                   target=\"_blank\">\n" +
-                    "                                    " + wallet.address + "\n" +
-                    "                                </a>\n" +
-                    "                            </div>"
-                )
-            }
-        }
-    }
-
 
     $(window).on('load', function () {
         $.ajax({
@@ -219,54 +232,47 @@
             url: "/api/profile/get",
             success: function (response) {
                 if ('id' in response) {
-                    // if (response.avatar){
-                    //     $("#account-upload-img").attr(
-                    //         "src",
-                    //         "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
-                    //     )
-                    // }
+                    if (response.avatar) {
+                        $("#account-upload-img").attr(
+                            "src",
+                            "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
+                        )
+                    }
                     username.val(response.username)
                     email.val(response.email)
                     messages.html(response.countMessages)
                     wallets.html(response.wallets.length)
-                    user_name.html(response.username)
                     render_wallets(response.wallets)
                 }
             },
             error: function (response) {
             }
         })
+        $('.content-wrapper').fadeIn("normal")
     });
 
-
-    function ajax_logout() {
-        $.ajax({
-            type: "POST",
-            url: "/api/auth/logout",
-            success: function (response) {
-                console.log(response)
-                location.reload()
-            },
-            error: function (response) {
-            }
-        })
-    }
 
     $("#profile_update").submit(function (e) {
         e.preventDefault();
         let fileData = profile_image.prop('files')[0];
         let format_data = new FormData()
         format_data.append('username', username.val())
+        format_data.append('password', new_password.val())
+        format_data.append('repeat_password', new_password2.val())
         if (fileData) {
             format_data.append('profile_image', fileData)
         }
+        $('.content-wrapper').hide()
+        $('.dropdown-user').hide()
         $.ajax({
             type: "PUT",
             url: "/api/profile/update",
             enctype: 'multipart/form-data',
             data: format_data,
             success: function (response) {
-                user_name.html(response.username)
+                $('.content-wrapper').fadeIn("normal")
+                $('.dropdown-user').fadeIn("normal")
+                $(".user-name").html(response.username)
                 toastr.success('Данные профиля успешно обновлены', 'Успех')
 
             },
@@ -279,7 +285,16 @@
         })
     });
 
-    $("#add_wallet").on("click", function () {
+    $("#importWallet").submit(function (e) {
+        e.preventDefault();
+        $("button[type='reset']").trigger('click');
+
+
+    })
+
+    $("#addNewWallet").submit(function (e) {
+        e.preventDefault();
+        $("button[type='reset']").trigger('click');
         $.ajax({
             type: "POST",
             url: "/api/ethereum/wallets/create",
@@ -305,6 +320,23 @@
             }
         })
     });
+
+    function render_wallets(wallets) {
+        if (wallets.length > 0) {
+            for (let wallet of wallets) {
+                $("#wallets-list").append(
+                    "                <div class=\"mt-1\">\n" +
+                    "                                <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                    "                                     alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                    "                                <a href=\"https://etherscan.io/address/" + wallet.address + "\"\n" +
+                    "                                   target=\"_blank\">\n" +
+                    "                                    " + wallet.address + "\n" +
+                    "                                </a>\n" +
+                    "                            </div>"
+                )
+            }
+        }
+    }
 
 </script>
 

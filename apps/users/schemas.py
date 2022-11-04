@@ -33,6 +33,7 @@ class UserRegisterResponse(ApiSchema):
 class UserLogin(ApiSchema):
     email: EmailStr
     password: str
+    remember_me: bool
 
 
 class UserLoginResponse(ApiSchema):
@@ -48,6 +49,7 @@ class UserPayload(ApiSchema):
     id: UUID
     username: str
     avatar: Any
+    token: Union[str, None]
 
 
 class UserProfile(ApiSchema):

@@ -12,7 +12,8 @@
           rel="stylesheet">
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', path='/app-assets/vendors/css/vendors.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/extensions/toastr.min.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/vendors/css/extensions/toastr.min.css') }}">
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', path='/app-assets/vendors/css/charts/apexcharts.css') }}">
 
@@ -36,7 +37,8 @@
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', path='/app-assets/css/plugins/extensions/ext-component-toastr.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/assets/css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/plugins/extensions/ext-component-toastr.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/plugins/extensions/ext-component-toastr.css') }}">
     <title>{% block title %}Crypto Wallet{% endblock %}</title>
     <style type="text/css">.apexcharts-canvas {
         position: relative;
@@ -701,6 +703,7 @@
         height: 200%;
     }
     </style>
+    {% block style %}{% endblock %}
 </head>
 <!-- END: Head-->
 
@@ -715,6 +718,7 @@
     </div>
     <div class="pace-activity"></div>
 </div>
+<div id="overlayer"></div>
 
 
 <!-- BEGIN: Header-->
@@ -755,6 +759,24 @@
 <script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-toastr.js') }}"></script>
 
 <script>
+
+    $("#logout").on('click', function () {
+        ajax_logout()
+    });
+
+    function ajax_logout() {
+        $.ajax({
+            type: "POST",
+            url: "/api/auth/logout",
+            success: function (response) {
+                console.log(response)
+                location.reload()
+            },
+            error: function (response) {
+            }
+        })
+    }
+
     $(window).on('load', function () {
         if (feather) {
             feather.replace({
@@ -762,7 +784,27 @@
                 height: 14
             });
         }
+        $.ajax({
+            type: "GET",
+            url: "/api/profile/get",
+            success: function (response) {
+                $('.dropdown-user').fadeIn("normal")
+                if ('id' in response) {
+                    if (response.avatar) {
+                        $(".round").attr(
+                            "src",
+                            "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
+                        )
+                    }
+                    $(".user-name").html(response.username)
+                }
+            },
+            error: function (response) {
+            }
+        })
     })
+
+
 </script>
 
 {% block scripts %}{% endblock %}

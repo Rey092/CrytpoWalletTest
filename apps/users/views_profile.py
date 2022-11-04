@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi_helper.schemas.examples_generate import examples_generate
 from sqlalchemy.orm import Session
 from starlette import status
 
 from apps.users.dependencies import get_db, get_user_manager
+from apps.users.exceptions import (
+    DeleteImageInvalidException,
+    PasswordInvalidException,
+    PasswordMismatchException,
+    UsernameInvalidException,
+)
 from apps.users.manager import UserManager
-from apps.users.models import User
-from apps.users.schemas import UserProfile, UserUpdate
-from apps.users.user import get_current_user
+from apps.users.schemas import UserPayload, UserProfile, UserUpdate
+from apps.users.user import get_current_user, get_current_user_payload
+from config.storage import StorageException, ValidateFormatException
 
 profile_router = APIRouter()
 
@@ -29,10 +35,24 @@ async def get_profile(
     return user
 
 
-@profile_router.put("/update", response_model=UserProfile)
+@profile_router.put(
+    "/update",
+    status_code=status.HTTP_200_OK,
+    responses=examples_generate.get_error_responses(
+        UsernameInvalidException,
+        PasswordMismatchException,
+        StorageException,
+        ValidateFormatException,
+        DeleteImageInvalidException,
+        PasswordInvalidException,
+        auth=True,
+    ),
+    response_model=UserProfile,
+)
 async def update_profile(
+    response: Response,
     user_data: UserUpdate = Depends(UserUpdate.as_form),
-    user: User = Depends(get_current_user),
+    user: UserPayload = Depends(get_current_user_payload),
     user_manager: UserManager = Depends(get_user_manager),
     db: Session = Depends(get_db),
 ):
@@ -40,11 +60,11 @@ async def update_profile(
     Update user profile\n
     Permission: Is authenticated.
     """
-    user = await user_manager.update(
+    result = await user_manager.update(
         user.id,
+        user.token,
         user_data,
         db,
     )
-    print(user_data)
-
-    return user
+    response.set_cookie(key="Authorization", value=f"Bearer {result[-1]}")
+    return result[0]
