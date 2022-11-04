@@ -8,4 +8,4 @@ run:
 
 
 run_parser:
-	python manage.py ethereum-blocks-parser
+	python apps/network_ethereum/block_parser.py

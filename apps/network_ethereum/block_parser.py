@@ -6,13 +6,13 @@ import logging
 from aio_pika import DeliveryMode, ExchangeType, Message, connect_robust
 from websockets import connect
 
-from config.settings import settings
+# from config.settings import settings
 
 logger = logging.getLogger(__name__)
 
 
 async def get_event():
-    async with connect(settings.infura_api_url) as websocket:
+    async with connect("wss://sepolia.infura.io/ws/v3/7c8d5f115738446d9bf671107b64c3a7") as websocket:
         await websocket.send(
             '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["newHeads"]}',
         )
@@ -45,3 +45,7 @@ async def get_event():
 
             except Exception:
                 pass
+
+
+if __name__ == "__main__":
+    asyncio.run(get_event())
