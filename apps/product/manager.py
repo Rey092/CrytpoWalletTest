@@ -15,6 +15,7 @@ from apps.product.exceptions import (
 from apps.product.models import Order, Product
 from apps.product.schemas import OrderCreate, ProductCreate
 from apps.users.models import User
+from config.storage import SqlAlchemyStorage
 from config.web3_clients import EthereumProviderClient
 
 
@@ -23,13 +24,21 @@ class ProductManager:
         self,
         database: ProductDatabase,
         ethereum_provider: EthereumProviderClient,
+        storage: SqlAlchemyStorage,
     ):
         self.product_db = database
         self.ethereum_provider = ethereum_provider
+        self.storage = storage
 
     async def create_new_product(self, db: Session, product_create: ProductCreate) -> Product:
         if product_create.price <= 0:
             raise InvalidPriceException()
+        product_create.image = await self.storage.upload(
+            file=product_create.image,
+            upload_to="ibay",
+            sizes=(150, 150),
+            content_types=["png", "jpg", "jpeg"],
+        )
         product = await self.product_db.create_product(db, product_create)
         if not product:
             raise InvalidWalletException()

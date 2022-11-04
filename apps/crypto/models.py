@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import uuid
 
-from sqlalchemy import BigInteger, Boolean, Column, Enum, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, Enum, Float, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -47,7 +47,7 @@ class Transaction(Base):
     address_from = Column(String)
     address_to = Column(String)
     value = Column(Float)
-    age = Column(Integer)
+    age = Column(DateTime)
     txn_fee = Column(Float)
     status = Column(Boolean)
     fee = Column(Enum(TransactionFee))

@@ -69,27 +69,19 @@ class EthereumProviderClient(BaseClient, BaseDecoder):
             raise SendTransactionException(message=str(ex))
         return str(tx_receipt.transactionHash.hex())
 
-    async def get_transactions_by_block(self, block_hash, user_wallets: List[str]):
+    async def get_transactions_from_block(self, block_hash, addresses: List[str]):
         try:
             transactions = self.provider.eth.get_block(block_hash, True)["transactions"]
-        except Exception as ex:
-            print(str(ex))
+        except Exception:
             return
 
         if transactions:
-            for transaction in transactions:
-                print(f'Address from: {transaction["from"]}')  # noqa
-                print(f'Address to: {transaction["to"]}')  # noqa
-                if (
-                    transaction["to"] == "0x71Df913fab8083A7ed2529fd02eebEcB066E7549"  # noqa
-                    or transaction["from"] == "0x71Df913fab8083A7ed2529fd02eebEcB066E7549"  # noqa
-                ):
-                    print(f'Ура, есть совпадение! Вот нужная транзакция: {transaction.get("hash").hex()}')  # noqa
-                else:
-                    print("Совпадений нет =(")
-                print("------------------------------------------------------------")
-        else:
-            print("Транзакций в блоке нет!")
+            transactions = [
+                transaction
+                for transaction in transactions
+                if transaction["to"] in addresses or transaction["from"] in addresses  # noqa
+            ]
+            return transactions
 
 
 class EtherscanClient(BaseClient, BaseDecoder):
@@ -104,8 +96,10 @@ class EtherscanClient(BaseClient, BaseDecoder):
                 "address_to": transaction.get("to"),
                 "value": self.from_wei_to_eth(transaction.get("value")),
                 "age": self.timestamp_to_period(transaction.get("timeStamp")),
-                "txn_fee": self.from_wei_to_eth(int(transaction.get("gasPrice")) * int(transaction.get("gasUsed"))),
-                "status": True if int(transaction.get("txreceipt_status")) == 1 else False,
+                "txn_fee": self.from_wei_to_eth(int(transaction.get("gasPrice")) * 21000),
+                "status": True
+                if transaction.get("txreceipt_status") == "1" or transaction.get("txreceipt_status") is None
+                else False,
             }
             for transaction in data.get("result")
         ]

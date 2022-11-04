@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
-from typing import List, Type
+from typing import List, Tuple, Type
 
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from apps.crypto.enums import AssetCode, TransactionFee
 from apps.crypto.models import Asset, Transaction, Wallet
 from apps.crypto.schemas import WalletCreate
+from apps.crypto.utils.format_date import format_date
 
 
 class BaseCryptoDatabase(ABC):
@@ -25,6 +26,18 @@ class BaseCryptoDatabase(ABC):
         pass
 
     @abstractmethod
+    async def update_wallet_balance(self, db: Session, wallet: Wallet, value: float):
+        pass
+
+    @abstractmethod
+    async def update_wallet_balance_by_transaction(self, db: Session, couples: List[Tuple[Wallet, dict]]):
+        pass
+
+    @abstractmethod
+    async def get_wallets(self, db: Session) -> List[Wallet]:
+        pass
+
+    @abstractmethod
     async def get_wallet_by_private_key(self, db: Session, private_key: str, user_id: str) -> Wallet:
         pass
 
@@ -33,7 +46,7 @@ class BaseCryptoDatabase(ABC):
         pass
 
     @abstractmethod
-    async def get_wallets(self, db: Session, user_id: str) -> List[Wallet]:
+    async def get_wallets_by_user_id(self, db: Session, user_id: str) -> List[Wallet]:
         pass
 
     @abstractmethod
@@ -60,6 +73,25 @@ class EthereumDatabase(BaseCryptoDatabase):
         db.refresh(db_wallet)
         return db_wallet
 
+    async def get_wallets(self, db: Session) -> List[Wallet]:
+        return db.query(self.wallet).all()
+
+    async def update_wallet_balance(self, db: Session, wallet: Wallet, value: float):
+        wallet.balance = wallet.balance - value
+        db.add(wallet)
+        db.commit()
+        db.refresh(wallet)
+
+    async def update_wallet_balance_by_transaction(self, db: Session, couples: List[Tuple[Wallet, dict]]):
+        for couple in couples:
+            print(f"до {couple[0].balance}")
+            print(f'тран {float(couple[1]["value"])}')
+            couple[0].balance = float(couple[0].balance) + float(couple[1]["value"])
+            print(f"после {couple[0].balance}")
+            db.add(couple[0])
+            db.commit()
+            db.refresh(couple[0])
+
     async def get_wallet_by_private_key(self, db: Session, private_key: str, user_id: str) -> Wallet:
         return (
             db.query(self.wallet)
@@ -73,7 +105,7 @@ class EthereumDatabase(BaseCryptoDatabase):
     async def get_wallet_by_address(self, db: Session, address: str) -> Wallet:
         return db.query(self.wallet).filter(self.wallet.address == address).first()
 
-    async def get_wallets(self, db: Session, user_id: str) -> List[Wallet]:
+    async def get_wallets_by_user_id(self, db: Session, user_id: str) -> List[Wallet]:
         return db.query(self.wallet).filter(self.wallet.user_id == user_id).all()
 
     async def create_transaction(self, db: Session, transactions: List[dict]) -> None:
@@ -107,4 +139,6 @@ class EthereumDatabase(BaseCryptoDatabase):
             )
             .all()
         )
+        transactions = [format_date(transaction) for transaction in transactions]
+        print(transactions[0].age)
         return transactions

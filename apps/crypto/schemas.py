@@ -42,7 +42,7 @@ class TransactionDetail(ApiSchema):
     address_from: str
     address_to: str
     value: float
-    age: int
+    age: str
     txn_fee: Decimal
     status: bool
 

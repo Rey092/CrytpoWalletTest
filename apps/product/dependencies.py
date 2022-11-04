@@ -6,6 +6,7 @@ from apps.crypto.models import Wallet
 from apps.product.database import ProductDatabase
 from apps.product.manager import ProductManager
 from apps.product.models import Order, Product
+from apps.users.dependencies import get_storage
 from apps.users.models import User
 from config.db import SessionLocal
 from config.web3_clients import EthereumProviderClient
@@ -35,4 +36,5 @@ async def get_ethereum_provider_client() -> EthereumProviderClient:
 async def get_product_manager() -> ProductManager:
     product_db = await get_product_db()
     ethereum_provider = await get_ethereum_provider_client()
-    return ProductManager(product_db, ethereum_provider)
+    storage = await get_storage()
+    return ProductManager(product_db, ethereum_provider, storage)

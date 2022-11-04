@@ -71,7 +71,7 @@ class EthereumManager(BaseCryptoManager):
         return created_wallet
 
     async def get_all_users_wallets(self, db: Session, user_id: str) -> List[Wallet]:
-        return await self.ethereum_db.get_wallets(db, user_id)
+        return await self.ethereum_db.get_wallets_by_user_id(db, user_id)
 
     async def get_transactions_by_wallet_address(self, db: Session, address: str) -> List[Transaction]:
         return await self.ethereum_db.get_transactions(db, address)
@@ -85,7 +85,21 @@ class EthereumManager(BaseCryptoManager):
         if (wallet_from.balance - 0.001) < transaction_create.value:
             raise InvalidValueException(message="The value exceeds the balance of the wallet.")
         txn_hash = await self.ethereum_provider.send_raw_transaction(transaction_create, wallet_from)
+        if txn_hash:
+            await self.ethereum_db.update_wallet_balance(db, wallet_from, transaction_create.value)
         return {"txn_hash": txn_hash}
 
     async def check_transactions_in_block(self, db: Session, block_hash: str):
-        pass
+        wallets = await self.ethereum_db.get_wallets(db)
+        addresses = [wallet.address for wallet in wallets]
+        checked_transactions = await self.ethereum_provider.get_transactions_from_block(block_hash, addresses)
+        if checked_transactions:
+            transactions = await self.etherscan_client.get_result({"result": checked_transactions})
+            await self.ethereum_db.create_transaction(db, transactions)
+            couples_for_update_balance = [
+                (wallet, transaction)
+                for wallet in wallets
+                for transaction in transactions
+                if wallet.address == transaction["address_to"]
+            ]
+            await self.ethereum_db.update_wallet_balance_by_transaction(db, couples_for_update_balance)
