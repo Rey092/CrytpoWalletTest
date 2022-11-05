@@ -65,7 +65,7 @@ Login
 <script>
 
     $("#login_form").validate({
-        submitHandler: function (form) {
+        submitHandler: function () {
             const email = $('#login-email').val()
             const password = $('#login-password').val()
             const remember_me = $("input[type='checkbox']").prop('checked')
@@ -86,7 +86,6 @@ Login
                 },
                 error: function (response) {
                     if (response.status === 401) {
-                        console.log(response.status + ' ' + response.statusText);
                         $(".form-error").html(
                             '<span id="login-email-error" class="error">Недействительные учетные данные.</span>'
                         )
