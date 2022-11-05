@@ -13,6 +13,7 @@ from fastapi_helper.exceptions.validation_exceptions import init_validation_hand
 from starlette.staticfiles import StaticFiles
 
 from apps.crypto.api_service_consumer import main_consumer_thread
+from apps.crypto.wallets_balance_parser import parsing_balances_thread
 from apps.front.router import front_router
 from apps.users import models
 
@@ -99,7 +100,9 @@ def create_app() -> FastAPI:
     init_cache()
     init_logging()
 
+    # Start needed threads
     main_consumer_thread.start()
+    parsing_balances_thread.start()
 
     return app_
 

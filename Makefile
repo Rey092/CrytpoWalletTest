@@ -7,5 +7,9 @@ run:
 	uvicorn config.app:app --reload
 
 
+init:
+	python manage.py init
+
+
 run_parser:
 	python apps/network_ethereum/block_parser.py

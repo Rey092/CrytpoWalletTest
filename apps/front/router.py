@@ -4,6 +4,7 @@ from fastapi.routing import APIRouter
 from apps.front.auth_views import auth_front_router
 from apps.front.chat_views import chat_front_router
 from apps.front.profile_views import profile_front_router
+from apps.front.wallet_views import wallets_front_router
 
 front_router = APIRouter()
 
@@ -14,6 +15,9 @@ front_router.include_router(auth_front_router, prefix="/auth")
 # Profile
 front_router.include_router(profile_front_router, prefix="/profile")
 
+# Crypto
+front_router.include_router(wallets_front_router, prefix="/wallets")
+# front_router.include_router(product_front_router, prefix="/ibay")
 
-# # Crypto
+# Chat
 front_router.include_router(chat_front_router, prefix="/chat")

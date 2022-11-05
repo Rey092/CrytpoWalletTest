@@ -30,6 +30,10 @@ class BaseCryptoDatabase(ABC):
         pass
 
     @abstractmethod
+    async def update_balances(self, db: Session, wallets: List[Wallet]):
+        pass
+
+    @abstractmethod
     async def update_wallet_balance_by_transaction(self, db: Session, couples: List[Tuple[Wallet, dict]]):
         pass
 
@@ -77,20 +81,22 @@ class EthereumDatabase(BaseCryptoDatabase):
         return db.query(self.wallet).all()
 
     async def update_wallet_balance(self, db: Session, wallet: Wallet, value: float):
-        wallet.balance = wallet.balance - value
+        wallet.balance -= value
         db.add(wallet)
         db.commit()
         db.refresh(wallet)
 
+    async def update_balances(self, db: Session, wallets: List[Wallet]):
+        db.add_all(wallets)
+        db.commit()
+
     async def update_wallet_balance_by_transaction(self, db: Session, couples: List[Tuple[Wallet, dict]]):
+        wallets = []
         for couple in couples:
-            print(f"до {couple[0].balance}")
-            print(f'тран {float(couple[1]["value"])}')
-            couple[0].balance = float(couple[0].balance) + float(couple[1]["value"])
-            print(f"после {couple[0].balance}")
-            db.add(couple[0])
-            db.commit()
-            db.refresh(couple[0])
+            couple[0].balance += float(couple[1]["value"])
+            wallets.append(couple[0])
+        db.add_all(wallets)
+        db.commit()
 
     async def get_wallet_by_private_key(self, db: Session, private_key: str, user_id: str) -> Wallet:
         return (
@@ -114,8 +120,8 @@ class EthereumDatabase(BaseCryptoDatabase):
             db_transaction = self.transaction(
                 txn_hash=txn.get("txn_hash"),
                 block_number=txn.get("block_number"),
-                address_from=txn.get("address_from"),
-                address_to=txn.get("address_to"),
+                address_from=txn.get("address_from").lower(),
+                address_to=txn.get("address_to").lower(),
                 value=txn.get("value"),
                 age=txn.get("age"),
                 txn_fee=txn.get("txn_fee"),
@@ -125,9 +131,12 @@ class EthereumDatabase(BaseCryptoDatabase):
             )
             db.add(db_transaction)
             try:
+                # TODO: remove print
+                print("before commit")
                 db.commit()
-                db.refresh(db_transaction)
-            except Exception:
+                print("ok")
+            except Exception as ex:
+                print(str(ex))
                 db.rollback()
 
     async def get_transactions(self, db: Session, address: str) -> List[Transaction]:
@@ -140,5 +149,4 @@ class EthereumDatabase(BaseCryptoDatabase):
             .all()
         )
         transactions = [format_date(transaction) for transaction in transactions]
-        print(transactions[0].age)
         return transactions
