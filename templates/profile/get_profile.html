@@ -30,11 +30,12 @@ Crypto Wallet|Profile
                                          alt="profile image" height="100" width="100">
                                 </a>
                                 <!-- upload and reset button -->
-                                <div class="d-flex align-items-end mt-75 ms-1">
+                                <div class="d-flex align-items-end mt-75 ms-1" id="management_file">
                                     <div>
-                                        <label for="account-upload"
+                                        <label for="account-upload" id="label-upload"
                                                class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Загрузить</label>
-                                        <input type="file" id="account-upload" hidden="" accept="image/*">
+                                        <input type="file" id="account-upload" name="upload_image" hidden=""
+                                               accept="image/*">
                                         <button type="button" id="account-reset"
                                                 class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Удалить
                                         </button>
@@ -46,7 +47,8 @@ Crypto Wallet|Profile
                             <!--/ header section -->
 
                             <!-- form -->
-                            <form class="validate-form mt-2 pt-50" id="profile_update" method="post">
+                            <form class="validate-form mt-2 pt-50" id="profile_update" method="post"
+                                  novalidate="novalidate">
                                 <div class="row">
                                     <div class="col-12 col-sm-6 mb-1">
                                         <label class="form-label" for="username">Имя пользователя</label>
@@ -75,15 +77,19 @@ Crypto Wallet|Profile
                                                    placeholder="············"
                                                    aria-describedby="password"
                                                    tabindex="3">
-                                            <span class="input-group-text cursor-pointer"><svg
-                                                    xmlns="http://www.w3.org/2000/svg" width="14"
-                                                    height="14" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                    class="feather feather-eye"><path
-                                                    d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle
-                                                    cx="12" cy="12"
-                                                    r="3"></circle></svg></span>
+                                            <span class="input-group-text cursor-pointer">
+                                                <svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                        viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                        class="feather feather-eye">
+                                                    <path
+                                                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                                                    </path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-6 mb-1">
@@ -224,6 +230,7 @@ Crypto Wallet|Profile
     </div>
 </div>
 
+
 {% endblock %}
 
 
@@ -239,6 +246,8 @@ Crypto Wallet|Profile
     const profile_image = $("#account-upload")
     const profile_image_preload = $("#account-upload-img")
     var profile_image_def = null
+    const content = $('.content-wrapper')
+    const user_content = $('.dropdown-user')
     //
 
 
@@ -267,7 +276,7 @@ Crypto Wallet|Profile
             error: function (response) {
             }
         })
-        $('.content-wrapper').fadeIn("normal")
+        content.fadeIn(1000)
     });
     //
 
@@ -282,11 +291,37 @@ Crypto Wallet|Profile
     // loads preview images end
 
 
+    // delete image
+    $("#account-reset").on("click", function () {
+        $(this).parent().remove();
+        $("#management_file").append(
+            '<div>\n' +
+            '    <button type="reset" id="delete-reset" class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Отменить удаление\n' +
+            '    </button>\n' +
+            '</div>'
+        )
+    })
+    //
+
 
     // update profile
-    let validator = $("#profile_update").validate({
+
+    $.validator.addMethod("check_repeated_password", function (value) {
+        if (value.length > 0) {
+            let password = $('#new_password').val()
+            if (password === value) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return true
+        }
+    });
+
+
+    var validator = $("#profile_update").validate({
         submitHandler: function (e) {
-            e.preventDefault();
             let fileData = profile_image.prop('files')[0];
             let format_data = new FormData()
             format_data.append('username', username.val())
@@ -295,52 +330,99 @@ Crypto Wallet|Profile
             if (fileData) {
                 format_data.append('profile_image', fileData)
             }
-            $('.content-wrapper').hide()
-            $('.dropdown-user').hide()
+            content.hide()
+            user_content.hide()
             $.ajax({
                 type: "PUT",
                 url: "/api/profile/update",
                 enctype: 'multipart/form-data',
                 data: format_data,
                 success: function (response) {
-                    $('.content-wrapper').fadeIn("normal")
-                    $('.dropdown-user').fadeIn("normal")
-                    $(".user-name").html(response.username)
-                    toastr.success('Данные профиля успешно обновлены', 'Успех')
-
+                    if (response.id) {
+                        toastr.success('Данные профиля успешно обновлены', 'Успех')
+                        if (response.avatar) {
+                            $(".round").attr(
+                                "src",
+                                "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
+                            )
+                            $("#account-upload-img").attr(
+                                "src",
+                                "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
+                            )
+                        }
+                        $(".user-name").html(response.username)
+                        new_password.val("")
+                        new_password2.val("")
+                    }
                 },
                 error: function (response) {
-                    console.log(response)
+                    $("#account-upload-img").attr(
+                        "src",
+                        profile_image_def
+                    )
+                    if (response.status === 400 || response.status === 422) {
+                        let res = response.responseJSON
+                        if (res.length > 0) {
+                            if (res[0].code === 'format_error') {
+                                toastr.error(
+                                    'Загружаемый файл должен быть в формате [\'png\', \'jpg\', \'jpeg\'].',
+                                    'Ошибка'
+                                )
+                            } else {
+                                toastr.error(
+                                    'Произошла ошибка при попытке обновить профиль, проверьте правильность введенной информации',
+                                    'Ошибка'
+                                )
+                            }
+                        } else {
+                            toastr.error(
+                                'Произошла ошибка при попытке обновить профиль, проверьте правильность введенной информации',
+                                'Ошибка'
+                            )
+                        }
+                    }
                 },
                 cache: false,
                 contentType: false,
                 processData: false
             })
+            content.fadeIn(1000)
+            user_content.fadeIn(1000)
+            profile_image.val('');
+
         },
         rules: {
             username: {
                 required: true,
                 minlength: 5
             },
+            new_password: {
+                required: false,
+                minlength: 8,
+            },
+            new_password2: {
+                required: function (element) {
+                    return $("#new_password").val().length > 0;
+                },
+                minlength: 8,
+                check_repeated_password: true
+            }
         },
         messages: {
             username: {
                 required: "Это поле обязательно к заполнению.",
                 minlength: "Пожалуйста, введите не менее 5 символов.",
             },
-        },
-        errorElement: 'span',
-        highlight: function (element, errorClass, validClass) {
-            $(element).addClass('error');
-            if ($(element).parent().hasClass('input-group')) {
-                $(element).parent().addClass('is-invalid');
-            }
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element).removeClass('error');
-            if ($(element).parent().hasClass('input-group')) {
-                $(element).parent().removeClass('is-invalid');
-            }
+            new_password: {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 8 символов.",
+
+            },
+            new_password2: {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 8 символов.",
+                check_repeated_password: "Пароли не совпадают."
+            },
         }
     });
     //
@@ -396,6 +478,10 @@ Crypto Wallet|Profile
                     "                            </div>"
                 )
             }
+        } else {
+            $("#wallets-list").html(
+                "<p>У вас еще нет кошельков. Вы можете добавить новый или импортировать существующий.</p>"
+            )
         }
     }
 

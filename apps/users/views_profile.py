@@ -60,6 +60,7 @@ async def update_profile(
     Update user profile\n
     Permission: Is authenticated.
     """
+    print(user_data)
     result = await user_manager.update(
         user.id,
         user.token,
