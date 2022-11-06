@@ -34,9 +34,10 @@ Crypto Wallet|Profile
                                     <div>
                                         <label for="account-upload" id="label-upload"
                                                class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Загрузить</label>
-                                        <input type="file" id="account-upload" name="upload_image" hidden=""
+                                        <input type="file" id="account-upload" onchange="loadPreviewImage(this)"
+                                               name="upload_image" hidden=""
                                                accept="image/*">
-                                        <button type="button" id="account-reset"
+                                        <button type="button" id="delete_image" onclick="deleteImage()"
                                                 class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Удалить
                                         </button>
                                         <p class="mb-0">Допустимые типы файлов: png, jpg, jpeg.</p>
@@ -47,7 +48,7 @@ Crypto Wallet|Profile
                             <!--/ header section -->
 
                             <!-- form -->
-                            <form class="validate-form mt-2 pt-50" id="profile_update" method="post"
+                            <form class="validate-form mt-2 pt-50" id="profile_update" method="POST"
                                   novalidate="novalidate">
                                 <div class="row">
                                     <div class="col-12 col-sm-6 mb-1">
@@ -243,11 +244,15 @@ Crypto Wallet|Profile
     const new_password2 = $("#new_password2")
     const messages = $("#messages")
     const wallets = $("#wallets")
-    const profile_image = $("#account-upload")
     const profile_image_preload = $("#account-upload-img")
-    var profile_image_def = null
     const content = $('.content-wrapper')
     const user_content = $('.dropdown-user')
+    var delete_image = false
+    var profile_image_def = null
+    var profile_image = null
+    var host_file = "https://cryptowallet.fra1.digitaloceanspaces.com/"
+
+
     //
 
 
@@ -259,53 +264,89 @@ Crypto Wallet|Profile
             success: function (response) {
                 if ('id' in response) {
                     if (response.avatar) {
-                        $("#account-upload-img").attr(
+                        profile_image_preload.attr(
                             "src",
-                            "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
+                            host_file + response.avatar + ""
                         )
+                    } else {
+                        $("#delete_image").attr('disabled', 'disabled')
                     }
                     username.val(response.username)
                     email.val(response.email)
                     messages.html(response.countMessages)
                     wallets.html(response.wallets.length)
                     render_wallets(response.wallets)
-                    profile_image_def = $("#account-upload-img").attr('src')
+                    profile_image_def = profile_image_preload.attr('src')
 
                 }
             },
             error: function (response) {
+                console.log(response)
             }
         })
         content.fadeIn(1000)
     });
     //
 
-    // loads preview images
-    $('input[type=file]').on('change', function (element) {
-        if (element.target.files[0]) {
-            profile_image_preload.attr("src", URL.createObjectURL(element.target.files[0]))
+
+    // load preview images
+    function loadPreviewImage(element) {
+        if (element.files[0]) {
+            profile_image_preload.attr("src", URL.createObjectURL(element.files[0]))
+            profile_image = element.files[0]
         } else {
             profile_image_preload.attr("src", profile_image_def);
         }
-    })
+    }
+
     // loads preview images end
 
 
     // delete image
-    $("#account-reset").on("click", function () {
-        $(this).parent().remove();
-        $("#management_file").append(
+    function deleteImage() {
+        delete_image = true
+        profile_image_preload.attr("src",
+            "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}");
+        $("#management_file").html(
             '<div>\n' +
-            '    <button type="reset" id="delete-reset" class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Отменить удаление\n' +
+            '    <button type="reset" onclick="backImageUpload(true)" class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Отменить удаление\n' +
             '    </button>\n' +
             '</div>'
         )
-    })
+    }
+
+    function backImageUpload(flag) {
+        delete_image = false
+        profile_image_preload.attr("src", profile_image_def);
+        if (flag) {
+            $("#management_file").html(
+                '<div>\n' +
+                '    <label for="account-upload" id="label-upload" class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Загрузить</label>\n' +
+                '    <input type="file" id="account-upload" name="upload_image" onchange="loadPreviewImage(this)" hidden="" accept="image/*">\n' +
+                '    <button type="button" onclick="deleteImage()" class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Удалить\n' +
+                '    </button>\n' +
+                '    <p class="mb-0">Допустимые типы файлов: png, jpg, jpeg.</p>\n' +
+                '</div>'
+            )
+        } else {
+            $("#management_file").html(
+                '<div>\n' +
+                '    <label for="account-upload" id="label-upload" class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Загрузить</label>\n' +
+                '    <input type="file" id="account-upload" name="upload_image" onchange="loadPreviewImage(this)" hidden="" accept="image/*">\n' +
+                '    <button type="button" onclick="deleteImage()" class="btn btn-sm btn-outline-secondary mb-75 waves-effect" disabled> Удалить\n' +
+                '    </button>\n' +
+                '    <p class="mb-0">Допустимые типы файлов: png, jpg, jpeg.</p>\n' +
+                '</div>'
+            )
+        }
+    }
+
     //
 
 
     // update profile
 
+    // custom validation method
     $.validator.addMethod("check_repeated_password", function (value) {
         if (value.length > 0) {
             let password = $('#new_password').val()
@@ -318,37 +359,42 @@ Crypto Wallet|Profile
             return true
         }
     });
+    //
 
 
     var validator = $("#profile_update").validate({
         submitHandler: function (e) {
-            let fileData = profile_image.prop('files')[0];
-            let format_data = new FormData()
-            format_data.append('username', username.val())
-            format_data.append('password', new_password.val())
-            format_data.append('repeat_password', new_password2.val())
-            if (fileData) {
-                format_data.append('profile_image', fileData)
-            }
             content.hide()
             user_content.hide()
+            let fileData = profile_image
+            let form_data = new FormData()
+            form_data.append('username', username.val())
+            form_data.append('password', new_password.val())
+            form_data.append('repeat_password', new_password2.val())
+            form_data.append('delete', delete_image)
+            if (fileData) {
+                form_data.append('profile_image', fileData)
+            }
             $.ajax({
                 type: "PUT",
                 url: "/api/profile/update",
                 enctype: 'multipart/form-data',
-                data: format_data,
+                data: form_data,
                 success: function (response) {
+                    toastr.success('Данные профиля успешно обновлены', 'Успех')
                     if (response.id) {
-                        toastr.success('Данные профиля успешно обновлены', 'Успех')
                         if (response.avatar) {
                             $(".round").attr(
-                                "src",
-                                "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
+                                "src", host_file + response.avatar + ""
                             )
                             $("#account-upload-img").attr(
-                                "src",
-                                "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
+                                "src", host_file + response.avatar + ""
                             )
+                            profile_image_def = host_file + response.avatar + ""
+                            backImageUpload(true)
+                        } else {
+                            profile_image_def = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+                            backImageUpload(false)
                         }
                         $(".user-name").html(response.username)
                         new_password.val("")
@@ -357,8 +403,7 @@ Crypto Wallet|Profile
                 },
                 error: function (response) {
                     $("#account-upload-img").attr(
-                        "src",
-                        profile_image_def
+                        "src", profile_image_def
                     )
                     if (response.status === 400 || response.status === 422) {
                         let res = response.responseJSON
@@ -388,8 +433,8 @@ Crypto Wallet|Profile
             })
             content.fadeIn(1000)
             user_content.fadeIn(1000)
-            profile_image.val('');
-
+            profile_image = null;
+            delete_image = false
         },
         rules: {
             username: {
