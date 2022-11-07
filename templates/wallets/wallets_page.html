@@ -5,6 +5,17 @@ Crypto Wallet | My Wallets
 {% endblock %}
 
 {% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css') }}">
+<style>
+    .trans_row {
+        max-width: 200px;
+        min-width: 150px;
+        overflow: hidden;
+    }
+</style>
 {% endblock %}
 
 
@@ -22,40 +33,9 @@ Crypto Wallet | My Wallets
                             <h4 class="card-title">Кошельки</h4>
                         </div>
                         <div id="wallets_list" class="row card-body py-2 my-25">
-                            <!-- Wallet -->
-<!--                            <div class="col-xl-6 col-md-12 col-sm-12">-->
-<!--                                <div class="card shadow-none border cursor-pointer">-->
-<!--                                    <div class="card-body">-->
-<!--                                        <div class="d-flex">-->
-<!--                                            <a href="#" class="me-25">-->
-<!--                                                <img src="{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}" alt="avatar" height="90">-->
-<!--                                            </a>-->
-<!--                                            <div class="row" style="font-size: 14px">-->
-<!--                                                <div class="d-flex align-items-top mt-75 ms-1">-->
-<!--                                                    <p><b>Адрес:</b><span style="font-size: calc(9px + 0.5vw)"> <a href="">0x6FaC1e909c842EC23BF7A7A40f5675f0b42c20B4</a></span></p>-->
-<!--                                                </div>-->
-<!--                                                <div class="d-flex align-items-top mt-75 ms-1">-->
-<!--                                                    <p><b>Баланс:</b><span class="card-title"> <b>1.297036991 ETH</b></span></p>-->
-<!--                                                </div>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                        <div class="row d-flex align-items-end mt-75" style="text-align: center">-->
-<!--                                            <div class="row">-->
-<!--                                                <div class="col-lg-4 col-md-4">-->
-<!--                                                    <button type="button" class="btn btn-sm btn-info waves-effect" style="width: 100%; margin: 2px; height: 35px">Просмотреть транзакции</button>-->
-<!--                                                </div>-->
-<!--                                                <div class="col-lg-4 col-md-4">-->
-<!--                                                    <button type="button" class="btn btn-sm btn-success waves-effect" style="width: 100%; margin: 2px; height: 35px">Отправить транзакцию</button>-->
-<!--                                                </div>-->
-<!--                                                <div class="col-lg-4 col-md-4">-->
-<!--                                                    <button type="button" class="btn btn-sm btn-warning waves-effect" style="width: 100%; margin: 2px; height: 35px">Получить 0,5 ETH</button>-->
-<!--                                                </div>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-                            <!-- Wallet end -->
+                            <!-- Wallets -->
+
+                            <!-- Wallets end -->
                         </div>
                     </div>
                     <!-- All user's wallets end-->
@@ -64,116 +44,57 @@ Crypto Wallet | My Wallets
         </div>
     </div>
 </div>
-<div class="modal fade" id="addWallet" tabindex="-1" aria-labelledby="addNewCardTitle" style="display: none;"
+<div class="modal fade" id="allTransactions" tabindex="-1" aria-labelledby="addNewCardTitle" style="display: none;"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-xl" >
         <div class="modal-content">
             <div class="modal-header bg-transparent">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body px-sm-5 mx-50 pb-5">
-                <h1 class="text-center mb-1">Добавить ETH кошелек</h1>
-                <p class="text-center">Вы действительно хотите добавить новый кошелек?</p>
-                <form id="addNewWallet" class="row gy-1 gx-2 mt-75" onsubmit="return false"
-                      novalidate="novalidate">
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
-                            Добавить
-                        </button>
-                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect" data-bs-dismiss="modal"
-                                aria-label="Close">
-                            Отказаться
-                        </button>
-                    </div>
-                </form>
+            <div class="modal-body px-sm-5 mx-50 pb-5 table-responsive">
+                <h5 class="text-center">Список транзакций <b>ETH</b> кошелька по адресу <b><span id="some_address"></span></b></h5>
+                <table class="table dataTable no-footer dtr-column" id="trans_datatable" role="grid" aria-describedby="DataTables_Table_3_info">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 200px; width: 20%; overflow: hidden">Txn Hash</th>
+                            <th style="min-width: 200px; width: 20%; overflow: hidden">From</th>
+                            <th style="min-width: 200px; width: 20%; overflow: hidden">To</th>
+                            <th>Value</th>
+                            <th>Age</th>
+                            <th>Txn Fee</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+<!--                        <tr style="min-width: 1200px">-->
+<!--                            <td style="max-width: 200px; overflow: hidden"><a target="_blank" href="https://sepolia.etherscan.io/tx/0x94c1510af6b8e9dd548afd5b1c91f58d5dab57e816a5d198fec6563311ea2aa6">0x94c1510af6b8e9dd548afd5b1c91f58d5dab57e816a5d198fec6563311ea2aa6</a></td>-->
+<!--                            <td style="max-width: 200px; overflow: hidden"><a target="_blank" href="https://sepolia.etherscan.io/address/0x37887c26f804ae2e4812a723583b45012434bb63">0x37887C26F804AE2E4812a723583B45012434bB63</a></td>-->
+<!--                            <td style="max-width: 200px; overflow: hidden"><a target="_blank" href="https://sepolia.etherscan.io/address/0x6FaC1e909c842EC23BF7A7A40f5675f0b42c20B4">0x6FaC1e909c842EC23BF7A7A40f5675f0b42c20B4</a></td>-->
+<!--                            <td>0.3 Ether</td>-->
+<!--                            <td>10 min ago</td>-->
+<!--                            <td>0.0000525</td>-->
+<!--                            <td style="color: green">Success</td>-->
+<!--                        </tr>-->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="importWallet" tabindex="-1" aria-labelledby="importNew" style="display: none;"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-transparent">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-sm-5 mx-50 pb-5">
-                <h1 class="text-center mb-1">Импортировать ETH кошелек</h1>
-                <!-- form -->
-                <form id="importNewWallet11" class="row gy-1 gx-2 mt-75" onsubmit="return false"
-                      novalidate="novalidate">
-                    <div class="col-12">
-                        <label class="form-label" for="modalAddCardNumber1"></label>
-                        <div class="input-group input-group-merge">
-                            <input id="modalAddCardNumber1" name="modalAddCard" class="form-control add-credit-card-mask"
-                                   type="text" placeholder="Enter private key" aria-describedby="modalAddCard2"
-                                   data-msg="Please enter your credit card number">
-                            <span class="input-group-text cursor-pointer p-25" id="modalAddCard2">
-                                                <span class="add-card-type"></span>
-                                            </span>
-                        </div>
-                    </div>
-
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
-                            Импортировать
-                        </button>
-                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect" data-bs-dismiss="modal"
-                                aria-label="Close">
-                            Отказаться
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="send_transaction" tabindex="-1" aria-labelledby="importNew" style="display: none;"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-transparent">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-sm-5 mx-50 pb-5">
-                <h1 class="text-center mb-1">Отправка <b>ETH</b></h1>
-                <!-- form -->
-                <form id="importNewWallet1" class="row gy-1 gx-2 mt-75" onsubmit="return false"
-                      novalidate="novalidate">
-                    <div class="col-12">
-                        <div class="input-group input-group-merge">
-                            <input id="modalAddCardNumber12" name="modalAddCard" class="form-control add-credit-card-mask"
-                                   type="text" placeholder="Введите адрес получателя" aria-describedby="modalAddCard2"
-                                   data-msg="Please enter your credit card number">
-                        </div>
-                        <div class="input-group input-group-merge mt-75">
-                            <input id="modalAddCardNumber123" name="modalAddCard" class="form-control add-credit-card-mask"
-                                   type="text" placeholder="Колличество ETH" aria-describedby="modalAddCard2"
-                                   data-msg="Please enter your credit card number">
-                        </div>
-                    </div>
-
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
-                            Отправить
-                        </button>
-                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect" data-bs-dismiss="modal"
-                                aria-label="Close">
-                            Отказаться
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
 
 {% block scripts %}
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/responsive.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/datatables.buttons.min.js') }}"></script>
 <script>
+    let wallet_address
+    let validator
+
+    // ajax for get all user's wallets
     $(window).on('load', function () {
         $.ajax({
             type: "GET",
@@ -187,46 +108,220 @@ Crypto Wallet | My Wallets
         $('.content-wrapper').fadeIn("normal")
     });
 
+
+    // render all wallets for user
     function render_user_wallets(wallets) {
         if (wallets.length > 0) {
             for (let wallet of wallets) {
                 $("#wallets_list").append(
                     "<div class=\"col-xl-6 col-md-12 col-sm-12\">\n" +
-                    "                                <div class=\"card shadow-none border cursor-pointer\">\n" +
-                    "                                    <div class=\"card-body\">\n" +
-                    "                                        <div class=\"d-flex\">\n" +
-                    "                                            <a href=\"#\" class=\"me-25\">\n" +
-                    "                                                <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\" alt=\"avatar\" height=\"90\">\n" +
-                    "                                            </a>\n" +
-                    "                                            <div class=\"row\" style=\"font-size: 14px\">\n" +
-                    "                                                <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
-                    "                                                    <p><b>Адрес:</b><span style=\"font-size: calc(9px + 0.5vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + wallet.address + "\">" + wallet.address + "</a></span></p>\n" +
-                    "                                                </div>\n" +
-                    "                                                <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
-                    "                                                    <p><b>Баланс:</b><span class=\"card-title\"> <b>" + wallet.balance + " ETH</b></span></p>\n" +
-                    "                                                </div>\n" +
-                    "                                            </div>\n" +
-                    "                                        </div>\n" +
-                    "                                        <div class=\"row d-flex align-items-end mt-75\" style=\"text-align: center\">\n" +
-                    "                                            <div class=\"row\">\n" +
-                    "                                                <div class=\"col-lg-4 col-md-4\">\n" +
-                    "                                                    <button type=\"button\" class=\"btn btn-sm btn-primary waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\">Просмотреть транзакции</button>\n" +
-                    "                                                </div>\n" +
-                    "                                                <div class=\"col-lg-4 col-md-4\">\n" +
-                    "                                                    <button type=\"button\" class=\"btn btn-sm btn-success waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"modal\" data-bs-target=\"#send_transaction\">Отправить транзакцию</button>\n" +
-                    "                                                </div>\n" +
-                    "                                                <div class=\"col-lg-4 col-md-4\">\n" +
-                    "                                                    <button type=\"button\" class=\"btn btn-sm btn-info waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\"><a href=\"https://sepoliafaucet.net/\" target=\"_blank\" style=\"color: white\">Получить 0.5 ETH</a></button>\n" +
-                    "                                                </div>\n" +
-                    "                                            </div>\n" +
-                    "                                        </div>\n" +
-                    "                                    </div>\n" +
-                    "                                </div>\n" +
-                    "                            </div>"
+                    "    <div class=\"card shadow-none border cursor-pointer\">\n" +
+                    "        <div class=\"card-body\">\n" +
+                    "            <div class=\"d-flex\">\n" +
+                    "                <a href=\"#\" class=\"me-25\">\n" +
+                    "                    <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\" alt=\"avatar\" height=\"90\">\n" +
+                    "                </a>\n" +
+                    "                <div class=\"row\" style=\"font-size: 14px\">\n" +
+                    "                    <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
+                    "                        <p><b>Адрес:</b><span style=\"font-size: calc(9px + 0.5vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + wallet.address + "\">" + wallet.address + "</a></span></p>\n" +
+                    "                    </div>\n" +
+                    "                    <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
+                    "                        <p><b>Баланс:</b><span class=\"card-title\"> <b>" + wallet.balance + " ETH</b></span></p>\n" +
+                    "                    </div>\n" +
+                    "                </div>\n" +
+                    "            </div>\n" +
+                    "            <div class=\"row d-flex align-items-end mt-75\" style=\"text-align: center\">\n" +
+                    "                <div class=\"row\">\n" +
+                    "                    <div class=\"col-lg-4 col-md-4\">\n" +
+                    "                        <button onclick='watch_transactions(this.value)' type=\"button\" value=\"" + wallet.address + "\" class=\"btn btn-sm btn-primary waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"modal\" data-bs-target=\"#allTransactions\">Просмотреть транзакции</button>\n" +
+                    "                    </div>\n" +
+                    "                    <div class=\"col-lg-4 col-md-4\">\n" +
+                    "                        <button onclick='get_wallet_address(this.value)' type=\"button\" value=\"" + wallet.address + "\" class=\"btn btn-sm btn-success waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"modal\" data-bs-target=\"#send_transaction_" + wallet.id + "\">Отправить транзакцию</button>\n" +
+                    "                    </div>\n" +
+                    "                    <div class=\"col-lg-4 col-md-4\">\n" +
+                    "                        <button type=\"button\" class=\"btn btn-sm btn-info waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\"><a href=\"https://sepoliafaucet.net/\" target=\"_blank\" style=\"color: white\">Получить 0.5 ETH</a></button>\n" +
+                    "                    </div>\n" +
+                    "                </div>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</div>\n" +
+                    "<div class=\"modal fade\" id=\"send_transaction_" + wallet.id + "\" tabindex=\"-1\" aria-labelledby=\"importTrans\" style=\"display: none;\"\n" +
+                    "     aria-hidden=\"true\">\n" +
+                    "    <div class=\"modal-dialog modal-dialog-centered\">\n" +
+                    "        <div class=\"modal-content\">\n" +
+                    "            <div class=\"modal-header bg-transparent\">\n" +
+                    "                <button type=\"button\" class=\"close-send-modal btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>\n" +
+                    "            </div>\n" +
+                    "            <div class=\"modal-body px-sm-5 mx-50 pb-5\">\n" +
+                    "                <h1 class=\"text-center mb-1\">Отправка <b>ETH</b></h1>\n" +
+                    "                <!-- form -->\n" +
+                    "                <form id=\"form_" + wallet.id + "\" class=\"row gy-1 gx-2 mt-75\" onsubmit=\"return false\"\n" +
+                    "                      novalidate=\"novalidate\">\n" +
+                    "                    <div class=\"col-12\">\n" +
+                    "                        <div class=\"input-group input-group-merge\">\n" +
+                    "                            <input id=\"sender_address_" + wallet.id + "\" name=\"address\" class=\"form-control add-credit-card-mask\"\n" +
+                    "                                   type=\"text\" placeholder=\"Введите адрес получателя\">\n" +
+                    "                        </div>\n" +
+                    "                        <div class=\"input-group input-group-merge mt-75\">\n" +
+                    "                            <input id=\"amount_eth_" + wallet.id + "\" name=\"amount\" class=\"form-control add-credit-card-mask\"\n" +
+                    "                                   type=\"text\" placeholder=\"Колличество ETH\">\n" +
+                    "                        </div>\n" +
+                    "                    </div>\n" +
+                    "\n" +
+                    "                    <div class=\"col-12 text-center\">\n" +
+                    "                        <button onclick=\"submit_trans(this.value)\" value=\"" + wallet.id + "\" type=\"submit\" class=\"btn btn-primary me-1 mt-2 waves-effect waves-float waves-light\">\n" +
+                    "                            Отправить\n" +
+                    "                        </button>\n" +
+                    "                        <button onclick=\"close_send_modal()\" type=\"reset\" class=\"close-send-modal btn btn-outline-secondary mt-2 waves-effect\" data-bs-dismiss=\"modal\"\n" +
+                    "                                aria-label=\"Close\">\n" +
+                    "                            Отказаться\n" +
+                    "                        </button>\n" +
+                    "                    </div>\n" +
+                    "                </form>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</div>"
                 )
             }
         }
     }
 
+    // after click on button get address this wallet for send transactions
+    function get_wallet_address(value){
+        wallet_address = value
+    }
+
+    // send transaction on another wallet + validation
+    function submit_trans(value){
+        validator = $("#form_" + value).validate({
+            submitHandler: function () {
+                const address_to = $('#sender_address_' + value).val()
+                const eth_value = $('#amount_eth_' + value).val()
+                $.ajax({
+                    type: "POST",
+                    url: "/api/ethereum/transactions/send",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        addressFrom: wallet_address,
+                        addressTo: address_to,
+                        value: eth_value
+                    }),
+                    success: function (response) {
+                        console.log(response)
+                    },
+                    error: function (response) {
+
+                    }
+                })
+            },
+            rules: {
+                'address': {
+                    required: true
+                },
+                'amount': {
+                    required: true
+                }
+            },
+            messages: {
+                'address': {
+                    required: "Это поле обязательно к заполнению."
+                },
+                'amount': {
+                    required: "Это поле обязательно к заполнению."
+                }
+            },
+            errorElement: 'span',
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('error');
+                if ($(element).parent().hasClass('input-group')) {
+                $(element).parent().addClass('is-invalid');
+            }
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('error');
+                if ($(element).parent().hasClass('input-group')) {
+                    $(element).parent().removeClass('is-invalid');
+                }
+            }
+        })
+    }
+
+    function close_send_modal(){
+        validator.resetForm()
+    }
+
+    // watch transactions by wallet
+    function watch_transactions(value){
+        $('#some_address').html(value)
+        $.ajax({
+            type: "GET",
+            url: "/api/ethereum/transactions/" + value,
+            success: function (response) {
+                render_wallet_transaction(response)
+            },
+            error: function (response) {
+            }
+        })
+    }
+
+    table = $('#trans_datatable').DataTable({
+            "responsive": false,
+            "lengthChange": false,
+            "autoWidth": false,
+            "ordering": false,
+            "searching": false,
+            "language": {
+                "infoFiltered": "(Отфильтровано _MAX_ записей)",
+                "zeroRecords": "Записей не найдено",
+                "info": "Показано с _START_ по _END_ записей из _TOTAL_",
+                "infoEmpty": "Нет записей.",
+                "search": "Поиск:",
+                "paginate": {
+                    "previous": "Предыдущая",
+                    "last": "Последняя",
+                    "next": "Следующая"
+                }
+            }
+        })
+
+    function render_wallet_transaction(transactions){
+        table.clear().draw()
+        if (transactions.length > 0) {
+            for (let trans of transactions){
+                table.row.add([
+                    "<a target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/" + trans.txnHash + "\">" + trans.txnHash + "</a>",
+                    "<a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + trans.addressFrom + "\">" + trans.addressFrom + "</a>",
+                    "<a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + trans.addressTo + "\">" + trans.addressTo + "</a>",
+                    trans.value + " Ether",
+                    "" + timer(trans.age) + " ago",
+                    "" + trans.txnFee + "<span style='color: lawngreen; font-size: 12px; float: right'> $</span>",
+                    "<span style='color: green'>Success</span>",
+                ]).draw()
+            }
+        }
+        $('td', table.rows().nodes()).addClass('trans_row');
+    }
+
+    function timer(value) {
+        let date = new Date(value)
+        let seconds = Math.floor((new Date() - date) / 1000)
+        let minutes = seconds / 60
+        let hours = minutes / 60
+        let days = hours / 24
+
+        if (seconds < 60) {
+            return Math.floor(seconds) + " secs"
+        }
+        if (minutes < 60) {
+            return `${Math.floor(minutes) } mins`
+        }
+        if (hours < 24) {
+            return Math.floor(hours) + " hrs " + Math.floor(minutes / 60) + " mins"
+        }
+        return Math.floor(days) + " days " + Math.floor(hours / 24) + " hrs"
+    }
 </script>
 {% endblock %}

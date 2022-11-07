@@ -14,18 +14,15 @@ async def parsing_balance():
     ethereum_manager = await get_ethereum_manager()
 
     while True:
-        await asyncio.sleep(10)
+        await asyncio.sleep(120)
         wallets = await ethereum_manager.get_all_wallets(db)
         wallets_for_update = []
 
         for wallet in wallets:
             balance = await ethereum_manager.parse_wallet_balance(wallet.address)
             if float(balance) != float(wallet.balance):
-                print(f"Change balance from {wallet.balance} to {balance}")
                 wallet.balance = balance
                 wallets_for_update.append(wallet)
-            else:
-                print("balance OK")
         await ethereum_manager.update_wallets_balances(db, wallets_for_update)
 
 
