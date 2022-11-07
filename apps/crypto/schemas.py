@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import datetime
 from decimal import Decimal
+from typing import Optional
 from uuid import UUID
 
 from fastapi_helper.schemas.camel_schema import ApiSchema
@@ -42,7 +44,7 @@ class TransactionDetail(ApiSchema):
     address_from: str
     address_to: str
     value: float
-    age: str
+    age: Optional[datetime.datetime]
     txn_fee: Decimal
     status: bool
 

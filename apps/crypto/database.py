@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from apps.crypto.enums import AssetCode, TransactionFee
 from apps.crypto.models import Asset, Transaction, Wallet
 from apps.crypto.schemas import WalletCreate
-from apps.crypto.utils.format_date import format_date
 
 
 class BaseCryptoDatabase(ABC):
@@ -148,5 +147,5 @@ class EthereumDatabase(BaseCryptoDatabase):
             )
             .all()
         )
-        transactions = [format_date(transaction) for transaction in transactions]
+
         return transactions
