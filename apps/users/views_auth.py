@@ -19,6 +19,7 @@ from apps.users.models import User
 from apps.users.schemas import UserLogin, UserLoginResponse, UserLogoutResponse, UserRegisterResponse
 from apps.users.tasks import update_permission
 from apps.users.user import get_current_user
+from config.settings import settings
 
 auth_router = APIRouter()
 
@@ -45,7 +46,11 @@ async def register(
     result = await user_manager.create(user, db, background_tasks)
     result[0]["access_token"] = result[-1]
     background_tasks.add_task(update_permission, result[0]["id"], db, user_manager)
-    response.set_cookie(key="Authorization", value=f'Bearer {result[0]["access_token"]}')
+    response.set_cookie(
+        key="Authorization",
+        value=f'Bearer {result[0]["access_token"]}',
+        expires=settings.jwt_access_not_expiration,
+    )
     return result[0]
 
 
@@ -79,5 +84,9 @@ async def login(
     """
     result = await user_manager.login(user, db)
     result[0]["access_token"] = result[-1]
-    response.set_cookie(key="Authorization", value=f'Bearer {result[0]["access_token"]}')
+    response.set_cookie(
+        key="Authorization",
+        value=f'Bearer {result[0]["access_token"]}',
+        expires=settings.jwt_access_not_expiration,
+    )
     return result[0]

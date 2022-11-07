@@ -197,7 +197,9 @@ Crypto Wallet|Profile
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-transparent">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button"
+                        class="btn-close close-import-modal"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body px-sm-5 mx-50 pb-5">
                 <h1 class="text-center mb-1">Импортировать ETH кошелек</h1>
@@ -205,22 +207,31 @@ Crypto Wallet|Profile
                 <form id="importNewWallet" class="row gy-1 gx-2 mt-75" onsubmit="return false"
                       novalidate="novalidate">
                     <div class="col-12">
-                        <label class="form-label" for="modalAddCardNumber"></label>
+                        <label class="form-label" for="privateKey"></label>
                         <div class="input-group input-group-merge">
-                            <input id="modalAddCardNumber" name="modalAddCard" class="form-control add-credit-card-mask"
+                            <input id="privateKey" name="privateKey" class="form-control add-credit-card-mask"
                                    type="text" placeholder="Enter private key" aria-describedby="modalAddCard2"
                                    data-msg="Please enter your credit card number">
                             <span class="input-group-text cursor-pointer p-25" id="modalAddCard2">
                                                 <span class="add-card-type"></span>
                                             </span>
+
                         </div>
+                        <div class="text-center mt-2" id="loading_import" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
+                        <button type="submit"
+                                class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
                             Импортировать
                         </button>
-                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect" data-bs-dismiss="modal"
+                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect close-import-modal"
+                                data-bs-dismiss="modal"
                                 aria-label="Close">
                             Отказаться
                         </button>
@@ -251,7 +262,6 @@ Crypto Wallet|Profile
     var profile_image_def = null
     var profile_image = null
     var host_file = "https://cryptowallet.fra1.digitaloceanspaces.com/"
-
 
     //
 
@@ -296,6 +306,7 @@ Crypto Wallet|Profile
             profile_image = element.files[0]
         } else {
             profile_image_preload.attr("src", profile_image_def);
+            profile_image = null
         }
     }
 
@@ -305,6 +316,7 @@ Crypto Wallet|Profile
     // delete image
     function deleteImage() {
         delete_image = true
+        profile_image = null
         profile_image_preload.attr("src",
             "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}");
         $("#management_file").html(
@@ -362,6 +374,7 @@ Crypto Wallet|Profile
     //
 
 
+    // validate form for update profile
     var validator = $("#profile_update").validate({
         submitHandler: function (e) {
             content.hide()
@@ -393,6 +406,9 @@ Crypto Wallet|Profile
                             profile_image_def = host_file + response.avatar + ""
                             backImageUpload(true)
                         } else {
+                            $(".round").attr(
+                                "src", "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+                            )
                             profile_image_def = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
                             backImageUpload(false)
                         }
@@ -413,9 +429,19 @@ Crypto Wallet|Profile
                                     'Загружаемый файл должен быть в формате [\'png\', \'jpg\', \'jpeg\'].',
                                     'Ошибка'
                                 )
-                            } else {
+                            }
+                            if (res[0].code === 'username_error') {
                                 toastr.error(
-                                    'Произошла ошибка при попытке обновить профиль, проверьте правильность введенной информации',
+                                    'Имя пользователя должно содержать не менее: от 5 до 40 символов, ' +
+                                    'без специальных символов',
+                                    'Ошибка'
+                                )
+                            }
+                            if (res[0].code === 'password_error') {
+                                toastr.error(
+                                    'Пароль должен содержать как минимум: ' +
+                                    'одну цифру, одну заглавную букву, одну строчную букву, ' +
+                                    'один специальный символ [$@#]',
                                     'Ошибка'
                                 )
                             }
@@ -472,13 +498,97 @@ Crypto Wallet|Profile
     });
     //
 
+    // import wallet
+    import_validator = $("#importNewWallet").validate({
+        submitHandler: function () {
+            $("#loading_import").css('display', 'block')
+            $("button").attr('disabled', 'disabled')
+            privateKeyValue = $("#privateKey").val()
+            console.log(privateKeyValue)
+            $.ajax({
+                type: "POST",
+                url: "/api/ethereum/wallets/import",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    privateKey: privateKeyValue,
 
-    $("#importWallet").submit(function (e) {
-        e.preventDefault();
-        $("button[type='reset']").trigger('click');
+                }),
+                success: function (response) {
+                    if (response.address) {
+                        $("#loading_import").css('display', 'none')
+                        $("button").removeAttr('disabled')
+                        $("button[type='reset']").trigger('click');
+                        let count = Number(wallets.text())
+                        wallets.html(count + 1)
+                        $("#no_wallets").remove()
+                        $("#wallets-list").append(
+                            "<div class=\"mt-1\">\n" +
+                            "    <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                            "         alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                            "    <a href=\"https://etherscan.io/address/" + response.address + "\"\n" +
+                            "       target=\"_blank\">\n" + response.address + "\n" +
+                            "    </a>\n" +
+                            " </div>"
+                        )
+                        toastr.success('Импортирован новый кошелек', 'Успех')
+                    }
+                },
+                error: function (response) {
+                    $("#loading_import").css('display', 'none')
+                    $("button").removeAttr('disabled')
+                    if (response.status === 400 || response.status === 422) {
+                        let res = response.responseJSON
+                        if (res.length > 0) {
+                            if (res[0].code === 'private_key_error') {
+                                if (res[0].type === 'Invalid Private Key') {
+                                    toastr.error(
+                                        'Неверный приватный ключ.',
+                                        'Ошибка'
+                                    )
+                                } else {
+                                    toastr.error(
+                                        'Кошелек с таким адресом уже существует для этого пользователя.',
+                                        'Ошибка'
+                                    )
+                                }
+                            } else {
+                                toastr.error(
+                                    'Произошла ошибка при попытке импортировать кошелек',
+                                    'Ошибка'
+                                )
+                            }
+                        }
+                    } else {
+                        toastr.error(
+                            'Произошла ошибка при попытке импортировать кошелек',
+                            'Ошибка'
+                        )
+                    }
+                }
+            })
+        },
+        rules: {
+            privateKey: {
+                required: true,
+                minlength: 64
+            },
+        },
+        messages: {
+            privateKey: {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 64 символов.",
+            }
+        }
+    });
 
-
+    $(".close-import-modal").on("click", function (){
+        import_validator.resetForm();
     })
+    //
+
+
+
 
     $("#addNewWallet").submit(function (e) {
         e.preventDefault();
@@ -489,15 +599,15 @@ Crypto Wallet|Profile
             success: function (response) {
                 let count = Number(wallets.text())
                 wallets.html(count + 1)
+                $("#no_wallets").remove()
                 $("#wallets-list").append(
-                    "                <div class=\"mt-1\">\n" +
-                    "                                <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
-                    "                                     alt=\"avatar\" height=\"40\" width=\"40\">\n" +
-                    "                                <a href=\"https://etherscan.io/address/" + response.address + "\"\n" +
-                    "                                   target=\"_blank\">\n" +
-                    "                                    " + response.address + "\n" +
-                    "                                </a>\n" +
-                    "                            </div>"
+                    "<div class=\"mt-1\">\n" +
+                    "    <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                    "         alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                    "     <a href=\"https://etherscan.io/address/" + response.address + "\"\n" +
+                    "        target=\"_blank\">\n" + response.address + "\n" +
+                    "      </a>\n" +
+                    "</div>"
                 )
 
                 toastr.success('Добавлен новый кошелек', 'Успех')
@@ -513,19 +623,18 @@ Crypto Wallet|Profile
         if (wallets.length > 0) {
             for (let wallet of wallets) {
                 $("#wallets-list").append(
-                    "                <div class=\"mt-1\">\n" +
-                    "                                <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
-                    "                                     alt=\"avatar\" height=\"40\" width=\"40\">\n" +
-                    "                                <a href=\"https://etherscan.io/address/" + wallet.address + "\"\n" +
-                    "                                   target=\"_blank\">\n" +
-                    "                                    " + wallet.address + "\n" +
-                    "                                </a>\n" +
-                    "                            </div>"
+                    "<div class=\"mt-1\">\n" +
+                    "    <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                    "         alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                    "     <a href=\"https://etherscan.io/address/" + wallet.address + "\"\n" +
+                    "        target=\"_blank\">\n" + wallet.address + "\n" +
+                    "      </a>\n" +
+                    "</div>"
                 )
             }
         } else {
             $("#wallets-list").html(
-                "<p>У вас еще нет кошельков. Вы можете добавить новый или импортировать существующий.</p>"
+                "<p id='no_wallets'>У вас еще нет кошельков. Вы можете добавить новый или импортировать существующий.</p>"
             )
         }
     }
