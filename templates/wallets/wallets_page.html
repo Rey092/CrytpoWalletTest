@@ -15,6 +15,14 @@ Crypto Wallet | My Wallets
         min-width: 150px;
         overflow: hidden;
     }
+    @media (max-width: 576px) {
+      .eth-image {
+        width: 50px;
+        height: 50px;
+        margin: 15px -15px 0 -10px;
+        padding: 0;
+      }
+    }
 </style>
 {% endblock %}
 
@@ -34,7 +42,6 @@ Crypto Wallet | My Wallets
                         </div>
                         <div id="wallets_list" class="row card-body py-2 my-25">
                             <!-- Wallets -->
-
                             <!-- Wallets end -->
                         </div>
                     </div>
@@ -60,22 +67,12 @@ Crypto Wallet | My Wallets
                             <th style="min-width: 200px; width: 20%; overflow: hidden">From</th>
                             <th style="min-width: 200px; width: 20%; overflow: hidden">To</th>
                             <th>Value</th>
-                            <th>Age</th>
+                            <th style="color: #0d6cb1">Age</th>
                             <th>Txn Fee</th>
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-<!--                        <tr style="min-width: 1200px">-->
-<!--                            <td style="max-width: 200px; overflow: hidden"><a target="_blank" href="https://sepolia.etherscan.io/tx/0x94c1510af6b8e9dd548afd5b1c91f58d5dab57e816a5d198fec6563311ea2aa6">0x94c1510af6b8e9dd548afd5b1c91f58d5dab57e816a5d198fec6563311ea2aa6</a></td>-->
-<!--                            <td style="max-width: 200px; overflow: hidden"><a target="_blank" href="https://sepolia.etherscan.io/address/0x37887c26f804ae2e4812a723583b45012434bb63">0x37887C26F804AE2E4812a723583B45012434bB63</a></td>-->
-<!--                            <td style="max-width: 200px; overflow: hidden"><a target="_blank" href="https://sepolia.etherscan.io/address/0x6FaC1e909c842EC23BF7A7A40f5675f0b42c20B4">0x6FaC1e909c842EC23BF7A7A40f5675f0b42c20B4</a></td>-->
-<!--                            <td>0.3 Ether</td>-->
-<!--                            <td>10 min ago</td>-->
-<!--                            <td>0.0000525</td>-->
-<!--                            <td style="color: green">Success</td>-->
-<!--                        </tr>-->
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -119,18 +116,18 @@ Crypto Wallet | My Wallets
                     "        <div class=\"card-body\">\n" +
                     "            <div class=\"d-flex\">\n" +
                     "                <a href=\"#\" class=\"me-25\">\n" +
-                    "                    <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\" alt=\"avatar\" height=\"90\">\n" +
+                    "                    <img class='eth-image' src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\" alt=\"avatar\" height=\"90\">\n" +
                     "                </a>\n" +
                     "                <div class=\"row\" style=\"font-size: 14px\">\n" +
                     "                    <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
-                    "                        <p><b>Адрес:</b><span style=\"font-size: calc(9px + 0.5vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + wallet.address + "\">" + wallet.address + "</a></span></p>\n" +
+                    "                        <p><b>Адрес:</b><span style=\"font-size: calc(8px + 0.4vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + wallet.address + "\">" + wallet.address + "</a></span></p>\n" +
                     "                    </div>\n" +
                     "                    <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
                     "                        <p><b>Баланс:</b><span class=\"card-title\"> <b>" + wallet.balance + " ETH</b></span></p>\n" +
                     "                    </div>\n" +
                     "                </div>\n" +
                     "            </div>\n" +
-                    "            <div class=\"row d-flex align-items-end mt-75\" style=\"text-align: center\">\n" +
+                    "            <div class=\"row align-items-end mt-75 ms-1\" style=\"text-align: center\">\n" +
                     "                <div class=\"row\">\n" +
                     "                    <div class=\"col-lg-4 col-md-4\">\n" +
                     "                        <button onclick='watch_transactions(this.value)' type=\"button\" value=\"" + wallet.address + "\" class=\"btn btn-sm btn-primary waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"modal\" data-bs-target=\"#allTransactions\">Просмотреть транзакции</button>\n" +
@@ -146,7 +143,7 @@ Crypto Wallet | My Wallets
                     "        </div>\n" +
                     "    </div>\n" +
                     "</div>\n" +
-                    "<div class=\"modal fade\" id=\"send_transaction_" + wallet.id + "\" tabindex=\"-1\" aria-labelledby=\"importTrans\" style=\"display: none;\"\n" +
+                    "<div class=\"modal fade \" data-bs-backdrop=\"static\" id=\"send_transaction_" + wallet.id + "\" tabindex=\"-1\" aria-labelledby=\"importTrans\" style=\"display: none;\"\n" +
                     "     aria-hidden=\"true\">\n" +
                     "    <div class=\"modal-dialog modal-dialog-centered\">\n" +
                     "        <div class=\"modal-content\">\n" +
@@ -168,6 +165,11 @@ Crypto Wallet | My Wallets
                     "                                   type=\"text\" placeholder=\"Колличество ETH\">\n" +
                     "                        </div>\n" +
                     "                    </div>\n" +
+                    "                    <div class=\"text-center mt-2\" id=\"loading_import_" + wallet.id + "\" style=\"display: none;\">\n" +
+                    "                        <div class=\"spinner-border text-primary\" role=\"status\">\n" +
+                    "                            <span class=\"visually-hidden\">Loading...</span>\n" +
+                    "                        </div>\n" +
+                    "                    </div>" +
                     "\n" +
                     "                    <div class=\"col-12 text-center\">\n" +
                     "                        <button onclick=\"submit_trans(this.value)\" value=\"" + wallet.id + "\" type=\"submit\" class=\"btn btn-primary me-1 mt-2 waves-effect waves-float waves-light\">\n" +
@@ -185,8 +187,13 @@ Crypto Wallet | My Wallets
                     "</div>"
                 )
             }
+        } else {
+            $("#wallets_list").append(
+                '<h4 class="card-title text-center">У вас ещё нет созданых кошельков... Перейдите в профиль для создания.</h4>'
+            )
         }
     }
+
 
     // after click on button get address this wallet for send transactions
     function get_wallet_address(value){
@@ -197,6 +204,9 @@ Crypto Wallet | My Wallets
     function submit_trans(value){
         validator = $("#form_" + value).validate({
             submitHandler: function () {
+                $('#loading_import_' + value).css('display', 'block')
+                $("button").attr('disabled', 'disabled')
+                $("input").attr('disabled', 'disabled')
                 const address_to = $('#sender_address_' + value).val()
                 const eth_value = $('#amount_eth_' + value).val()
                 $.ajax({
@@ -210,27 +220,74 @@ Crypto Wallet | My Wallets
                         value: eth_value
                     }),
                     success: function (response) {
-                        console.log(response)
+                        $('#loading_import_' + value).css('display', 'none')
+                        $("button").removeAttr('disabled')
+                        $("input").removeAttr('disabled')
+                        $("button[type='reset']").trigger('click');
+                        toastr.options = {
+                          "closeButton": true,
+                          "debug": false,
+                          "newestOnTop": false,
+                          "progressBar": false,
+                          "positionClass": "toast-bottom-right",
+                          "preventDuplicates": false,
+                          "onclick": null,
+                          "showDuration": "300",
+                          "hideDuration": "1000",
+                          "timeOut": 0,
+                          "extendedTimeOut": 0,
+                          "showEasing": "swing",
+                          "hideEasing": "linear",
+                          "showMethod": "fadeIn",
+                          "hideMethod": "fadeOut",
+                          "tapToDismiss": false
+                        }
+                        toastr.success('Отправка произведена. <a style=\"color: #007aff; font-weight: bold\" target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/' + response.txnHash + '\">Ссылка на транзакцию', 'Успех')
                     },
                     error: function (response) {
-
+                        $('#loading_import_' + value).css('display', 'none')
+                        $("button").removeAttr('disabled')
+                        $("input").removeAttr('disabled')
+                        if (response.status === 400 || response.status === 422) {
+                            let res = response.responseJSON
+                            if (res[0].code === 'address_error') {
+                                toastr.error(
+                                    'Введённый адрес получателя некорректен.',
+                                    'Ошибка'
+                                )
+                            } else if (res[0].code === 'value_error') {
+                                toastr.error(
+                                    'Введённое значение некорректно.',
+                                    'Ошибка'
+                                )
+                            } else {
+                                toastr.error(
+                                    'Что-то пошло не так. Перепроверьте баланс вашего кошелька или адрес получателя',
+                                    'Ошибка'
+                                )
+                            }
+                        }
                     }
                 })
             },
             rules: {
                 'address': {
-                    required: true
+                    required: true,
+                    minlength: 32
                 },
                 'amount': {
-                    required: true
+                    required: true,
+                    min: 0
                 }
             },
             messages: {
                 'address': {
-                    required: "Это поле обязательно к заполнению."
+                    required: "Это поле обязательно к заполнению.",
+                    minlength: "Пожалуйста, введите не менее 32(hex) символов."
                 },
                 'amount': {
-                    required: "Это поле обязательно к заполнению."
+                    required: "Это поле обязательно к заполнению.",
+                    min: "Минимальное значение не может быть меньше 0 и баланса вашего кошелька."
                 }
             },
             errorElement: 'span',
@@ -267,12 +324,21 @@ Crypto Wallet | My Wallets
         })
     }
 
+
+    // init datatable
     table = $('#trans_datatable').DataTable({
             "responsive": false,
             "lengthChange": false,
             "autoWidth": false,
-            "ordering": false,
+            "ordering": true,
             "searching": false,
+            'columnDefs': [
+                {
+                    'orderable': false,
+                    'targets': [0, 1, 2, 3, 5, 6]
+                }
+            ],
+            order: [],
             "language": {
                 "infoFiltered": "(Отфильтровано _MAX_ записей)",
                 "zeroRecords": "Записей не найдено",
@@ -286,6 +352,7 @@ Crypto Wallet | My Wallets
                 }
             }
         })
+
 
     function render_wallet_transaction(transactions){
         table.clear().draw()
