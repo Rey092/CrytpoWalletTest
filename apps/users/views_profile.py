@@ -14,6 +14,7 @@ from apps.users.exceptions import (
 from apps.users.manager import UserManager
 from apps.users.schemas import UserPayload, UserProfile, UserUpdate
 from apps.users.user import get_current_user, get_current_user_payload
+from config.settings import settings
 from config.storage import StorageException, ValidateFormatException
 
 profile_router = APIRouter()
@@ -66,5 +67,9 @@ async def update_profile(
         user_data,
         db,
     )
-    response.set_cookie(key="Authorization", value=f"Bearer {result[-1]}")
+    response.set_cookie(
+        key="Authorization",
+        value=f"Bearer {result[-1]}",
+        expires=settings.jwt_access_not_expiration,
+    )
     return result[0]
