@@ -2,6 +2,7 @@
 from async_lru import alru_cache
 from fastapi_helper.schemas.examples_generate import ExamplesGenerate
 
+from apps.crypto.api_service_producer import ApiServiceProducer
 from apps.crypto.database import EthereumDatabase
 from apps.crypto.manager import EthereumManager
 from apps.crypto.models import Asset, Transaction, Wallet
@@ -33,6 +34,11 @@ async def get_etherscan_client() -> EtherscanClient:
 @alru_cache()
 async def get_ethereum_provider_client() -> EthereumProviderClient:
     return EthereumProviderClient()
+
+
+@alru_cache()
+async def get_api_service_producer() -> ApiServiceProducer:
+    return ApiServiceProducer()
 
 
 @alru_cache()

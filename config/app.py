@@ -3,6 +3,7 @@
 import pathlib
 from typing import List
 
+import socketio
 import toml
 from fastapi import FastAPI, Request
 from fastapi.middleware import Middleware
@@ -15,6 +16,8 @@ from starlette.staticfiles import StaticFiles
 from apps.crypto.api_service_consumer import main_consumer_thread
 from apps.crypto.wallets_balance_parser import parsing_balances_thread
 from apps.front.router import front_router
+from apps.socketio_app.socket_server import sio
+from apps.socketio_app.socket_service_consumer import socket_consumer_thread
 from apps.users import models
 
 # from config.celery_utils import create_celery
@@ -86,6 +89,8 @@ def create_app() -> FastAPI:
         openapi_tags=metadata_tags,
     )
 
+    socketio.ASGIApp(sio, app_)
+
     # app_.celery_app = create_celery()
 
     # Adds startup and shutdown events.
@@ -103,6 +108,7 @@ def create_app() -> FastAPI:
     # Start needed threads
     main_consumer_thread.start()
     parsing_balances_thread.start()
+    socket_consumer_thread.start()
 
     return app_
 
