@@ -1,29 +1,31 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import datetime
 import json
-import logging
 
 from aio_pika import DeliveryMode, ExchangeType, Message, connect_robust
 from websockets import connect
 
-# from config.settings import settings
-
-logger = logging.getLogger(__name__)
+from config.settings import settings
 
 
 async def get_event():
-    async with connect("wss://sepolia.infura.io/ws/v3/7c8d5f115738446d9bf671107b64c3a7") as websocket:
+    async with connect(settings.infura_api_url) as websocket:
         await websocket.send(
             '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["newHeads"]}',
         )
         subscription_response = await websocket.recv()
-        logger.info(f"Parser start successfully {subscription_response}")
+        print(f"Parser start successfully {subscription_response}")
 
         while True:
             try:
                 message = await asyncio.wait_for(websocket.recv(), timeout=2)
                 response = json.loads(message)
                 block_number = response["params"]["result"]["number"]
+                print(
+                    f'{datetime.datetime.now().strftime("%H:%M:%S")} '
+                    f"-- Got new block form Ethereum Network -- {block_number}",
+                )
 
                 connection = await connect_robust("amqp://guest:guest@localhost/")
 
