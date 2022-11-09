@@ -3,7 +3,7 @@ import asyncio
 import logging
 from threading import Thread
 
-from apps.crypto.dependencies import get_ethereum_manager
+from apps.crypto.dependencies import get_api_service_producer, get_ethereum_manager
 from config.db import SessionLocal
 
 logger = logging.getLogger(__name__)
@@ -12,9 +12,10 @@ logger = logging.getLogger(__name__)
 async def parsing_balance():
     db = SessionLocal()
     ethereum_manager = await get_ethereum_manager()
+    producer = await get_api_service_producer()
 
     while True:
-        await asyncio.sleep(120)
+        await asyncio.sleep(10)
         wallets = await ethereum_manager.get_all_wallets(db)
         wallets_for_update = []
 
@@ -23,6 +24,10 @@ async def parsing_balance():
             if float(balance) != float(wallet.balance):
                 wallet.balance = balance
                 wallets_for_update.append(wallet)
+                await producer.publish_message(
+                    exchange_name="wallet_balance_exchange",
+                    message={str(wallet.id): balance},
+                )
         await ethereum_manager.update_wallets_balances(db, wallets_for_update)
 
 
