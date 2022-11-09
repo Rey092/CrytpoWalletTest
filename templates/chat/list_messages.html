@@ -7,6 +7,8 @@ Crypto Wallet|Chat
 {% block style %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/pages/app-chat.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/pages/app-chat-list.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/css/themes/bordered-layout.css') }}">
 {% endblock %}
 
 
@@ -14,166 +16,21 @@ Crypto Wallet|Chat
 <div class="app-content content chat-application">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
-    <div class="content-area-wrapper container-xxl p-0">
+    <div class="content-area-wrapper container-xxl p-0" id="block">
         <div class="sidebar-left">
             <div class="sidebar">
-                <!-- Admin user profile area -->
-                <div class="chat-profile-sidebar">
-                    <header class="chat-profile-header">
-                            <span class="close-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6"
-                                                                                             y2="18"></line><line x1="6"
-                                                                                                                  y1="6"
-                                                                                                                  x2="18"
-                                                                                                                  y2="18"></line></svg>
-                            </span>
-                        <!-- User Information -->
-                        <div class="header-profile-sidebar">
-                            <div class="avatar box-shadow-1 avatar-xl avatar-border">
-                                <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg" alt="user_avatar">
-                                <span class="avatar-status-online avatar-status-xl"></span>
-                            </div>
-                            <h4 class="chat-user-name">John Doe</h4>
-                            <span class="user-post">Admin</span>
-                        </div>
-                        <!--/ User Information -->
-                    </header>
-                    <!-- User Details start -->
-                    <div class="profile-sidebar-area ps ps--active-y">
-                        <h6 class="section-label mb-1">About</h6>
-                        <div class="about-user">
-                            <textarea data-length="120" class="form-control char-textarea" id="textarea-counter"
-                                      rows="5" placeholder="About User">Dessert chocolate cake lemon drops jujubes. Biscuit cupcake ice cream bear claw brownie brownie marshmallow.</textarea>
-                            <small class="counter-value float-end"><span class="char-count">108</span> / 120 </small>
-                        </div>
-                        <!-- To set user status -->
-                        <h6 class="section-label mb-1 mt-3">Status</h6>
-                        <ul class="list-unstyled user-status">
-                            <li class="pb-1">
-                                <div class="form-check form-check-success">
-                                    <input type="radio" id="activeStatusRadio" name="userStatus"
-                                           class="form-check-input" value="online" checked="">
-                                    <label class="form-check-label ms-25" for="activeStatusRadio">Active</label>
-                                </div>
-                            </li>
-                            <li class="pb-1">
-                                <div class="form-check form-check-danger">
-                                    <input type="radio" id="dndStatusRadio" name="userStatus" class="form-check-input"
-                                           value="busy">
-                                    <label class="form-check-label ms-25" for="dndStatusRadio">Do Not Disturb</label>
-                                </div>
-                            </li>
-                            <li class="pb-1">
-                                <div class="form-check form-check-warning">
-                                    <input type="radio" id="awayStatusRadio" name="userStatus" class="form-check-input"
-                                           value="away">
-                                    <label class="form-check-label ms-25" for="awayStatusRadio">Away</label>
-                                </div>
-                            </li>
-                            <li class="pb-1">
-                                <div class="form-check form-check-secondary">
-                                    <input type="radio" id="offlineStatusRadio" name="userStatus"
-                                           class="form-check-input" value="offline">
-                                    <label class="form-check-label ms-25" for="offlineStatusRadio">Offline</label>
-                                </div>
-                            </li>
-                        </ul>
-                        <!--/ To set user status -->
-
-                        <!-- User settings -->
-                        <h6 class="section-label mb-1 mt-2">Settings</h6>
-                        <ul class="list-unstyled">
-                            <li class="d-flex justify-content-between align-items-center mb-1">
-                                <div class="d-flex align-items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                         stroke-linejoin="round"
-                                         class="feather feather-check-square me-75 font-medium-3">
-                                        <polyline points="9 11 12 14 22 4"></polyline>
-                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                                    </svg>
-                                    <span class="align-middle">Two-step Verification</span>
-                                </div>
-                                <div class="form-check form-switch me-0">
-                                    <input type="checkbox" class="form-check-input" id="customSwitch1" checked="">
-                                    <label class="form-check-label" for="customSwitch1"></label>
-                                </div>
-                            </li>
-                            <li class="d-flex justify-content-between align-items-center mb-1">
-                                <div class="d-flex align-items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                         stroke-linejoin="round" class="feather feather-bell me-75 font-medium-3">
-                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                                    </svg>
-                                    <span class="align-middle">Notification</span>
-                                </div>
-                                <div class="form-check form-switch me-0">
-                                    <input type="checkbox" class="form-check-input" id="customSwitch2">
-                                    <label class="form-check-label" for="customSwitch2"></label>
-                                </div>
-                            </li>
-                            <li class="mb-1 d-flex align-items-center cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" class="feather feather-user me-75 font-medium-3">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                                <span class="align-middle">Invite Friends</span>
-                            </li>
-                            <li class="d-flex align-items-center cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" class="feather feather-trash me-75 font-medium-3">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                                <span class="align-middle">Delete Account</span>
-                            </li>
-                        </ul>
-                        <!--/ User settings -->
-
-                        <!-- Logout Button -->
-                        <div class="mt-3">
-                            <button class="btn btn-primary waves-effect waves-float waves-light">
-                                <span>Logout</span>
-                            </button>
-                        </div>
-                        <!--/ Logout Button -->
-                        <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
-                            <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
-                        </div>
-                        <div class="ps__rail-y" style="top: 0px; height: 616px; right: 0px;">
-                            <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 579px;"></div>
-                        </div>
-                    </div>
-                    <!-- User Details end -->
-                </div>
-                <!--/ Admin user profile area -->
-
                 <!-- Chat Sidebar area -->
                 <div class="sidebar-content">
                         <span class="sidebar-close-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6"
-                                                                                         y2="18"></line><line x1="6"
-                                                                                                              y1="6"
-                                                                                                              x2="18"
-                                                                                                              y2="18"></line></svg>
+                            <i data-feather="x"></i>
                         </span>
                     <!-- Sidebar header start -->
                     <div class="chat-fixed-search">
                         <div class="d-flex align-items-center w-100">
-                            <div class="sidebar-profile-toggle">
-                                <div class="avatar avatar-border">
-                                    <img class="round"
-                                         src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
-                                         alt="avatar" height="40" width="40">
+                            <div>
+                                <div class="avatar">
+                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+                                         alt="user_avatar" class="round" height="42" width="42"/>
                                     <span class="avatar-status-online"></span>
                                 </div>
                             </div>
@@ -182,62 +39,35 @@ Crypto Wallet|Chat
                     <!-- Sidebar header end -->
 
                     <!-- Sidebar Users start -->
-                    <div id="users-list" class="chat-user-list-wrapper list-group ps ps--active-y">
-                        <h4 class="chat-list-title">Онлайн</h4>
-                        <ul class="chat-users-list chat-list media-list">
-                            <li class="active">
-                                    <span class="avatar"><img
-                                            src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
-                                            height="42"
-                                            width="42" alt="Generic placeholder image">
-                                        <span class="avatar-status-offline"></span>
+                    <div class="chat-user-list-wrapper list-group">
+                        <h4 class="chat-list-title">Пользователи</h4>
+                        <ul>
+                            <li class="user-profile-toggle">
+                                    <span class="avatar">
+                                        <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+                                             height="42"
+                                             width="42" alt="Generic placeholder image"/>
+                                        <span class="avatar-status-online"></span>
                                     </span>
-                                <div class="chat-info flex-grow-1">
-                                    <h5 class="mb-0">Elizabeth Elliott</h5>
-                                </div>
-                                <div class="chat-meta text-nowrap">
-                                    <small class="float-end mb-25 chat-time">4:14 PM</small>
-
+                                <div class="chat-info">
+                                    <h5 class="mb-0">Jenny Perich</h5>
                                 </div>
                             </li>
-                            <li class="">
+                            <li class="user-profile-toggle">
                                     <span class="avatar"><img
-                                            src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
+                                            src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
                                             height="42"
-                                            width="42" alt="Generic placeholder image">
-                                        <span class="avatar-status-busy"></span>
+                                            width="42" alt="Generic placeholder image"/>
+                                        <span class="avatar-status-online"></span>
                                     </span>
-                                <div class="chat-info flex-grow-1">
-                                    <h5 class="mb-0">Kristopher Candy</h5>
-                                </div>
-                                <div class="chat-meta text-nowrap">
-                                    <small class="float-end mb-25 chat-time">9:09 AM</small>
-                                </div>
-                            </li>
-                            <li class="">
-                                    <span class="avatar"><img
-                                            src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
-                                            height="42"
-                                            width="42" alt="Generic placeholder image">
-                                        <span class="avatar-status-away"></span>
-                                    </span>
-                                <div class="chat-info flex-grow-1">
-                                    <h5 class="mb-0">Sarah Woods</h5>
-                                </div>
-                                <div class="chat-meta text-nowrap">
-                                    <small class="float-end mb-25 chat-time">5:48 PM</small>
+                                <div class="chat-info">
+                                    <h5 class="mb-0">Jimmy Parker</h5>
                                 </div>
                             </li>
                             <li class="no-results">
-                                <h6 class="mb-0">No Chats Found</h6>
+                                <h6 class="mb-0">No Contacts Found</h6>
                             </li>
                         </ul>
-                        <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
-                            <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
-                        </div>
-                        <div class="ps__rail-y" style="top: 0px; height: 751px; right: 0px;">
-                            <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 630px;"></div>
-                        </div>
                     </div>
                     <!-- Sidebar Users end -->
                 </div>
@@ -253,19 +83,6 @@ Crypto Wallet|Chat
                     <div class="body-content-overlay"></div>
                     <!-- Main chat area -->
                     <section class="chat-app-window">
-                        <!-- To load Conversation -->
-                        <div class="start-chat-area d-none">
-                            <div class="mb-1 start-chat-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" class="feather feather-message-square">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                </svg>
-                            </div>
-                            <h4 class="sidebar-toggle start-chat-text">Start Conversation</h4>
-                        </div>
-                        <!--/ To load Conversation -->
-
                         <!-- Active Chat -->
                         <div class="active-chat">
                             <!-- Chat Header -->
@@ -286,14 +103,15 @@ Crypto Wallet|Chat
                                 </header>
                             </div>
                             <!--/ Chat Header -->
+
                             <!-- User Chat messages -->
-                            <div class="user-chats ps ps--active-y">
+                            <div class="user-chats">
                                 <div class="chats">
                                     <div class="chat">
                                         <div class="chat-avatar">
                                                 <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
-                                                         alt="avatar" height="36" width="36">
+                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg"
+                                                         alt="avatar" height="36" width="36"/>
                                                 </span>
                                         </div>
                                         <div class="chat-body">
@@ -305,8 +123,8 @@ Crypto Wallet|Chat
                                     <div class="chat chat-left">
                                         <div class="chat-avatar">
                                                 <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
-                                                         alt="avatar" height="36" width="36">
+                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-7.jpg"
+                                                         alt="avatar" height="36" width="36"/>
                                                 </span>
                                         </div>
                                         <div class="chat-body">
@@ -325,8 +143,8 @@ Crypto Wallet|Chat
                                     <div class="chat">
                                         <div class="chat-avatar">
                                                 <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
-                                                         alt="avatar" height="36" width="36">
+                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg"
+                                                         alt="avatar" height="36" width="36"/>
                                                 </span>
                                         </div>
                                         <div class="chat-body">
@@ -338,12 +156,70 @@ Crypto Wallet|Chat
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
-                                    <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
-                                </div>
-                                <div class="ps__rail-y" style="top: 0px; right: 0px; height: 686px;">
-                                    <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 577px;"></div>
+                                    <div class="chat chat-left">
+                                        <div class="chat-avatar">
+                                                <span class="avatar box-shadow-1 cursor-pointer">
+                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-7.jpg"
+                                                         alt="avatar" height="36" width="36"/>
+                                                </span>
+                                        </div>
+                                        <div class="chat-body">
+                                            <div class="chat-content">
+                                                <p>Looks clean and fresh UI. 😃</p>
+                                            </div>
+                                            <div class="chat-content">
+                                                <p>It's perfect for my next project.</p>
+                                            </div>
+                                            <div class="chat-content">
+                                                <p>How can I purchase it?</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chat">
+                                        <div class="chat-avatar">
+                                                <span class="avatar box-shadow-1 cursor-pointer">
+                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg"
+                                                         alt="avatar" height="36" width="36"/>
+                                                </span>
+                                        </div>
+                                        <div class="chat-body">
+                                            <div class="chat-content">
+                                                <p>Thanks, from ThemeForest.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chat chat-left">
+                                        <div class="chat-avatar">
+                                                <span class="avatar box-shadow-1 cursor-pointer">
+                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-7.jpg"
+                                                         alt="avatar" height="36" width="36"/>
+                                                </span>
+                                        </div>
+                                        <div class="chat-body">
+                                            <div class="chat-content">
+                                                <p>I will purchase it for sure. 👍</p>
+                                            </div>
+                                            <div class="chat-content">
+                                                <p>Thanks.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chat">
+                                        <div class="chat-avatar">
+                                                <span class="avatar box-shadow-1 cursor-pointer">
+                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg"
+                                                         alt="avatar" height="36" width="36"/>
+                                                </span>
+                                        </div>
+                                        <div class="chat-body">
+                                            <div class="chat-content">
+                                                <p>Great, Feel free to get in touch on</p>
+                                            </div>
+                                            <div class="chat-content">
+                                                <p>https://pixinvent.ticksy.com/</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <!-- User Chat messages -->
@@ -351,32 +227,23 @@ Crypto Wallet|Chat
                             <!-- Submit Chat form -->
                             <form class="chat-app-form" action="javascript:void(0);" onsubmit="enterChat();">
                                 <div class="input-group input-group-merge me-1 form-send-message">
+                                    <span class="speech-to-text input-group-text"><i data-feather="mic"
+                                                                                     class="cursor-pointer"></i></span>
                                     <input type="text" class="form-control message"
-                                           placeholder="Type your message or use speech to text">
+                                           placeholder="Введите свое сообщение"/>
                                     <span class="input-group-text">
                                             <label for="attach-doc" class="attachment-icon form-label mb-0">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-image cursor-pointer text-secondary"><rect
-                                                        x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle
-                                                        cx="8.5" cy="8.5" r="1.5"></circle><polyline
-                                                        points="21 15 16 10 5 21"></polyline></svg>
-                                                <input type="file" id="attach-doc" hidden=""> </label></span>
+                                                <i data-feather="image" class="cursor-pointer text-secondary"></i>
+                                                <input type="file" id="attach-doc" hidden/> </label></span>
                                 </div>
-                                <button type="button" class="btn btn-primary send waves-effect waves-float waves-light"
-                                        onclick="enterChat();">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                         stroke-linejoin="round" class="feather feather-send d-lg-none">
-                                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                    </svg>
+                                <button type="button" class="btn btn-primary send" onclick="enterChat();">
+                                    <i data-feather="send" class="d-lg-none"></i>
                                     <span class="d-none d-lg-block">Отправить</span>
                                 </button>
                             </form>
                             <!--/ Submit Chat form -->
                         </div>
+
                         <!--/ Active Chat -->
                     </section>
                     <!--/ Main chat area -->
@@ -385,17 +252,13 @@ Crypto Wallet|Chat
                     <div class="user-profile-sidebar">
                         <header class="user-profile-header">
                                 <span class="close-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                         stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6"
-                                                                                                 y2="18"></line><line
-                                            x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    <i data-feather="x"></i>
                                 </span>
                             <!-- User Profile image with name -->
                             <div class="header-profile-sidebar">
                                 <div class="avatar box-shadow-1 avatar-border avatar-xl">
-                                    <img src="../../../app-assets/images/portrait/small/avatar-s-7.jpg"
-                                         alt="user_avatar" height="70" width="70">
+                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+                                         alt="user_avatar" height="70" width="70"/>
                                     <span class="avatar-status-busy avatar-status-lg"></span>
                                 </div>
                                 <h4 class="chat-user-name">Kristopher Candy</h4>
@@ -403,7 +266,7 @@ Crypto Wallet|Chat
                             </div>
                             <!--/ User Profile image with name -->
                         </header>
-                        <div class="user-profile-sidebar-area ps">
+                        <div class="user-profile-sidebar-area">
                             <!-- About User -->
                             <h6 class="section-label mb-1">About</h6>
                             <p>Toffee caramels jelly-o tart gummi bears cake I love ice cream lollipop.</p>
@@ -413,102 +276,21 @@ Crypto Wallet|Chat
                                 <h6 class="section-label mb-1 mt-3">Personal Information</h6>
                                 <ul class="list-unstyled">
                                     <li class="mb-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-mail font-medium-2 me-50">
-                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                            <polyline points="22,6 12,13 2,6"></polyline>
-                                        </svg>
+                                        <i data-feather="mail" class="font-medium-2 me-50"></i>
                                         <span class="align-middle">kristycandy@email.com</span>
                                     </li>
                                     <li class="mb-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-phone-call font-medium-2 me-50">
-                                            <path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                                        </svg>
+                                        <i data-feather="phone-call" class="font-medium-2 me-50"></i>
                                         <span class="align-middle">+1(123) 456 - 7890</span>
                                     </li>
                                     <li>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-clock font-medium-2 me-50">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <polyline points="12 6 12 12 16 14"></polyline>
-                                        </svg>
+                                        <i data-feather="clock" class="font-medium-2 me-50"></i>
                                         <span class="align-middle">Mon - Fri 10AM - 8PM</span>
                                     </li>
                                 </ul>
                             </div>
                             <!--/ User's personal information -->
 
-                            <!-- User's Links -->
-                            <div class="more-options">
-                                <h6 class="section-label mb-1 mt-3">Options</h6>
-                                <ul class="list-unstyled">
-                                    <li class="cursor-pointer mb-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-tag font-medium-2 me-50">
-                                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                                        </svg>
-                                        <span class="align-middle">Add Tag</span>
-                                    </li>
-                                    <li class="cursor-pointer mb-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-star font-medium-2 me-50">
-                                            <polygon
-                                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                        </svg>
-                                        <span class="align-middle">Important Contact</span>
-                                    </li>
-                                    <li class="cursor-pointer mb-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-image font-medium-2 me-50">
-                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                            <polyline points="21 15 16 10 5 21"></polyline>
-                                        </svg>
-                                        <span class="align-middle">Shared Media</span>
-                                    </li>
-                                    <li class="cursor-pointer mb-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-trash font-medium-2 me-50">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                        </svg>
-                                        <span class="align-middle">Delete Contact</span>
-                                    </li>
-                                    <li class="cursor-pointer">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-slash font-medium-2 me-50">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                                        </svg>
-                                        <span class="align-middle">Block Contact</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!--/ User's Links -->
-                            <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
-                                <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
-                            </div>
-                            <div class="ps__rail-y" style="top: 0px; right: 0px;">
-                                <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
-                            </div>
                         </div>
                     </div>
                     <!--/ User Chat profile right area -->
@@ -523,5 +305,70 @@ Crypto Wallet|Chat
 
 
 {% block scripts %}
+<script src="https://cdn.socket.io/3.1.3/socket.io.min.js"
+        integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
+        crossorigin="anonymous"></script>
+<script>
+    // connect
+    var socket = io('ws://127.0.0.1:8000', {
+        path: '/ws/socket.io'
+    });
+
+    socket.on("connect", function () {
+        socket.emit('user', {
+            username: 'Test'
+        });
+    });
+
+
+    function sendMsg() {
+        socket.emit("message", "HELLO WORLD");
+    }
+
+    socket.on("message", function (data) {
+        console.log(data)
+    })
+
+
+</script>
+
+
 <script src="{{ url_for('static', path='/app-assets/js/scripts/pages/app-chat.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-blockui.js') }}"></script>
+
+<script>
+
+    $(document).ready(function () {
+        $('.user-chats').scrollTop($('.user-chats > .chats').height());
+    });
+
+    $(".close-icon, .content-area-wrapper").on("click", function () {
+        $('li').removeClass('active');
+    })
+
+    // const section = $("#block")
+    //
+    // // function myGreeting() {
+    // //     $(".chat-application").css('display', 'block')
+    // // }
+    //
+    // test(section)
+    //
+    // function test (section) {
+    //     section.block({
+    //         message: '<div class="spinner-border text-primary" role="status"></div>',
+    //         timeout: 1000,
+    //         css: {
+    //             backgroundColor: 'transparent',
+    //             border: '0'
+    //         },
+    //         overlayCSS: {
+    //             backgroundColor: '#EBE9E9',
+    //             opacity: 0.9
+    //         }
+    //     })
+    // }
+
+
+</script>
 {% endblock %}
