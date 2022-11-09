@@ -110,7 +110,6 @@ def create_app() -> FastAPI:
     main_consumer_thread.start()
     parsing_balances_thread.start()
     socket_consumer_thread.start()
-
     app_.mount("/static", StaticFiles(directory="static"), name="static")
 
     return app_

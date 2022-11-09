@@ -26,7 +26,7 @@ async def parsing_balance():
                 wallets_for_update.append(wallet)
                 await producer.publish_message(
                     exchange_name="wallet_balance_exchange",
-                    message={str(wallet.id): balance},
+                    message={"wallet_id": str(wallet.id), "value": balance},
                 )
         await ethereum_manager.update_wallets_balances(db, wallets_for_update)
 
