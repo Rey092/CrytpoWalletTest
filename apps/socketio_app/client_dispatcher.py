@@ -3,7 +3,7 @@ import asyncio
 
 import socketio
 
-sio = socketio.AsyncClient(logger=True, engineio_logger=True)
+sio = socketio.AsyncClient()
 
 
 @sio.event
@@ -39,7 +39,7 @@ class ClientDispatcher:
         print("I'm disconnected!")
 
     async def sio_connect(self):
-        await sio.connect(self.url)
+        await sio.connect(self.url, socketio_path="/ws/socket.io")
 
     @staticmethod
     async def sio_disconnect():

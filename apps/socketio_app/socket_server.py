@@ -2,7 +2,7 @@
 import socketio
 
 # mgr = socketio.AsyncAioPikaManager('amqp://guest:guest@localhost/', 'new_blocks', logger=True)
-sio = socketio.AsyncServer(cors_allowed_origins="*", async_mode="asgi", logger=True, engineio_logger=True)
+sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
 # app = web.Application()
 # sio.attach(app)
 

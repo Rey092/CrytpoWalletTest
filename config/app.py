@@ -3,7 +3,6 @@
 import pathlib
 from typing import List
 
-import socketio
 import toml
 from fastapi import FastAPI, Request
 from fastapi.middleware import Middleware
@@ -16,7 +15,6 @@ from starlette.staticfiles import StaticFiles
 from apps.crypto.api_service_consumer import main_consumer_thread
 from apps.crypto.wallets_balance_parser import parsing_balances_thread
 from apps.front.router import front_router
-from apps.socketio_app.socket_server import sio
 from apps.socketio_app.socket_service_consumer import socket_consumer_thread
 from apps.users import models
 
@@ -89,7 +87,8 @@ def create_app() -> FastAPI:
         openapi_tags=metadata_tags,
     )
 
-    socketio.ASGIApp(sio, app_)
+    # sio_server = socketio.ASGIApp(socketio_server=sio, socketio_path='socket.io')
+    # app_.mount('/ws', sio_server)
 
     # app_.celery_app = create_celery()
 
@@ -110,11 +109,12 @@ def create_app() -> FastAPI:
     parsing_balances_thread.start()
     socket_consumer_thread.start()
 
+    app_.mount("/static", StaticFiles(directory="static"), name="static")
+
     return app_
 
 
 app = create_app()
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.exception_handler(DefaultHTTPException)
