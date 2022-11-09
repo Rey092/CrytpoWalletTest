@@ -166,7 +166,7 @@ Crypto Wallet|Profile
         </div>
     </div>
 </div>
-<div class="modal fade" id="addWallet" tabindex="-1" aria-labelledby="addNewCardTitle" style="display: none;"
+<div class="modal fade" id="addWallet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addNewCardTitle" style="display: none;"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -192,7 +192,7 @@ Crypto Wallet|Profile
         </div>
     </div>
 </div>
-<div class="modal fade" id="importWallet" tabindex="-1" aria-labelledby="importNew" style="display: none;"
+<div class="modal fade" id="importWallet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="importNew" style="display: none;"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -241,7 +241,6 @@ Crypto Wallet|Profile
         </div>
     </div>
 </div>
-
 
 {% endblock %}
 
@@ -582,12 +581,10 @@ Crypto Wallet|Profile
         }
     });
 
-    $(".close-import-modal").on("click", function (){
+    $(".close-import-modal").on("click", function () {
         import_validator.resetForm();
     })
     //
-
-
 
 
     $("#addNewWallet").submit(function (e) {
