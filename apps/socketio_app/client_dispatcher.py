@@ -46,6 +46,7 @@ class ClientDispatcher:
         await sio.sleep(1)
         await sio.disconnect()
 
+    @sio.event
     async def new_transaction(self, data: dict):
         await self.sio_connect()
         await sio.emit("new_transaction", data)
@@ -60,4 +61,5 @@ class ClientDispatcher:
 
 if __name__ == "__main__":
     client_manager = ClientDispatcher()
-    asyncio.run(client_manager.new_transaction({"txn_hash": "some_hash", "value": "some_value"}))
+    # asyncio.run(client_manager.new_transaction({"txn_hash": "some_hash", "value": "some_value"}))
+    asyncio.run(client_manager.update_balance({"wallet_id": "66c5aea0-25e6-432c-a1e8-1ff3951fde06", "value": "10"}))

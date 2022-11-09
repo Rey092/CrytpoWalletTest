@@ -127,7 +127,7 @@ Crypto Wallet | My Wallets
                     "                        <p><b>Адрес:</b><span style=\"font-size: calc(8px + 0.4vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + wallet.address + "\">" + wallet.address + "</a></span></p>\n" +
                     "                    </div>\n" +
                     "                    <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
-                    "                        <p><b>Баланс:</b><span class=\"card-title\"> <b>" + wallet.balance + " ETH</b></span></p>\n" +
+                    "                        <p><b>Баланс: </b><span id=\"balance_" + wallet.id + "\" class=\"card-title balance\"> <b>" + wallet.balance + " ETH</b></span></p>\n" +
                     "                    </div>\n" +
                     "                </div>\n" +
                     "            </div>\n" +
@@ -402,20 +402,32 @@ Crypto Wallet | My Wallets
     }
 
 
-    // connect
+
+    // socket.io
     const socket = io("ws://127.0.0.1:8000", {path: '/ws/socket.io'});
 
+    // event for connect
     socket.on("connect", function () {
-        console.log('hi')
+        console.log('connect')
     });
 
+    // event for connect error
     socket.on("connect_error", (error) => {
       console.log(error)
     });
 
-
-    socket.on("update balance", function (data) {
+    // event for getting new transaction for user
+    socket.on("new transaction", function (data) {
         console.log(data)
+    })
+
+    // event for update balance for user wallet
+    socket.on("front_update_wallet_balance", function (data) {
+        ($('.balance')).each(function (index, elem) {
+            if (elem.id === $('#balance_' + data.wallet_id).attr('id')) {
+                $(elem).html("<b>" + data.value + " ETH</b>")
+            }
+        })
     })
 </script>
 {% endblock %}
