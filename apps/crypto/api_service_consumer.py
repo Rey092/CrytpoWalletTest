@@ -13,7 +13,7 @@ from config.settings import settings
 logger = logging.getLogger(__name__)
 
 
-async def on_message(message: AbstractIncomingMessage) -> None:
+async def handle_new_block(message: AbstractIncomingMessage) -> None:
     db = SessionLocal()
     ethereum_manager = await get_ethereum_manager()
     async with message.process():
@@ -33,15 +33,15 @@ async def consumer() -> None:
         )
 
         # Declaring queue
-        queue = await channel.declare_queue(exclusive=True)
+        new_blocks_queue = await channel.declare_queue(exclusive=True)
 
         # Binding the queue to the exchange
-        await queue.bind(new_blocks_exchange)
+        await new_blocks_queue.bind(new_blocks_exchange)
 
         # Start listening the queue
-        await queue.consume(on_message)
+        await new_blocks_queue.consume(handle_new_block)
 
-        logger.info("[*] Waiting for messages form ethereum service")
+        logger.info("[*] Waiting for messages from ethereum service")
         await asyncio.Future()
 
 
