@@ -130,6 +130,7 @@
             url: "/api/profile/get",
             success: function (response) {
                 if ('id' in response) {
+                    localStorage.setItem('user_id', response.id);
                     if (response.avatar) {
                         $(".round").attr(
                             "src",
