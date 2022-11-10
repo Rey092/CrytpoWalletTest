@@ -46,4 +46,5 @@ async def get_ethereum_manager() -> EthereumManager:
     ethereum_db = await get_ethereum_db()
     etherscan_client = await get_etherscan_client()
     ethereum_provider = await get_ethereum_provider_client()
-    return EthereumManager(ethereum_db, etherscan_client, ethereum_provider)
+    api_service_producer = await get_api_service_producer()
+    return EthereumManager(ethereum_db, etherscan_client, ethereum_provider, api_service_producer)

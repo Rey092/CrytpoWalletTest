@@ -15,7 +15,7 @@ async def parsing_balance():
     producer = await get_api_service_producer()
 
     while True:
-        await asyncio.sleep(10)
+        await asyncio.sleep(120)
         wallets = await ethereum_manager.get_all_wallets(db)
         wallets_for_update = []
 
@@ -26,7 +26,7 @@ async def parsing_balance():
                 wallets_for_update.append(wallet)
                 await producer.publish_message(
                     exchange_name="wallet_balance_exchange",
-                    message={"wallet_id": str(wallet.id), "value": balance},
+                    message={"wallet_address": str(wallet.address), "value": balance},
                 )
         await ethereum_manager.update_wallets_balances(db, wallets_for_update)
 

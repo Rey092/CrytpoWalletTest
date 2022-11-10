@@ -12,7 +12,7 @@ Crypto Wallet | My Wallets
 <style>
     .trans_row {
         max-width: 200px;
-        min-width: 150px;
+        min-width: 160px;
         overflow: hidden;
     }
     @media (max-width: 576px) {
@@ -87,6 +87,9 @@ Crypto Wallet | My Wallets
 <script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js') }}"></script>
 <script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/responsive.bootstrap5.min.js') }}"></script>
 <script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/datatables.buttons.min.js') }}"></script>
+
+<script src="{{ url_for('static', path='/app-assets/js/scripts/components/components-popovers.js') }}"></script>
+
 <script src="https://cdn.socket.io/4.5.3/socket.io.min.js"
         integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi"
         crossorigin="anonymous">
@@ -95,6 +98,9 @@ Crypto Wallet | My Wallets
     let wallet_address
     let validator
 
+
+    // region Render User Wallets---------------------------------------------------------------------------------------
+    //==================================================================================================================
     // ajax for get all user's wallets
     $(window).on('load', function () {
         $.ajax({
@@ -102,13 +108,18 @@ Crypto Wallet | My Wallets
             url: "/api/ethereum/wallets",
             success: function (response) {
                 render_user_wallets(response)
+
+                // init all popovers on page
+                let popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+                popoverTriggerList.map(function (popoverTriggerEl) {
+                  return new bootstrap.Popover(popoverTriggerEl)
+                })
             },
             error: function (response) {
             }
         })
         $('.content-wrapper').fadeIn("normal")
     });
-
 
     // render all wallets for user
     function render_user_wallets(wallets) {
@@ -117,7 +128,7 @@ Crypto Wallet | My Wallets
                 $("#wallets_list").append(
                     "<div class=\"col-xl-6 col-md-12 col-sm-12\">\n" +
                     "    <div class=\"card shadow-none border cursor-pointer\">\n" +
-                    "        <div class=\"card-body\">\n" +
+                    "        <div id=\"" + wallet.address + "\" class=\"wallet card-body\">\n" +
                     "            <div class=\"d-flex\">\n" +
                     "                <a href=\"#\" class=\"me-25\">\n" +
                     "                    <img class='eth-image' src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\" alt=\"avatar\" height=\"90\">\n" +
@@ -127,7 +138,7 @@ Crypto Wallet | My Wallets
                     "                        <p><b>Адрес:</b><span style=\"font-size: calc(8px + 0.4vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + wallet.address + "\">" + wallet.address + "</a></span></p>\n" +
                     "                    </div>\n" +
                     "                    <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
-                    "                        <p><b>Баланс: </b><span id=\"balance_" + wallet.id + "\" class=\"card-title balance\"> <b>" + wallet.balance + " ETH</b></span></p>\n" +
+                    "                        <p><b>Баланс: </b><span id=\"balance_" + wallet.address + "\" class=\"card-title balance\"> <b>" + wallet.balance + " ETH</b></span></p>\n" +
                     "                    </div>\n" +
                     "                </div>\n" +
                     "            </div>\n" +
@@ -140,7 +151,9 @@ Crypto Wallet | My Wallets
                     "                        <button onclick='get_wallet_address(this.value)' type=\"button\" value=\"" + wallet.address + "\" class=\"btn btn-sm btn-success waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"modal\" data-bs-target=\"#send_transaction_" + wallet.id + "\">Отправить транзакцию</button>\n" +
                     "                    </div>\n" +
                     "                    <div class=\"col-lg-4 col-md-4\">\n" +
-                    "                        <a href=\"https://sepoliafaucet.net/\" target=\"_blank\" class=\"btn btn-sm btn-info waves-effect\" style=\"color: white; width: 100%; margin: 2px; height: 35px\">Получить 0.5 ETH</a>\n" +
+                    "                    <a href=\"https://sepoliafaucet.net/\" target='_blank'><button type=\"button\" class=\"btn btn-info waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"popover\" data-bs-content=\"Чтобы запросить средства через Twitter, сделайте твит со своим адресом Ethereum, вставленным в содержимое(окружающий текст не имеет значения). После чего скопируйте и вставьте URL-адрес опубликованного твита в поле ввода Sepolia Faucet и запросите средства! Вы можете запрашивать 0,5 Sepolia ETH (SEP) каждые 24 часа.\" data-bs-trigger=\"hover\" title=\"\" data-bs-original-title=\"Как это работает?\">\n" +
+                    "                        Получить 0.5 ETH\n" +
+                    "                    </button></a>\n" +
                     "                    </div>\n" +
                     "                </div>\n" +
                     "            </div>\n" +
@@ -199,7 +212,9 @@ Crypto Wallet | My Wallets
     }
 
 
-    // after click on button get address this wallet for send transactions
+    // region Send Transaction------------------------------------------------------------------------------------------
+    //==================================================================================================================
+    // after click on button get address of this wallet for send transactions
     function get_wallet_address(value){
         wallet_address = value
     }
@@ -228,24 +243,10 @@ Crypto Wallet | My Wallets
                         $("button").removeAttr('disabled')
                         $("input").removeAttr('disabled')
                         $("button[type='reset']").trigger('click');
-                        toastr.options = {
-                          "closeButton": true,
-                          "debug": false,
-                          "newestOnTop": false,
-                          "progressBar": false,
-                          "positionClass": "toast-bottom-right",
-                          "preventDuplicates": false,
-                          "onclick": null,
-                          "showDuration": "300",
-                          "hideDuration": "1000",
-                          "timeOut": 0,
-                          "extendedTimeOut": 0,
-                          "showEasing": "swing",
-                          "hideEasing": "linear",
-                          "showMethod": "fadeIn",
-                          "hideMethod": "fadeOut",
-                          "tapToDismiss": false
-                        }
+                        toastr_options()
+                        let old_wallet_balance = parseFloat($('#balance_' + wallet_address).text())
+                        let new_wallet_balance = (old_wallet_balance - parseFloat(eth_value)).toFixed(8)
+                        $('#balance_' + wallet_address).html("<b>" + new_wallet_balance + " ETH</b>")
                         toastr.success('Отправка произведена. <a style=\"color: #007aff; font-weight: bold\" target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/' + response.txnHash + '\">Ссылка на транзакцию', 'Успех')
                     },
                     error: function (response) {
@@ -261,7 +262,7 @@ Crypto Wallet | My Wallets
                                 )
                             } else if (res[0].code === 'value_error') {
                                 toastr.error(
-                                    'Введённое значение некорректно.',
+                                    'Введённое значение некорректно или превышает баланс кошелька.',
                                     'Ошибка'
                                 )
                             } else {
@@ -310,12 +311,16 @@ Crypto Wallet | My Wallets
         })
     }
 
+    // reset jquery validate for form
     function close_send_modal(){
         validator.resetForm()
     }
 
+    // region Watch Transactions ---------------------------------------------------------------------------------------
+    // =================================================================================================================
     // watch transactions by wallet
     function watch_transactions(value){
+        localStorage.address = value
         $('#some_address').html(value)
         $.ajax({
             type: "GET",
@@ -327,7 +332,6 @@ Crypto Wallet | My Wallets
             }
         })
     }
-
 
     // init datatable
     table = $('#trans_datatable').DataTable({
@@ -357,13 +361,7 @@ Crypto Wallet | My Wallets
             }
         })
 
-
-    // for sockets
-    function test(value){
-        watch_transactions(value)
-        console.log('hi')
-    }
-
+    // render transactions in datatable
     function render_wallet_transaction(transactions){
         table.clear().draw()
         if (transactions.length > 0) {
@@ -382,49 +380,13 @@ Crypto Wallet | My Wallets
         $('td', table.rows().nodes()).addClass('trans_row');
     }
 
-    function timer(value) {
-        let date = new Date(value)
-        let seconds = Math.floor((new Date() - date) / 1000)
-        let minutes = seconds / 60
-        let hours = minutes / 60
-        let days = hours / 24
 
-        if (seconds < 60) {
-            return Math.floor(seconds) + " secs"
-        }
-        if (minutes < 60) {
-            return `${Math.floor(minutes) } mins`
-        }
-        if (hours < 24) {
-            return Math.floor(hours) + " hrs " + Math.floor(minutes / 60) + " mins"
-        }
-        return Math.floor(days) + " days " + Math.floor(hours / 24) + " hrs"
-    }
-
-
-
-    // socket.io
-    const socket = io("ws://127.0.0.1:8000", {path: '/ws/socket.io'});
-
-    // event for connect
-    socket.on("connect", function () {
-        console.log('connect')
-    });
-
-    // event for connect error
-    socket.on("connect_error", (error) => {
-      console.log(error)
-    });
-
-    // event for getting new transaction for user
-    socket.on("new transaction", function (data) {
-        console.log(data)
-    })
-
+    // socket.io -------------------------------------------------------------------------------------------------------
+    // =================================================================================================================
     // event for update balance for user wallet
     socket.on("front_update_wallet_balance", function (data) {
         ($('.balance')).each(function (index, elem) {
-            if (elem.id === $('#balance_' + data.wallet_id).attr('id')) {
+            if (elem.id === $('#balance_' + data.wallet_address).attr('id')) {
                 $(elem).html("<b>" + data.value + " ETH</b>")
             }
         })

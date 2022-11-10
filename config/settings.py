@@ -60,6 +60,14 @@ class Settings(BaseSettings):
     postgres_db: str
     postgres_echo: bool = False
 
+    # Variables for the product database
+    product_postgres_host: str = "localhost"
+    product_postgres_port: int = 5444
+    product_postgres_user: str
+    product_postgres_password: str
+    product_postgres_db: str
+    product_postgres_echo: bool = False
+
     # Variables for Redis
     redis_host: str = "localhost"
     redis_port: int = 6379
@@ -126,6 +134,23 @@ class Settings(BaseSettings):
             user=self.postgres_user,
             password=self.postgres_password,
             path=f"/{self.postgres_db}",
+        )
+
+    @property
+    def product_db_url(self) -> URL:
+        """
+        Assemble product database URL from settings.
+
+        :return: product database URL.
+
+        """
+        return URL.build(
+            scheme="postgresql",
+            host=self.product_postgres_host,
+            port=self.product_postgres_port,
+            user=self.product_postgres_user,
+            password=self.product_postgres_password,
+            path=f"/{self.product_postgres_db}",
         )
 
     @property

@@ -12,7 +12,7 @@ class ApiServiceProducer:
     async def publish_message(
         self,
         exchange_name: str,
-        message: Union[str, dict],
+        message: Union[str, list, dict],
         exchange_type: Union[ExchangeType, None] = ExchangeType.FANOUT,
         delivery_mode: Union[DeliveryMode, int, None] = DeliveryMode.PERSISTENT,
     ):

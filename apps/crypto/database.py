@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Type
 
@@ -70,6 +71,7 @@ class EthereumDatabase(BaseCryptoDatabase):
             address=wallet_create.address,
             balance=wallet_create.balance,
             asset_id=asset_id,
+            date_created=datetime.datetime.now(),
         )
         db.add(db_wallet)
         db.commit()
@@ -111,7 +113,10 @@ class EthereumDatabase(BaseCryptoDatabase):
         return db.query(self.wallet).filter(self.wallet.address == address).first()
 
     async def get_wallets_by_user_id(self, db: Session, user_id: str) -> List[Wallet]:
-        return db.query(self.wallet).filter(self.wallet.user_id == user_id).all()
+        wallets = (
+            db.query(self.wallet).order_by(desc(self.wallet.date_created)).filter(self.wallet.user_id == user_id).all()
+        )
+        return wallets
 
     async def create_transaction(self, db: Session, transactions: List[dict]) -> None:
         asset_id = db.query(self.asset).filter(self.asset.code == AssetCode.ETH).first().id
@@ -147,5 +152,4 @@ class EthereumDatabase(BaseCryptoDatabase):
             )
             .all()
         )
-
         return transactions
