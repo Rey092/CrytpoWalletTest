@@ -9,6 +9,7 @@ Crypto Wallet|Chat
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/pages/app-chat-list.css') }}">
 <link rel="stylesheet" type="text/css"
       href="{{ url_for('static', path='/app-assets/css/themes/bordered-layout.css') }}">
+
 {% endblock %}
 
 
@@ -41,29 +42,29 @@ Crypto Wallet|Chat
                     <!-- Sidebar Users start -->
                     <div class="chat-user-list-wrapper list-group">
                         <h4 class="chat-list-title">Пользователи</h4>
-                        <ul>
-                            <li class="user-profile-toggle">
-                                    <span class="avatar">
-                                        <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
-                                             height="42"
-                                             width="42" alt="Generic placeholder image"/>
-                                        <span class="avatar-status-online"></span>
-                                    </span>
-                                <div class="chat-info">
-                                    <h5 class="mb-0">Jenny Perich</h5>
-                                </div>
-                            </li>
-                            <li class="user-profile-toggle">
-                                    <span class="avatar"><img
-                                            src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
-                                            height="42"
-                                            width="42" alt="Generic placeholder image"/>
-                                        <span class="avatar-status-online"></span>
-                                    </span>
-                                <div class="chat-info">
-                                    <h5 class="mb-0">Jimmy Parker</h5>
-                                </div>
-                            </li>
+                        <ul class="chat-list-users">
+                            <!--                            <li class="user-profile-toggle">-->
+                            <!--                                    <span class="avatar">-->
+                            <!--                                        <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"-->
+                            <!--                                             height="42"-->
+                            <!--                                             width="42" alt="Generic placeholder image"/>-->
+                            <!--                                        <span class="avatar-status-online"></span>-->
+                            <!--                                    </span>-->
+                            <!--                                <div class="chat-info">-->
+                            <!--                                    <h5 class="mb-0">Jenny Perich</h5>-->
+                            <!--                                </div>-->
+                            <!--                            </li>-->
+                            <!--                            <li class="user-profile-toggle">-->
+                            <!--                                    <span class="avatar"><img-->
+                            <!--                                            src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"-->
+                            <!--                                            height="42"-->
+                            <!--                                            width="42" alt="Generic placeholder image"/>-->
+                            <!--                                        <span class="avatar-status-online"></span>-->
+                            <!--                                    </span>-->
+                            <!--                                <div class="chat-info">-->
+                            <!--                                    <h5 class="mb-0">Jimmy Parker</h5>-->
+                            <!--                                </div>-->
+                            <!--                            </li>-->
                             <li class="no-results">
                                 <h6 class="mb-0">No Contacts Found</h6>
                             </li>
@@ -107,119 +108,6 @@ Crypto Wallet|Chat
                             <!-- User Chat messages -->
                             <div class="user-chats">
                                 <div class="chats">
-                                    <div class="chat">
-                                        <div class="chat-avatar">
-                                                <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg"
-                                                         alt="avatar" height="36" width="36"/>
-                                                </span>
-                                        </div>
-                                        <div class="chat-body">
-                                            <div class="chat-content">
-                                                <p>How can we help? We're here for you! 😄</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="chat chat-left">
-                                        <div class="chat-avatar">
-                                                <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-7.jpg"
-                                                         alt="avatar" height="36" width="36"/>
-                                                </span>
-                                        </div>
-                                        <div class="chat-body">
-                                            <div class="chat-content">
-                                                <p>Hey John, I am looking for the best admin template.</p>
-                                                <p>Could you please help me to find it out? 🤔</p>
-                                            </div>
-                                            <div class="chat-content">
-                                                <p>It should be Bootstrap 4 compatible.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="divider">
-                                        <div class="divider-text">Yesterday</div>
-                                    </div>
-                                    <div class="chat">
-                                        <div class="chat-avatar">
-                                                <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg"
-                                                         alt="avatar" height="36" width="36"/>
-                                                </span>
-                                        </div>
-                                        <div class="chat-body">
-                                            <div class="chat-content">
-                                                <p>Absolutely!</p>
-                                            </div>
-                                            <div class="chat-content">
-                                                <p>Vuexy admin is the responsive bootstrap 4 admin template.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="chat chat-left">
-                                        <div class="chat-avatar">
-                                                <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-7.jpg"
-                                                         alt="avatar" height="36" width="36"/>
-                                                </span>
-                                        </div>
-                                        <div class="chat-body">
-                                            <div class="chat-content">
-                                                <p>Looks clean and fresh UI. 😃</p>
-                                            </div>
-                                            <div class="chat-content">
-                                                <p>It's perfect for my next project.</p>
-                                            </div>
-                                            <div class="chat-content">
-                                                <p>How can I purchase it?</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="chat">
-                                        <div class="chat-avatar">
-                                                <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg"
-                                                         alt="avatar" height="36" width="36"/>
-                                                </span>
-                                        </div>
-                                        <div class="chat-body">
-                                            <div class="chat-content">
-                                                <p>Thanks, from ThemeForest.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="chat chat-left">
-                                        <div class="chat-avatar">
-                                                <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-7.jpg"
-                                                         alt="avatar" height="36" width="36"/>
-                                                </span>
-                                        </div>
-                                        <div class="chat-body">
-                                            <div class="chat-content">
-                                                <p>I will purchase it for sure. 👍</p>
-                                            </div>
-                                            <div class="chat-content">
-                                                <p>Thanks.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="chat">
-                                        <div class="chat-avatar">
-                                                <span class="avatar box-shadow-1 cursor-pointer">
-                                                    <img src="../../../app-assets/images/portrait/small/avatar-s-11.jpg"
-                                                         alt="avatar" height="36" width="36"/>
-                                                </span>
-                                        </div>
-                                        <div class="chat-body">
-                                            <div class="chat-content">
-                                                <p>Great, Feel free to get in touch on</p>
-                                            </div>
-                                            <div class="chat-content">
-                                                <p>https://pixinvent.ticksy.com/</p>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             <!-- User Chat messages -->
@@ -234,7 +122,9 @@ Crypto Wallet|Chat
                                     <span class="input-group-text">
                                             <label for="attach-doc" class="attachment-icon form-label mb-0">
                                                 <i data-feather="image" class="cursor-pointer text-secondary"></i>
-                                                <input type="file" id="attach-doc" hidden/> </label></span>
+                                                <input type="file" id="attach-doc" hidden accept="image/*">
+                                            </label>
+                                    </span>
                                 </div>
                                 <button type="button" class="btn btn-primary send" onclick="enterChat();">
                                     <i data-feather="send" class="d-lg-none"></i>
@@ -312,17 +202,57 @@ Crypto Wallet|Chat
 <script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-blockui.js') }}"></script>
 
 <script>
+    var user_id = localStorage.getItem('user_id')
 
     $(document).ready(function () {
         $('.user-chats').scrollTop($('.user-chats > .chats').height());
+
     });
 
-    $(".close-icon, .content-area-wrapper").on("click", function () {
-        $('li').removeClass('active');
-    })
+    // $(".close-icon, .content-area-wrapper").on("click", function () {
+    //     $('li').removeClass('active');
+    // })
 
-    // connect
-    var socket = io('ws://127.0.0.1:7000', {
+
+    // const section = $("#block")
+    //
+    // // function myGreeting() {
+    // //     $(".chat-application").css('display', 'block')
+    // // }
+    //
+    // test(section, 1000)
+    //
+    // function test(section, time) {
+    //     section.block({
+    //         message: '<div class="spinner-border text-primary" role="status"></div>',
+    //         timeout: time,
+    //         css: {
+    //             backgroundColor: 'transparent',
+    //             border: '0'
+    //         },
+    //         overlayCSS: {
+    //             backgroundColor: '#EBE9E9',
+    //             opacity: 0.9
+    //         }
+    //     })
+    // }
+
+    function renderUsers(data, connect) {
+        if (connect) {
+            if (data.auth !== user_id) {
+                let li = '<li class="user-profile-toggle" id="' + data.sid + '"></li>'
+                let username = '<h5 class="mb-0">' + data.auth + '</h5>'
+                $(".chat-list-users").append(li)
+                $(".user-profile-toggle:last-child").append(username)
+            }
+        } else {
+            $("#" + data.sid + "").remove()
+        }
+
+    }
+
+    // connect socket
+    var socket = io('ws://127.0.0.1:8000', {
         path: '/ws/socket.io',
         auth: localStorage.getItem('user_id')
     });
@@ -335,43 +265,77 @@ Crypto Wallet|Chat
         console.log('disconnect')
     });
 
+    //
+
+    // sockets events
+    socket.on('connect_user', function (data) {
+        renderUsers(data, true)
+    })
+
+    socket.on('disconnect_user', function (data) {
+        renderUsers(data, false)
+    })
+
+    socket.on('writes_message', function (data) {
+        console.log('writers')
+    })
+
+    //
+
+
+    // send message
     function enterChat(source) {
-        var message = $('.message').val();
+        let message = $('.message').val();
         if (/\S/.test(message)) {
-            socket.emit('new_message', message)
+            socket.emit('new_message', {'message': message, 'user_id': user_id})
         }
     }
 
-    socket.on('update_message', function (message) {
-        var html = '<div class="chat-content">' + '<p>' + message + '</p>' + '</div>';
-        $('.chat:last-child .chat-body').append(html);
+
+    $('.message').keypress(function () {
+        socket.emit('writes_message', {'user_id': user_id})
+    })
+    //
+
+
+    socket.on('update_message', function (data) {
+        let profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+        let username = '<p style="color: #0a6aa1">' + data.user_id + '</p>'
+
+        let html_message = '<div class="chat-content">' + '<p>' + data.message + ' ' + '<small style="color: #D8D8D8">11:40</small>' + '</p>' + '</div>';
+        let first_html_message = '<div class="chat-content">' + username + '<p>' + data.message + ' ' + '<small style="color: #D8D8D8">11:40</small>' + '</p>' + '</div>'
+        let chat_right = '<div class="chat chat-right"></div>'
+        let chat_left = '<div class="chat chat-left user-' + data.user_id + '"></div>'
+        let chat_body = '<div class="chat-body"></div>'
+        let chat_avatar = '<div class="chat-avatar">\n' +
+            '<span class="avatar box-shadow-1 cursor-pointer">\n' +
+            '<img src=' + profile_image + '\n' +
+            '     alt="avatar" height="36" width="36"/>\n' +
+            '</span>\n' +
+            '</div>'
+
+
+        if (data.user_id === user_id) {
+            if ($('.chat-right:last-child').length) {
+                $('.chat-right:last-child .chat-body').append(html_message);
+            } else {
+                $(".chats").append(chat_right)
+                $('.chat-right:last-child').append(chat_avatar).append(chat_body)
+                $('.chat-right:last-child .chat-body').append(html_message);
+            }
+        } else {
+            if ($('.user-' + data.user_id + ':last-child').length) {
+                $('.user-' + data.user_id + ':last-child .chat-body').append(html_message);
+            } else {
+                $(".chats").append(chat_left)
+                $('.user-' + data.user_id + ':last-child').append(chat_avatar).append(chat_body)
+                $('.user-' + data.user_id + ':last-child .chat-body').append(first_html_message)
+            }
+        }
+
         $('.message').val('');
         $('.user-chats').scrollTop($('.user-chats > .chats').height());
     })
-
-
-    // const section = $("#block")
-    //
-    // // function myGreeting() {
-    // //     $(".chat-application").css('display', 'block')
-    // // }
-    //
-    // test(section)
-    //
-    // function test (section) {
-    //     section.block({
-    //         message: '<div class="spinner-border text-primary" role="status"></div>',
-    //         timeout: 1000,
-    //         css: {
-    //             backgroundColor: 'transparent',
-    //             border: '0'
-    //         },
-    //         overlayCSS: {
-    //             backgroundColor: '#EBE9E9',
-    //             opacity: 0.9
-    //         }
-    //     })
-    // }
 
 
 </script>
