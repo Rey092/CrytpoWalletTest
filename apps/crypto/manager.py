@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from config.web3_clients import EthereumProviderClient, EtherscanClient
 
+from .api_service_producer import ApiServiceProducer
 from .database import BaseCryptoDatabase
 from .exceptions import (
     InvalidPrivateKeyException,
@@ -25,10 +26,12 @@ class BaseCryptoManager:
         database: BaseCryptoDatabase,
         etherscan_client: EtherscanClient,
         ethereum_provider: EthereumProviderClient,
+        api_service_producer: ApiServiceProducer,
     ):
         self.ethereum_db = database
         self.etherscan_client = etherscan_client
         self.ethereum_provider = ethereum_provider
+        self.api_service_producer = api_service_producer
 
     async def generate_private_key(self, wallet: WalletCreate) -> WalletCreate:
         hex_string = secrets.token_hex(32)
@@ -105,6 +108,19 @@ class EthereumManager(BaseCryptoManager):
                 for transaction in transactions
                 if wallet.address.lower() == transaction["address_to"].lower()
             ]
+            message = [
+                {
+                    "address_to": couple[1]["address_to"],
+                    "txn_hash": couple[1]["txn_hash"],
+                    "value": couple[1]["value"],
+                    "new_balance": couple[0].balance + float(couple[1]["value"]),
+                }
+                for couple in couples_for_update_balance
+            ]
+            await self.api_service_producer.publish_message(
+                exchange_name="new_transactions_exchange",
+                message=message,
+            )
             await self.ethereum_db.update_wallet_balance_by_transaction(db, couples_for_update_balance)
 
     async def get_all_wallets(self, db: Session) -> List[Wallet]:

@@ -20,14 +20,12 @@ async def disconnect(sid):
 
 # region Wallets
 @sio.event
-async def new_transaction(sid, data):
-    print(data)
-    await sio.emit("new_transaction", data)
+async def new_transactions(sid, data):
+    await sio.emit("front_new_transactions", data)
 
 
 @sio.event
 async def update_balance(sid, data):
-    print(data)
     await sio.emit("front_update_wallet_balance", data)
 
 

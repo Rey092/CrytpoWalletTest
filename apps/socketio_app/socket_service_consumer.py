@@ -16,8 +16,15 @@ logger = logging.getLogger(__name__)
 async def handle_updating_wallet_balance(message: AbstractIncomingMessage) -> None:
     client = await get_client_dispatcher()
     async with message.process():
-        logger.info(f"Test: {message.body}")
+        logger.info(f"Wallet balance: {message.body}")
         await client.update_balance(json.loads(message.body.decode("utf-8")))
+
+
+async def handle_new_transactions(message: AbstractIncomingMessage) -> None:
+    client = await get_client_dispatcher()
+    async with message.process():
+        logger.info(f"New Transactions: {message.body}")
+        await client.new_transactions(json.loads(message.body.decode("utf-8")))
 
 
 async def consumer() -> None:
@@ -25,19 +32,27 @@ async def consumer() -> None:
     async with connection:
         channel = await connection.channel()
 
-        balance_exchange = await channel.declare_exchange(
+        # create exchanges
+        wallet_balance_exchange = await channel.declare_exchange(
             "wallet_balance_exchange",
+            ExchangeType.FANOUT,
+        )
+        new_transactions_exchange = await channel.declare_exchange(
+            "new_transactions_exchange",
             ExchangeType.FANOUT,
         )
 
         # Declaring queue
         wallet_balance_queue = await channel.declare_queue(exclusive=True)
+        new_transactions_queue = await channel.declare_queue(exclusive=True)
 
         # Binding the queue to the exchange
-        await wallet_balance_queue.bind(balance_exchange)
+        await wallet_balance_queue.bind(wallet_balance_exchange)
+        await new_transactions_queue.bind(new_transactions_exchange)
 
         # Start listening the queue
         await wallet_balance_queue.consume(handle_updating_wallet_balance)
+        await new_transactions_queue.consume(handle_new_transactions)
 
         logger.info("[*] Waiting for messages from API service")
         await asyncio.Future()

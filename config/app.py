@@ -16,6 +16,7 @@ from starlette.staticfiles import StaticFiles
 from apps.crypto.api_service_consumer import main_consumer_thread
 from apps.crypto.wallets_balance_parser import parsing_balances_thread
 from apps.front.router import front_router
+from apps.ibay import ibay_models
 from apps.socketio_app.socket_server import sio
 from apps.socketio_app.socket_service_consumer import socket_consumer_thread
 from apps.users import models
@@ -42,6 +43,10 @@ def init_routers(app_: FastAPI) -> None:
 
 def init_database() -> None:
     models.Base.metadata.create_all(bind=engine)
+
+
+def init_product_database() -> None:
+    ibay_models.BaseIBay.metadata.create_all(bind=engine)
 
 
 def make_middleware() -> List[Middleware]:
@@ -101,7 +106,8 @@ def create_app() -> FastAPI:
     # Initialize other utils.
     init_routers(app_=app_)
     init_validation_handler(app=app_)
-    init_database()
+    # init_database()
+    init_product_database()
 
     init_cache()
     init_logging()

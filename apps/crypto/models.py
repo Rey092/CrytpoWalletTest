@@ -33,6 +33,7 @@ class Wallet(Base):
     balance = Column(Float, default=0)
     asset_id = Column(UUID(as_uuid=True), ForeignKey("asset.id"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
+    date_created = Column(DateTime)
 
     products = relationship("Product", backref="wallet")
 
