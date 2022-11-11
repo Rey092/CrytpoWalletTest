@@ -68,6 +68,10 @@ class Settings(BaseSettings):
     product_postgres_db: str
     product_postgres_echo: bool = False
 
+    mongodb_host: str
+    mongodb_port: int
+    mongodb_name: str
+
     # Variables for Redis
     redis_host: str = "localhost"
     redis_port: int = 6379
@@ -134,6 +138,20 @@ class Settings(BaseSettings):
             user=self.postgres_user,
             password=self.postgres_password,
             path=f"/{self.postgres_db}",
+        )
+
+    @property
+    def mongodb_url(self) -> URL:
+        """
+        Assemble database URL from settings.
+
+        :return: mongodb URL.
+
+        """
+        return URL.build(
+            scheme="mongodb",
+            host=self.mongodb_host,
+            port=self.mongodb_port,
         )
 
     @property
