@@ -17,6 +17,8 @@ from apps.crypto.api_service_consumer import main_consumer_thread
 from apps.crypto.wallets_balance_parser import parsing_balances_thread
 from apps.front.router import front_router
 from apps.ibay import ibay_models
+from apps.ibay.config.db import engine_ibay
+from apps.ibay.ibay_service_consumer import ibay_consumer_thread
 from apps.socketio_app.socket_server import sio
 from apps.socketio_app.socket_service_consumer import socket_consumer_thread
 from apps.users import models
@@ -46,7 +48,7 @@ def init_database() -> None:
 
 
 def init_product_database() -> None:
-    ibay_models.BaseIBay.metadata.create_all(bind=engine)
+    ibay_models.BaseIBay.metadata.create_all(bind=engine_ibay)
 
 
 def make_middleware() -> List[Middleware]:
@@ -106,7 +108,7 @@ def create_app() -> FastAPI:
     # Initialize other utils.
     init_routers(app_=app_)
     init_validation_handler(app=app_)
-    # init_database()
+    init_database()
     init_product_database()
 
     init_cache()
@@ -116,6 +118,8 @@ def create_app() -> FastAPI:
     main_consumer_thread.start()
     parsing_balances_thread.start()
     socket_consumer_thread.start()
+    ibay_consumer_thread.start()
+
     app_.mount("/static", StaticFiles(directory="static"), name="static")
 
     return app_

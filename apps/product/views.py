@@ -16,6 +16,7 @@ from apps.product.manager import ProductManager
 from apps.product.schemas import OrderCreate, OrderDetail, ProductCreate, ProductDetail
 from apps.users.models import User
 from apps.users.user import get_current_user, get_current_user_payload
+from config.storage import StorageException, ValidateFormatException
 
 product_router = APIRouter()
 
@@ -44,6 +45,8 @@ async def get_products(
     responses=examples_generate.get_error_responses(
         InvalidPriceException,
         InvalidWalletException,
+        ValidateFormatException,
+        StorageException,
         auth=True,
     ),
     response_model=ProductDetail,

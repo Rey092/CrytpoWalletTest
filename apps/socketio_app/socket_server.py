@@ -32,6 +32,20 @@ async def update_balance(sid, data):
 # endregion Wallets
 
 
+# region IBay
+@sio.event
+async def new_product(sid, data):
+    await sio.emit("front_new_product", data)
+
+
+@sio.event
+async def new_order(sid, data):
+    await sio.emit("front_new_order", data)
+
+
+# endregion IBay
+
+
 # region Chat
 @sio.event
 async def new_message(sid, data):

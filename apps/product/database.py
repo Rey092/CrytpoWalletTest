@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import datetime
 from typing import List, Type, Union
 from uuid import UUID
 
+from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -35,6 +37,7 @@ class ProductDatabase:
             title=product_create.title,
             image=product_create.image,
             price=product_create.price,
+            date_created=datetime.datetime.now(),
         )
         db.add(db_product)
         try:
@@ -45,7 +48,12 @@ class ProductDatabase:
         return db_product
 
     async def get_products(self, db: Session) -> List[Product]:
-        return db.query(self.product).filter(self.product.is_sold == False).all()  # noqa
+        return (
+            db.query(self.product)
+            .order_by(desc(self.product.date_created))
+            .filter(self.product.is_sold == False)  # noqa
+            .all()
+        )
 
     async def get_product(self, db: Session, product_id: UUID) -> Product:
         return db.query(self.product).filter(self.product.id == product_id).first()
@@ -61,6 +69,7 @@ class ProductDatabase:
         db_order = self.order(
             txn_hash=txn_hash,
             product_id=product_id,
+            date=datetime.datetime.now(),
         )
         db.add(db_order)
         db.commit()

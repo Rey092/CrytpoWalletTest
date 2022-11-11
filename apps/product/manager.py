@@ -2,8 +2,10 @@
 from typing import List
 from uuid import UUID
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
+from apps.crypto.api_service_producer import ApiServiceProducer
 from apps.crypto.schemas import TransactionCreate
 from apps.product.database import ProductDatabase
 from apps.product.exceptions import (
@@ -25,10 +27,12 @@ class ProductManager:
         database: ProductDatabase,
         ethereum_provider: EthereumProviderClient,
         storage: SqlAlchemyStorage,
+        api_service_producer: ApiServiceProducer,
     ):
         self.product_db = database
         self.ethereum_provider = ethereum_provider
         self.storage = storage
+        self.api_service_producer = api_service_producer
 
     async def create_new_product(self, db: Session, product_create: ProductCreate) -> Product:
         if product_create.price <= 0:
@@ -42,6 +46,10 @@ class ProductManager:
         product = await self.product_db.create_product(db, product_create)
         if not product:
             raise InvalidWalletException()
+        await self.api_service_producer.publish_message(
+            exchange_name="new_product_exchange",
+            message=jsonable_encoder(product),
+        )
         return product
 
     async def get_all_products(self, db: Session) -> List[Product]:
@@ -67,7 +75,12 @@ class ProductManager:
         txn_hash = await self.ethereum_provider.send_raw_transaction(transaction_create, wallet)
 
         await self.product_db.update_is_sold_product_status(db, product.id)
-        return await self.product_db.create_order(db, txn_hash, str(product.id))
+        order = await self.product_db.create_order(db, txn_hash, str(product.id))
+        await self.api_service_producer.publish_message(
+            exchange_name="new_order_exchange",
+            message=jsonable_encoder(order),
+        )
+        return order
 
     async def get_users_orders(self, db: Session, user_id: UUID) -> List[Order]:
         return await self.product_db.get_orders(db, user_id)

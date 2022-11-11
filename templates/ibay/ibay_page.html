@@ -1,0 +1,265 @@
+{% extends 'elements/base.html' %}
+
+{% block title %}
+Crypto Wallet | IBay
+{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/forms/select/select2.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/components.css') }}">
+
+<style>
+    @media (max-width: 576px) {
+      .product-image {
+        width: 65px;
+        height: 75px;
+        margin: 5px -5px 0 -10px;
+        padding: 0;
+      }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0" style="display: none;">
+        <div class="content-body">
+            <div class="row">
+                <div class="col-12">
+                    <!-- All user's wallets -->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">
+                                Продукты
+                            </h4>
+                            <span style="text-align: right">
+                                <button id="create_product" type="button" class="btn btn-gradient-primary" data-bs-toggle="modal" data-bs-target="#createProduct">
+                                    <font style="vertical-align: inherit;">
+                                        <font style="vertical-align: inherit;">
+                                            Создать товар
+                                        </font>
+                                    </font>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="products_list" class="row card-body py-2 my-25">
+                            <!-- Products -->
+<!--                            <input type="button" id="test" value="test">-->
+                            <!-- Products end -->
+                        </div>
+                    </div>
+                    <!-- All user's wallets end-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="createProduct" tabindex="-1" data-bs-backdrop="static" style="display: none"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-transparent">
+                <button type="button" class="btn-close close-import-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-sm-5 mx-50 pb-5">
+                <h4 class="text-center mb-1">Создать продукт</h4>
+                <!-- form -->
+                <form id="create_product_form" class="row gy-1 gx-2 mt-75" onsubmit="return false" novalidate="novalidate">
+                    <div class="mb-2">
+                        <label for="product_name" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="product_name" name="product_name" placeholder="Введите название продукта" tabindex="1">
+
+                        <div>
+                            <label for="product_address" class="form-label mt-75">Кошелёк</label>
+                            <select name="product_address" style="min-width: 380px" id="product_address" class="hide-search form-select select2-hidden-accessible"></select>
+                        </div>
+
+                        <label for="product_price" class="form-label mt-75">Цена</label>
+                        <input type="text" class="form-control" id="product_price" name="product_price" placeholder="Укажите стоимость продукта" tabindex="3">
+
+                        <div style="margin-top: 15px">
+                            <span style="font-size: 14px; margin-right: 10px; margin-top: 4px" class="mt-75">Выберите фото</span>
+                            <label for="product_image" id="image_label" class="btn btn-gradient-primary waves-effect waves-float waves-light" title="Файл не выбран">Загрузить</label>
+                            <input type="file" id="product_image" name="product_image" hidden accept="image/*">
+                        </div>
+                    </div>
+                    <input type="submit" class="btn btn-gradient-success waves-effect waves-float waves-light" value="Создать">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/app-assets/vendors/js/forms/select/select2.full.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/js/scripts/forms/form-select2.js') }}"></script>
+
+<script>
+    // $('#test').click(function (){
+    //     console.log($('#product_address'))
+    // })
+
+
+
+    // region Render Products-------------------------------------------------------------------------------------------
+    //==================================================================================================================
+    // ajax for get all products
+    $(window).on('load', function () {
+        $.ajax({
+            type: "GET",
+            url: "/api/ibay/products",
+            success: function (response) {
+                render_products(response)
+                if (user_wallets) {
+                    console.log(user_wallets)
+                    $(user_wallets).each(function (index, wallet) {
+                        $('#product_address').append(
+                            "<option value=" + wallet.id + ">" + wallet.address + " (" + wallet.balance + " ETH)</option>"
+                        )
+                    })
+                }
+
+            },
+            error: function (response) {
+            }
+        })
+        $('.content-wrapper').fadeIn("normal")
+    });
+
+    // render all wallets for user
+    function render_products(products) {
+        if (products.length > 0) {
+            for (let product of products) {
+                $("#products_list").append(
+                    "<div class=\"col-xl-6 col-md-12 col-sm-12\">\n" +
+                    "    <div class=\"card shadow-none border cursor-pointer\">\n" +
+                    "        <div id=\"\" class=\"card-body\">\n" +
+                    "            <div class=\"d-flex\">\n" +
+                    "                <span class=\"me-25\">\n" +
+                    "                    <img style='margin-top: 5px' class='product-image' src=\"https://cryptowallet.fra1.digitaloceanspaces.com/" + product.image + "\" alt=\"product_image\" height=\"100\">\n" +
+                    "                </span>\n" +
+                    "                <div style=\"font-size: 14px\">\n" +
+                    "                    <div class=\" align-items-top ms-1\">\n" +
+                    "                        <p style=\"margin: 0\"><b>Название: <span style=\"font-size: 15px\">" + product.title + "</span></b></p></b>\n" +
+                    "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Адрес: </b><span style=\"font-size: calc(8px + 0.3vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + product.wallet.address + "\">" + product.wallet.address + "</a></span></p>\n" +
+                    "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Цена: <span style=\"font-size: 15px\">" + product.price + " ETH</span></b></p></b>\n" +
+                    "                        <div style=\"\">\n" +
+                    "                            <button id=\"" + product.wallet.id + "\" style=\"min-width: 150px\" type=\"button\" class=\"mt-75 btn btn-primary waves-effect waves-float waves-light\">\n" +
+                    "                                <font style=\"vertical-align: inherit;\">\n" +
+                    "                                    <font style=\"vertical-align: inherit;\">\n" +
+                    "                                        Купить\n" +
+                    "                                    </font>\n" +
+                    "                                </font>\n" +
+                    "                            </button>\n" +
+                    "                        </div>\n" +
+                    "                    </div>\n" +
+                    "                </div>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</div>"
+                )
+            }
+        } else {
+            $("#products_list").append(
+                '<h4 class="card-title text-center">Нет доступных лотов для покупки... Но вы можете создать свой продукт!</h4>'
+            )
+        }
+    }
+
+
+    // region Create Product--------------------------------------------------------------------------------------------
+    //==================================================================================================================
+    // upload image
+    $("#product_image").change(function() {
+      if (this.files[0]) {
+          filename = this.files[0].name;
+          $('#image_label').attr('title', filename)
+      } else {
+          $('#image_label').attr('title', "Файл не выбран")
+      }
+    });
+
+    let product_validator = $("#create_product_form").validate({
+        submitHandler: function (e) {
+            let form_data = new Map()
+            $.ajax({
+                type: "PUT",
+                url: "/api/profile/update",
+                enctype: 'multipart/form-data',
+                data: form_data,
+                success: function (response) {
+
+                },
+                error: function (response) {
+
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+            content.fadeIn(1000)
+            user_content.fadeIn(1000)
+            profile_image = null;
+            delete_image = false
+        },
+        rules: {
+            product_name: {
+                required: true
+            },
+            product_address: {
+                required: false
+            },
+            product_price: {
+                required: true
+            },
+            product_image: {
+                required: true
+            }
+        },
+        messages: {
+            product_name: {
+                required: "Это поле обязательно к заполнению."
+            },
+            product_address: {
+                required: "Это поле обязательно к заполнению."
+            },
+            product_price: {
+                required: "Это поле обязательно к заполнению."
+            },
+            product_image: {
+                required: "Это поле обязательно к заполнению."
+            },
+            errorElement: 'span',
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('error');
+                if ($(element).parent().hasClass('input-group')) {
+                $(element).parent().addClass('is-invalid');
+            }
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('error');
+                if ($(element).parent().hasClass('input-group')) {
+                    $(element).parent().removeClass('is-invalid');
+                }
+            }
+        }
+    });
+
+
+
+
+
+    // socket.io -------------------------------------------------------------------------------------------------------
+    // =================================================================================================================
+    // event for update balance for user wallet
+    socket.on("pass", function (data) {
+
+    })
+</script>
+{% endblock %}

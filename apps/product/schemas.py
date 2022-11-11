@@ -54,6 +54,7 @@ class UserUpdate(BaseModel):
 class WalletDetail(ApiSchema):
     id: UUID
     address: str
+    balance: str
 
 
 @as_form
