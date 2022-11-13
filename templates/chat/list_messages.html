@@ -179,6 +179,7 @@ Crypto Wallet|Chat
 <script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-blockui.js') }}"></script>
 
 <script>
+    let file_host = "https://cryptowallet.fra1.digitaloceanspaces.com/"
 
 
     $(document).ready(function () {
@@ -196,10 +197,7 @@ Crypto Wallet|Chat
                     user_data['username'] = response.username
                     if (response.avatar) {
                         user_data['avatar'] = response.avatar
-                        $(".round").attr(
-                            "src",
-                            "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
-                        )
+                        $(".round").attr("src", file_host + response.avatar + "")
                     }
                     $(".user-name").html(response.username)
                     user_wallets = response.wallets
@@ -237,11 +235,63 @@ Crypto Wallet|Chat
         } else {
             $("#" + data.sid + "").remove()
         }
-
     }
+
+    function writesUser(data) {
+        console.log(data.sid + 'печатает')
+        // $("#" + data.sid + "").each(function () {
+        //     if ($('.writes-' + data.sid + '').length < 1) {
+        //         $('.chat-info').append(
+        //             '<span class="writes-' + data.sid + '">печатает...</span>'
+        //         )
+        //     }
+        // })
+    }
+
+    function renderHistory(data) {
+        for (let message of data.history.reverse()) {
+            let profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+            if (message.avatar) {
+                profile_image = file_host + message.avatar
+            }
+            let username = '<p style="color: #0a6aa1">' + message.username + '</p>'
+            let html_message = '<div class="chat-content">' + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + message.date + '</small>' + '</p>' + '</div>';
+            let first_html_message = '<div class="chat-content">' + username + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + message.date + '</small>' + '</p>' + '</div>'
+            let chat_right = '<div class="chat chat-right"></div>'
+            let chat_left = '<div class="chat chat-left user-' + message.user_id + '"></div>'
+            let chat_body = '<div class="chat-body"></div>'
+            let chat_avatar = '<div class="chat-avatar">\n' +
+                '<span class="avatar box-shadow-1 cursor-pointer">\n' +
+                '<img src=' + profile_image + '\n' +
+                '     alt="avatar" height="36" width="36"/>\n' +
+                '</span>\n' +
+                '</div>'
+
+            if (message.user_id === data.user.auth.id) {
+                if ($('.chat-right:last-child').length) {
+                    $('.chat-right:last-child .chat-body').append(html_message);
+                } else {
+                    $(".chats").append(chat_right)
+                    $('.chat-right:last-child').append(chat_avatar).append(chat_body)
+                    $('.chat-right:last-child .chat-body').append(html_message);
+                }
+            } else {
+                if ($('.user-' + message.user_id + ':last-child').length) {
+                    $('.user-' + message.user_id + ':last-child .chat-body').append(html_message);
+                } else {
+                    $(".chats").append(chat_left)
+                    $('.user-' + message.user_id + ':last-child').append(chat_avatar).append(chat_body)
+                    $('.user-' + message.user_id + ':last-child .chat-body').append(first_html_message)
+                }
+            }
+        }
+    }
+
 
     function connectSockets(user_data) {
         let socket = io("ws://127.0.0.1:8000", {path: '/ws/socket.io', auth: user_data});
+
+
         // event for connect
         socket.on("connect", function () {
             console.log('connect')
@@ -263,7 +313,11 @@ Crypto Wallet|Chat
         })
 
         socket.on('writes_message', function (data) {
-            console.log('writers')
+            writesUser(data)
+        })
+
+        socket.on('get_history', function (data) {
+            renderHistory(data)
         })
 
         //
@@ -276,7 +330,7 @@ Crypto Wallet|Chat
                 socket.emit('new_message', {
                     'message': message,
                     'user_id': user_data.id,
-                    'image': '',
+                    'image': null,
                     'date': new Date()
                 })
             }
@@ -290,8 +344,6 @@ Crypto Wallet|Chat
 
 
         socket.on('update_message', function (data) {
-            console.log(data.message.user_id)
-            console.log(user_data.id)
             let profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
             let username = '<p style="color: #0a6aa1">' + data.user.auth.username + '</p>'
 

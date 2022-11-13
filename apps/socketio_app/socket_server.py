@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import socketio
 
-from apps.socketio_app.dependencies import get_chat_database
+from apps.socketio_app.dependencies import get_chat_manager
 from apps.socketio_app.models import ChatMessage
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
@@ -12,6 +12,9 @@ async def connect(sid, environ, auth):
     print("connect")
     await sio.save_session(sid, {"auth": auth, "sid": sid})
     session = await sio.get_session(sid)
+    manager = await get_chat_manager()
+    history = await manager.get_history_chat()
+    await sio.emit("get_history", {"history": history, "user": session}, room=sid)
     await sio.emit("connect_user", session)
 
 
@@ -39,18 +42,25 @@ async def update_balance(sid, data):
 # region Chat
 @sio.event
 async def new_message(sid, data):
-    print("message", data)
-    mongodb_chat = await get_chat_database()
-    mes = ChatMessage(**data)
-    await mongodb_chat.create_message(mes)
+    manager = await get_chat_manager()
+    message = ChatMessage(**data)
+    await manager.new_message(message)
     session = await sio.get_session(sid)
     await sio.emit("update_message", {"message": data, "user": session})
+
+
+# @sio.event
+# async def list_messages(sid):
+#     manager = await get_chat_manager()
+#     history = await manager.get_history_chat()
+#     session = await sio.get_session(sid)
+#     await sio.emit('get_history', {"history": history, "user": session})
 
 
 @sio.event
 async def writes_message(sid, data):
     print("writes_message", data)
-    await sio.emit("writes_message", data)
+    await sio.emit("writes_message", {"sid": sid})
 
 
 # endregion Chat

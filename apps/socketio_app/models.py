@@ -4,12 +4,13 @@ from typing import Optional
 from uuid import UUID
 
 from beanie import Document
+from pydantic import BaseModel
 
 
 class ChatUser(Document):
     id: UUID
     username: str
-    avatar: str
+    avatar: Optional[str] = None
 
     class Settings:
         name = "chat_user"
@@ -24,11 +25,15 @@ class ChatMessage(Document):
     class Settings:
         name = "chat_message"
 
-    # class Config:
-    #     schema_extra = {
-    #         "example": {
-    #             "message": "Test message",
-    #             "image": "Test image",
-    #             "date": datetime.now()
-    #         }
-    #     }
+
+class User(BaseModel):
+    id: UUID
+    avatar: Optional[str] = None
+    username: str
+
+
+class ListChatMessage(BaseModel):
+    user: User
+    message: str
+    image: Optional[str] = None
+    date: Optional[datetime]

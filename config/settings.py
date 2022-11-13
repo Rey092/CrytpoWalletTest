@@ -73,12 +73,12 @@ class Settings(BaseSettings):
     mongodb_name: str
 
     # Variables for Redis
-    redis_host: str = "localhost"
-    redis_port: int = 6379
+    redis_host: str
+    redis_port: int
     redis_user: Optional[str] = None
     redis_pass: Optional[str] = None
     redis_base: Optional[str] = None
-    redis_pool_size: int = 16
+    redis_pool_size: int
 
     # Variables for RabbitMQ
     rabbit_host: str = "localhost"
