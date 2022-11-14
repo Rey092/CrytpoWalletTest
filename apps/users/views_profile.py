@@ -33,6 +33,7 @@ async def get_profile(
     Get user profile\n
     Permission: Is authenticated.
     """
+    print("send")
     return user
 
 

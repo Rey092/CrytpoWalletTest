@@ -5,6 +5,7 @@ from typing import List
 
 import socketio
 import toml
+from beanie import init_beanie
 from fastapi import FastAPI, Request
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,16 +18,12 @@ from apps.crypto.api_service_consumer import main_consumer_thread
 from apps.crypto.wallets_balance_parser import parsing_balances_thread
 from apps.front.router import front_router
 from apps.ibay import ibay_models
+from apps.socketio_app.config.db import collections, db
 from apps.socketio_app.socket_server import sio
 from apps.socketio_app.socket_service_consumer import socket_consumer_thread
 from apps.users import models
-
-# from config.celery_utils import create_celery
 from config.costum_logging import CustomizeLogger
 from config.db import engine
-
-# from config.db import TORTOISE_CONFIG
-# from config.lifetime import register_shutdown_event, register_startup_event
 from config.openapi import metadata_tags
 from config.router import api_router
 
@@ -47,6 +44,10 @@ def init_database() -> None:
 
 def init_product_database() -> None:
     ibay_models.BaseIBay.metadata.create_all(bind=engine)
+
+
+async def init_mongodb() -> init_beanie:
+    await init_beanie(database=db, document_models=collections)
 
 
 def make_middleware() -> List[Middleware]:
@@ -106,7 +107,7 @@ def create_app() -> FastAPI:
     # Initialize other utils.
     init_routers(app_=app_)
     init_validation_handler(app=app_)
-    # init_database()
+    init_database()
     init_product_database()
 
     init_cache()
@@ -122,6 +123,11 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+@app.on_event("startup")
+async def start_mongodb():
+    await init_mongodb()
 
 
 @app.exception_handler(DefaultHTTPException)
