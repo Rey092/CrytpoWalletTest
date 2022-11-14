@@ -25,6 +25,7 @@
     $this.select2({
       // the following code is used to disable x-scrollbar when click in select input and
       // take 100% width in responsive also
+      placeholder: 'Выберите...',
       dropdownAutoWidth: true,
       width: '100%',
       dropdownParent: $this.parent()
@@ -71,7 +72,12 @@
 
   // Hide Search Box
   hideSearch.select2({
-    placeholder: 'Select an option',
+    placeholder: 'Выберите кошелёк',
+    language: {
+        "noResults": function () {
+            return 'Ничего не найдено.'
+        }
+    },
     minimumResultsForSearch: Infinity
   });
 

@@ -2,6 +2,7 @@
 from async_lru import alru_cache
 from fastapi_helper.schemas.examples_generate import ExamplesGenerate
 
+from apps.crypto.api_service_producer import ApiServiceProducer
 from apps.crypto.models import Wallet
 from apps.product.database import ProductDatabase
 from apps.product.manager import ProductManager
@@ -33,8 +34,14 @@ async def get_ethereum_provider_client() -> EthereumProviderClient:
 
 
 @alru_cache()
+async def get_api_service_producer() -> ApiServiceProducer:
+    return ApiServiceProducer()
+
+
+@alru_cache()
 async def get_product_manager() -> ProductManager:
     product_db = await get_product_db()
     ethereum_provider = await get_ethereum_provider_client()
     storage = await get_storage()
-    return ProductManager(product_db, ethereum_provider, storage)
+    api_service_producer = await get_api_service_producer()
+    return ProductManager(product_db, ethereum_provider, storage, api_service_producer)

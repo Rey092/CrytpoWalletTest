@@ -62,7 +62,7 @@ class Settings(BaseSettings):
 
     # Variables for the product database
     product_postgres_host: str = "localhost"
-    product_postgres_port: int = 5444
+    product_postgres_port: int = 5432
     product_postgres_user: str
     product_postgres_password: str
     product_postgres_db: str
