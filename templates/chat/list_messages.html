@@ -17,7 +17,7 @@ Crypto Wallet|Chat
 <div class="app-content content chat-application">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
-    <div class="content-area-wrapper container-xxl p-0" id="block">
+    <div class="content-area-wrapper container-xxl p-0" id="block" style="display: none;">
         <div class="sidebar-left">
             <div class="sidebar">
                 <!-- Chat Sidebar area -->
@@ -78,6 +78,29 @@ Crypto Wallet|Chat
                                                 <line x1="3" y1="18" x2="21" y2="18"></line>
                                             </svg>
                                         </div>
+                                        <h6 class="mb-0">Crypto Wallet</h6>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                             stroke-linecap="round" stroke-linejoin="round"
+                                             class="feather feather-phone-call cursor-pointer d-sm-block d-none font-medium-2 me-1">
+                                            <path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                             stroke-linecap="round" stroke-linejoin="round"
+                                             class="feather feather-video cursor-pointer d-sm-block d-none font-medium-2 me-1">
+                                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                             stroke-linecap="round" stroke-linejoin="round"
+                                             class="feather feather-search cursor-pointer d-sm-block d-none font-medium-2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
                                     </div>
                                 </header>
                             </div>
@@ -85,8 +108,7 @@ Crypto Wallet|Chat
 
                             <!-- User Chat messages -->
                             <div class="user-chats">
-                                <div class="chats">
-                                </div>
+                                <div class="chats"></div>
                             </div>
                             <!-- User Chat messages -->
 
@@ -126,33 +148,21 @@ Crypto Wallet|Chat
                                 <div class="avatar box-shadow-1 avatar-border avatar-xl">
                                     <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
                                          alt="user_avatar" height="70" width="70"/>
-                                    <span class="avatar-status-busy avatar-status-lg"></span>
+                                    <span class="avatar-status-online"></span>
                                 </div>
-                                <h4 class="chat-user-name">Kristopher Candy</h4>
-                                <span class="user-post">UI/UX Designer 👩🏻‍💻</span>
+                                <h4 class="chat-user-name"></h4>
+                                <span class="user-post">Пользователь 💻</span>
                             </div>
                             <!--/ User Profile image with name -->
                         </header>
                         <div class="user-profile-sidebar-area">
-                            <!-- About User -->
-                            <h6 class="section-label mb-1">About</h6>
-                            <p>Toffee caramels jelly-o tart gummi bears cake I love ice cream lollipop.</p>
-                            <!-- About User -->
                             <!-- User's personal information -->
                             <div class="personal-info">
-                                <h6 class="section-label mb-1 mt-3">Personal Information</h6>
+                                <h6 class="section-label mb-1 mt-3">Личная информация</h6>
                                 <ul class="list-unstyled">
                                     <li class="mb-1">
                                         <i data-feather="mail" class="font-medium-2 me-50"></i>
-                                        <span class="align-middle">kristycandy@email.com</span>
-                                    </li>
-                                    <li class="mb-1">
-                                        <i data-feather="phone-call" class="font-medium-2 me-50"></i>
-                                        <span class="align-middle">+1(123) 456 - 7890</span>
-                                    </li>
-                                    <li>
-                                        <i data-feather="clock" class="font-medium-2 me-50"></i>
-                                        <span class="align-middle">Mon - Fri 10AM - 8PM</span>
+                                        <span class="align-middle"></span>
                                     </li>
                                 </ul>
                             </div>
@@ -179,37 +189,106 @@ Crypto Wallet|Chat
 <script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-blockui.js') }}"></script>
 
 <script>
-    let file_host = "https://cryptowallet.fra1.digitaloceanspaces.com/"
+    let chat = $(".chats")
 
 
-    $(document).ready(function () {
-        $('.user-chats').scrollTop($('.user-chats > .chats').height());
-    });
+    // sockets events for chat
+    socket.on('connect_user', function (data) {
+        renderUsers(data, user_data, true)
+    })
 
-    $(window).on('load', function () {
-        $.ajax({
-            type: "GET",
-            url: "/api/profile/get",
-            success: function (response) {
-                let user_data = {}
-                if ('id' in response) {
-                    user_data['id'] = response.id
-                    user_data['username'] = response.username
-                    if (response.avatar) {
-                        user_data['avatar'] = response.avatar
-                        $(".round").attr("src", file_host + response.avatar + "")
-                    }
-                    $(".user-name").html(response.username)
-                    user_wallets = response.wallets
-                    connectSockets(user_data)
-                }
+    socket.on('disconnect_user', function (data) {
+        renderUsers(data, user_data, false)
+    })
+
+    socket.on('get_history', function (data) {
+        if (chat.html() === '') {
+            renderHistory(data)
+        }
+    })
+
+    socket.on('data_user', function (data) {
+        showProfile(data)
+    })
+
+    //
 
 
-            },
-            error: function (response) {
-            }
+    function getProfile(element) {
+        socket.emit('detail_user', {
+            'sid': element.id,
         })
-        $('.dropdown-user').fadeIn(1000)
+    }
+
+    function showProfile(data) {
+        if (data.auth.avatar) {
+            $("img").attr("src", file_host + data.auth.avatar)
+        }
+        $(".chat-user-name").html(data.auth.username)
+        $(".align-middle").html(data.auth.email)
+        $(".body-content-overlay").addClass('show')
+        $(".user-profile-sidebar").addClass('show')
+
+
+    }
+
+
+    // send message
+    $(".chat-app-form").submit(function () {
+        let message = $('.message').val();
+        if (/\S/.test(message)) {
+            socket.emit('new_message', {
+                'message': message,
+                'user_id': user_data.id,
+                'image': null,
+                'date': new Date()
+            })
+        }
+    })
+
+
+    $('.message').keypress(function () {
+        socket.emit('writes_message', {'user_id': user_data.id})
+    })
+    //
+
+
+    socket.on('update_message', (data) => {
+        let profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+        let username = '<p style="color: #0a6aa1">' + data.user.auth.username + '</p>'
+        let html_message = '<div class="chat-content">' + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8">11:40</small>' + '</p>' + '</div>';
+        let first_html_message = '<div class="chat-content">' + username + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8">11:40</small>' + '</p>' + '</div>'
+        let chat_right = '<div class="chat chat-right"></div>'
+        let chat_left = '<div class="chat chat-left user-' + data.user.auth.id + '"></div>'
+        let chat_body = '<div class="chat-body"></div>'
+        let chat_avatar = '<div class="chat-avatar">\n' +
+            '<span class="avatar box-shadow-1 cursor-pointer">\n' +
+            '<img src=' + profile_image + '\n' +
+            '     alt="avatar" height="36" width="36"/>\n' +
+            '</span>\n' +
+            '</div>'
+
+
+        if (data.message.user_id === user_data.id) {
+            if ($('.chat-right:last-child').length) {
+                $('.chat-right:last-child .chat-body').append(html_message);
+            } else {
+                $(".chats").append(chat_right)
+                $('.chat-right:last-child').append(chat_avatar).append(chat_body)
+                $('.chat-right:last-child .chat-body').append(html_message);
+            }
+        } else {
+            if ($('.user-' + data.message.user_id + ':last-child').length) {
+                $('.user-' + data.message.user_id + ':last-child .chat-body').append(html_message);
+            } else {
+                $(".chats").append(chat_left)
+                $('.user-' + data.message.user_id + ':last-child').append(chat_avatar).append(chat_body)
+                $('.user-' + data.message.user_id + ':last-child .chat-body').append(first_html_message)
+            }
+        }
+
+        $('.message').val('');
+        $('.user-chats').scrollTop($('.user-chats > .chats').height());
     })
 
 
@@ -219,7 +298,7 @@ Crypto Wallet|Chat
             let src = host_file + data.auth.avatar + ""
             if (data.auth.id !== user_data.id) {
                 $(".no-users").css('display', 'none')
-                let li = '<li class="user-profile-toggle" id="' + data.sid + '"></li>'
+                let li = '<li class="user-profile-toggle" onclick="getProfile(this)" id="' + data.sid + '"></li>'
                 let username = ' <div class="chat-info">\n' +
                     '<h5 class="mb-0">' + data.auth.username + '</h5>\n' +
                     '</div>'
@@ -237,26 +316,24 @@ Crypto Wallet|Chat
         }
     }
 
-    function writesUser(data) {
-        console.log(data.sid + 'печатает')
-        // $("#" + data.sid + "").each(function () {
-        //     if ($('.writes-' + data.sid + '').length < 1) {
-        //         $('.chat-info').append(
-        //             '<span class="writes-' + data.sid + '">печатает...</span>'
-        //         )
-        //     }
-        // })
-    }
 
     function renderHistory(data) {
+        let current_date
         for (let message of data.history.reverse()) {
+            let this_date = message.date.split(',')[0]
+            let this_time = message.date.split(',')[1]
+            if (current_date !== this_date) {
+                let date_divider = '<div class="divider"><div class="divider-text">' + this_date + '</div></div>'
+                $(".chats").append(date_divider)
+            }
+            current_date = this_date
             let profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
             if (message.avatar) {
                 profile_image = file_host + message.avatar
             }
             let username = '<p style="color: #0a6aa1">' + message.username + '</p>'
-            let html_message = '<div class="chat-content">' + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + message.date + '</small>' + '</p>' + '</div>';
-            let first_html_message = '<div class="chat-content">' + username + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + message.date + '</small>' + '</p>' + '</div>'
+            let html_message = '<div class="chat-content">' + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>';
+            let first_html_message = '<div class="chat-content">' + username + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>'
             let chat_right = '<div class="chat chat-right"></div>'
             let chat_left = '<div class="chat chat-left user-' + message.user_id + '"></div>'
             let chat_body = '<div class="chat-body"></div>'
@@ -285,103 +362,13 @@ Crypto Wallet|Chat
                 }
             }
         }
+        $(".content-area-wrapper").fadeIn(1000)
     }
 
 
-    function connectSockets(user_data) {
-        let socket = io("ws://127.0.0.1:8000", {path: '/ws/socket.io', auth: user_data});
-
-
-        // event for connect
-        socket.on("connect", function () {
-            console.log('connect')
-        });
-
-        // event for connect error
-        socket.on("connect_error", (error) => {
-            console.log(error)
-        });
-
-
-        // sockets events
-        socket.on('connect_user', function (data) {
-            renderUsers(data, user_data, true)
-        })
-
-        socket.on('disconnect_user', function (data) {
-            renderUsers(data, user_data, false)
-        })
-
-        socket.on('writes_message', function (data) {
-            writesUser(data)
-        })
-
-        socket.on('get_history', function (data) {
-            renderHistory(data)
-        })
-
-        //
-
-
-        // send message
-        $(".chat-app-form").submit(function () {
-            let message = $('.message').val();
-            if (/\S/.test(message)) {
-                socket.emit('new_message', {
-                    'message': message,
-                    'user_id': user_data.id,
-                    'image': null,
-                    'date': new Date()
-                })
-            }
-        })
-
-
-        $('.message').keypress(function () {
-            socket.emit('writes_message', {'user_id': user_data.id})
-        })
-        //
-
-
-        socket.on('update_message', function (data) {
-            let profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
-            let username = '<p style="color: #0a6aa1">' + data.user.auth.username + '</p>'
-
-            let html_message = '<div class="chat-content">' + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8">11:40</small>' + '</p>' + '</div>';
-            let first_html_message = '<div class="chat-content">' + username + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8">11:40</small>' + '</p>' + '</div>'
-            let chat_right = '<div class="chat chat-right"></div>'
-            let chat_left = '<div class="chat chat-left user-' + data.user.auth.id + '"></div>'
-            let chat_body = '<div class="chat-body"></div>'
-            let chat_avatar = '<div class="chat-avatar">\n' +
-                '<span class="avatar box-shadow-1 cursor-pointer">\n' +
-                '<img src=' + profile_image + '\n' +
-                '     alt="avatar" height="36" width="36"/>\n' +
-                '</span>\n' +
-                '</div>'
-
-
-            if (data.message.user_id === user_data.id) {
-                if ($('.chat-right:last-child').length) {
-                    $('.chat-right:last-child .chat-body').append(html_message);
-                } else {
-                    $(".chats").append(chat_right)
-                    $('.chat-right:last-child').append(chat_avatar).append(chat_body)
-                    $('.chat-right:last-child .chat-body').append(html_message);
-                }
-            } else {
-                if ($('.user-' + data.message.user_id + ':last-child').length) {
-                    $('.user-' + data.message.user_id + ':last-child .chat-body').append(html_message);
-                } else {
-                    $(".chats").append(chat_left)
-                    $('.user-' + data.message.user_id + ':last-child').append(chat_avatar).append(chat_body)
-                    $('.user-' + data.message.user_id + ':last-child .chat-body').append(first_html_message)
-                }
-            }
-
-            $('.message').val('');
-            $('.user-chats').scrollTop($('.user-chats > .chats').height());
-        })
-    }
+    $(document).ready(function () {
+        $('.user-chats').scrollTop($('.user-chats > .chats').height());
+    });
 
 
     // $(".close-icon, .content-area-wrapper").on("click", function () {

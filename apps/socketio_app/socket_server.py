@@ -1,28 +1,33 @@
 # -*- coding: utf-8 -*-
+
 import socketio
 
 from apps.socketio_app.dependencies import get_chat_manager
 from apps.socketio_app.models import ChatMessage
+from apps.socketio_app.utils.service_path import get_path
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
 
 
 @sio.event
 async def connect(sid, environ, auth):
-    print("connect")
     await sio.save_session(sid, {"auth": auth, "sid": sid})
-    session = await sio.get_session(sid)
-    manager = await get_chat_manager()
-    history = await manager.get_history_chat()
-    await sio.emit("get_history", {"history": history, "user": session}, room=sid)
-    await sio.emit("connect_user", session)
+    if await get_path(environ):
+        sio.enter_room(sid, "chat_users")
+        session = await sio.get_session(sid)
+        manager = await get_chat_manager()
+        history = await manager.get_history_chat()
+        await sio.emit("connect_user", session, room="chat_users")
+        await sio.emit("get_history", {"history": history, "user": session}, to=sid)
 
 
 @sio.event
 async def disconnect(sid):
-    print("disconnect")
-    data = {"sid": sid}
-    await sio.emit("disconnect_user", data)
+    await sio.emit(
+        "disconnect_user",
+        {"sid": sid},
+        room="chat_users",
+    )
 
 
 # region Wallets
@@ -60,21 +65,30 @@ async def new_message(sid, data):
     message = ChatMessage(**data)
     await manager.new_message(message)
     session = await sio.get_session(sid)
-    await sio.emit("update_message", {"message": data, "user": session})
-
-
-# @sio.event
-# async def list_messages(sid):
-#     manager = await get_chat_manager()
-#     history = await manager.get_history_chat()
-#     session = await sio.get_session(sid)
-#     await sio.emit('get_history', {"history": history, "user": session})
+    await sio.emit(
+        "update_message",
+        {
+            "message": data,
+            "user": session,
+        },
+        room="chat_users",
+    )
 
 
 @sio.event
-async def writes_message(sid, data):
-    print("writes_message", data)
-    await sio.emit("writes_message", {"sid": sid})
+async def detail_user(sid, data):
+    session = await sio.get_session(
+        data.get("sid"),
+    )
+    await sio.emit("data_user", session, room="chat_users", to=sid)
 
+
+# @sio.event
+# async def writes_message(sid, data):
+#     await sio.emit(
+#         "writes_message",
+#         {"sid": sid},
+#         room='chat_users'
+#     )
 
 # endregion Chat
