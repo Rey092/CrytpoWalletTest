@@ -5,6 +5,7 @@ from typing import List
 
 import socketio
 import toml
+from beanie import init_beanie
 from fastapi import FastAPI, Request
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,16 +20,12 @@ from apps.front.router import front_router
 from apps.ibay import ibay_models
 from apps.ibay.config.db import engine_ibay
 from apps.ibay.ibay_service_consumer import ibay_consumer_thread
+from apps.socketio_app.config.db import collections, db
 from apps.socketio_app.socket_server import sio
 from apps.socketio_app.socket_service_consumer import socket_consumer_thread
 from apps.users import models
-
-# from config.celery_utils import create_celery
 from config.costum_logging import CustomizeLogger
 from config.db import engine
-
-# from config.db import TORTOISE_CONFIG
-# from config.lifetime import register_shutdown_event, register_startup_event
 from config.openapi import metadata_tags
 from config.router import api_router
 
@@ -49,6 +46,10 @@ def init_database() -> None:
 
 def init_product_database() -> None:
     ibay_models.BaseIBay.metadata.create_all(bind=engine_ibay)
+
+
+async def init_mongodb() -> init_beanie:
+    await init_beanie(database=db, document_models=collections)
 
 
 def make_middleware() -> List[Middleware]:
@@ -126,6 +127,11 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+@app.on_event("startup")
+async def start_mongodb():
+    await init_mongodb()
 
 
 @app.exception_handler(DefaultHTTPException)
