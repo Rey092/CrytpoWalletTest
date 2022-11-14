@@ -156,45 +156,45 @@
     // sockets ---------------------------------------------------------------------------------------------------------
     //==================================================================================================================
 
-    // const socket = io("ws://127.0.0.1:8000", {path: '/ws/socket.io'});
-    //
-    //
-    // // event for connect
-    // socket.on("connect", function () {
-    //     console.log('connect')
-    // });
-    //
-    // // event for connect error
-    // socket.on("connect_error", (error) => {
-    //     console.log(error)
-    // });
-    //
-    // // event for getting new transaction for user
-    // socket.on("front_new_transactions", function (data) {
-    //     $(data).each(function (list_index, dict) {
-    //         $(user_wallets).each(function (index, elem) {
-    //             if (dict.address_to === elem.address) {
-    //                 toastr_options()
-    //                 toastr.success(
-    //                     '<div style="margin-top: 10px; font-weight: bold">\n' +
-    //                     '    <p style="margin: 0">Получено ' + parseFloat(dict.value) + ' ETH на кошелёк</p>\n' +
-    //                     '    <p style="margin: 0">' + elem.address + '</p>\n' +
-    //                     '    <p><a style="color: #1e5bbd" target="_blank" href="https://sepolia.etherscan.io/tx/' + dict.txn_hash + '">Ссылка на транзакцию</a></p>\n' +
-    //                     '</div>',
-    //                     '<div style="font-weight: bold">\n' +
-    //                     '    <span>Новая транзакция</span><span style="float: right">' + get_hours_and_minutes_time() + '</span>\n' +
-    //                     '</div>'
-    //                 )
-    //                 $('#balance_' + elem.address).html("<b>" + dict.new_balance + " ETH</b>")
-    //                 if ($('.modal[style*="display: block"]').length !== 0) {
-    //                     if (localStorage.address === dict.address_to) {
-    //                         watch_transactions(dict.address_to)
-    //                     }
-    //                 }
-    //             }
-    //         })
-    //     })
-    // })
+    const socket = io("ws://127.0.0.1:8000", {path: '/ws/socket.io'});
+
+
+    // event for connect
+    socket.on("connect", function () {
+        console.log('connect')
+    });
+
+    // event for connect error
+    socket.on("connect_error", (error) => {
+        console.log(error)
+    });
+
+    // event for getting new transaction for user
+    socket.on("front_new_transactions", function (data) {
+        $(data).each(function (list_index, dict) {
+            $(user_wallets).each(function (index, elem) {
+                if (dict.address_to === elem.address) {
+                    toastr_options()
+                    toastr.success(
+                        '<div style="margin-top: 10px; font-weight: bold">\n' +
+                        '    <p style="margin: 0">Получено ' + parseFloat(dict.value) + ' ETH на кошелёк</p>\n' +
+                        '    <p style="margin: 0">' + elem.address + '</p>\n' +
+                        '    <p><a style="color: #1e5bbd" target="_blank" href="https://sepolia.etherscan.io/tx/' + dict.txn_hash + '">Ссылка на транзакцию</a></p>\n' +
+                        '</div>',
+                        '<div style="font-weight: bold">\n' +
+                        '    <span>Новая транзакция</span><span style="float: right">' + get_hours_and_minutes_time() + '</span>\n' +
+                        '</div>'
+                    )
+                    $('#balance_' + elem.address).html("<b>" + dict.new_balance + " ETH</b>")
+                    if ($('.modal[style*="display: block"]').length !== 0) {
+                        if (localStorage.address === dict.address_to) {
+                            watch_transactions(dict.address_to)
+                        }
+                    }
+                }
+            })
+        })
+    })
 </script>
 
 {% block scripts %}{% endblock %}

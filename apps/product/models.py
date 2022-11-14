@@ -31,4 +31,5 @@ class Order(Base):
     date = Column(DateTime)
     status = Column(Enum(OrderStatus), default=OrderStatus.NEW)
     txn_hash_return = Column(String, nullable=True)
+    buyer_address = Column(String)
     product_id = Column(UUID(as_uuid=True), ForeignKey("product.id"))

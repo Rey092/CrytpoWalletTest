@@ -3,7 +3,7 @@ import datetime
 from typing import List, Type, Union
 from uuid import UUID
 
-from sqlalchemy import desc
+from sqlalchemy import asc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -50,7 +50,7 @@ class ProductDatabase:
     async def get_products(self, db: Session) -> List[Product]:
         return (
             db.query(self.product)
-            .order_by(desc(self.product.date_created))
+            .order_by(asc(self.product.date_created))
             .filter(self.product.is_sold == False)  # noqa
             .all()
         )
@@ -65,10 +65,11 @@ class ProductDatabase:
         db.commit()
         db.refresh(product)
 
-    async def create_order(self, db: Session, txn_hash: str, product_id: str) -> Order:
+    async def create_order(self, db: Session, txn_hash: str, product_id: str, buyer_address: str) -> Order:
         db_order = self.order(
             txn_hash=txn_hash,
             product_id=product_id,
+            buyer_address=buyer_address,
             date=datetime.datetime.now(),
         )
         db.add(db_order)
@@ -83,16 +84,7 @@ class ProductDatabase:
         db.commit()
         db.refresh(wallet)
 
-    async def get_orders(self, db: Session, user_id: UUID) -> List[Order]:
-        orders = (
-            db.query(self.order)
-            .join(self.product)
-            .join(self.wallet)
-            .join(self.user)
-            .filter(
-                self.user.id == user_id,
-            )
-            .all()
-        )
+    async def get_orders(self, db: Session, addresses: List[str]) -> List[Order]:
+        orders = db.query(self.order).order_by(asc(self.order.date)).filter(self.order.buyer_address.in_(addresses))
         orders = [format_date(order) for order in orders]
         return orders
