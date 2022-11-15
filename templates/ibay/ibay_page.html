@@ -9,6 +9,14 @@ Crypto Wallet | IBay
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/components.css') }}">
 
 <style>
+    .main-menu.menu-dark {
+      color: #dcdcdc;
+      background: #283046;
+    }
+    .main-menu.menu-dark .navigation {
+      background: #283046;
+    }
+
     @media (max-width: 576px) {
       .product-image {
         width: 65px;
@@ -16,6 +24,46 @@ Crypto Wallet | IBay
         margin: 5px -5px 0 -10px;
         padding: 0;
       }
+    }
+
+    @media (max-width: 576px) {
+      .order-image {
+        width: 50px;
+        height: 65px;
+        margin: 5px -5px 0 -10px;
+        padding: 0;
+      }
+    }
+    @media (max-width: 576px) {
+      .txn_width {
+        max-width: 250px;
+      }
+    }
+
+    .NEW {
+        font-size: 16px;
+        color: orange;
+        font-weight: bold
+    }
+    .COMPLETE {
+        font-size: 16px;
+        color: green;
+        font-weight: bold
+    }
+    .FAILED {
+        font-size: 16px;
+        color: red;
+        font-weight: bold
+    }
+    .RETURN {
+        font-size: 16px;
+        color: blue;
+        font-weight: bold
+    }
+    .DELIVERY {
+        font-size: 16px;
+        color: greenyellow;
+        font-weight: bold
     }
 </style>
 {% endblock %}
@@ -29,7 +77,7 @@ Crypto Wallet | IBay
         <div class="content-body">
             <div class="row">
                 <div class="col-12">
-                    <!-- All user's wallets -->
+                    <!-- All products -->
                     <div class="card">
                         <div class="card-header border-bottom">
                             <h4 class="card-title">
@@ -47,11 +95,49 @@ Crypto Wallet | IBay
                         </div>
                         <div id="products_list" class="row card-body py-2 my-25">
                             <!-- Products -->
-<!--                            <input type="button" id="test" value="test">-->
+<!--                            <input type="button" id="test" value="test" data-bs-toggle="modal" data-bs-target="#createOrder">-->
                             <!-- Products end -->
                         </div>
                     </div>
-                    <!-- All user's wallets end-->
+                    <!-- All products end -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <!-- All user's orders -->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">
+                                Заказы
+                            </h4>
+                        </div>
+                        <div id="orders_list" class="row card-body py-2 my-25">
+                            <!-- Orders -->
+<!--                            <div class="col-xl-6 col-md-12 col-sm-12">-->
+<!--                                <div class="card shadow-none border cursor-pointer">-->
+<!--                                    <div class="card-body">-->
+<!--                                        <div class="d-flex">-->
+<!--                                            <span class="me-25">-->
+<!--                                                <img style="margin-top: 5px" class="order-image" src="https://cryptowallet.fra1.digitaloceanspaces.com/ibay/image_ebaa835a-9c17-47fb-81d2-91c520c46901.png" alt="order_image" height="100">-->
+<!--                                            </span>-->
+<!--                                            <div style="font-size: 14px">-->
+<!--                                                <div class=" align-items-top ms-1">-->
+<!--                                                    <p style="margin: 0"><b>Название: <span style="font-size: 15px">Red Car</span></b></p></b>-->
+<!--                                                    <p style="margin: 0; overflow: hidden" class="mt-75 txn_width"><b>Транзакция: </b><span style="font-size: calc(7px + 0.2vw)"> <a target="_blank" href="https://sepolia.etherscan.io/tx/0xa10ce728c85fae0dd3774e6468b32e03d655af7c4eb472e6d3c7bd15b049ad11">0xa10ce728c85fae0dd3774e6468b32e03d655af7c4eb472e6d3c7bd15b049ad11</a></span></p>-->
+<!--                                                    <p style="margin: 0" class="mt-75"><b>Цена: <span style="font-size: 15px">0.12345678 ETH</span></b></p></b>-->
+<!--                                                    <p style="margin: 0" class="mt-75"><b>Время заказа: <span style="font-size: 15px">10.12.2022 15:42</span></b></p></b>-->
+<!--                                                    <p style="margin: 0" class="mt-75"><b>Статус: <span id="order_status" class="new_order">Новый</span></b></p></b>-->
+<!--                                                    <p style="margin: 0; overflow: hidden" class="mt-75 txn_width"><b>Возврат: </b><span id="order_return" style="font-size: calc(7px + 0.2vw)"> <a target="_blank" href="https://sepolia.etherscan.io/tx/0xa10ce728c85fae0dd3774e6468b32e03d655af7c4eb472e6d3c7bd15b049ad11">0xa10ce728c85fae0dd3774e6468b32e03d655af7c4eb472e6d3c7bd15b049ad11</a></span></p>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                            <!-- Orders end -->
+                        </div>
+                    </div>
+                    <!-- All user's orders end-->
                 </div>
             </div>
         </div>
@@ -62,7 +148,7 @@ Crypto Wallet | IBay
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-transparent">
-                <button type="button" class="btn-close close-import-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button onclick="close_create_modal()" type="button" class="btn-close close-import-modal" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body px-sm-5 mx-50 pb-5">
                 <h4 class="text-center mb-1">Создать продукт</h4>
@@ -81,11 +167,12 @@ Crypto Wallet | IBay
                         <input type="text" class="form-control" id="product_price" name="product_price" placeholder="Укажите стоимость продукта" tabindex="3">
 
                         <div style="margin-top: 15px">
-                            <span style="font-size: 14px; margin-right: 10px; margin-top: 4px" class="mt-75">Выберите фото</span>
+                            <span id="choose_image" style="font-size: 14px; margin-right: 10px; margin-top: 4px" class="mt-75">Выберите фото</span>
                             <label for="product_image" id="image_label" class="btn btn-gradient-primary waves-effect waves-float waves-light" title="Файл не выбран">Загрузить</label>
                             <input type="file" id="product_image" name="product_image" hidden accept="image/*">
                         </div>
                     </div>
+                    <input id="hidden_reset" data-bs-dismiss="modal" aria-label="Close" type="reset" hidden value="reset">
                     <input type="submit" class="btn btn-gradient-success waves-effect waves-float waves-light" value="Создать">
                 </form>
             </div>
@@ -100,11 +187,15 @@ Crypto Wallet | IBay
 <script src="{{ url_for('static', path='/app-assets/js/scripts/forms/form-select2.js') }}"></script>
 
 <script>
+    let wallet = $('#product_address')
+    let product_title = $('#product_name')
+    let product_price = $('#product_price')
+    let product_image
+    let product_id
+
     // $('#test').click(function (){
-    //     console.log($('#product_address'))
+    //     console.log($('.product').length)
     // })
-
-
 
     // region Render Products-------------------------------------------------------------------------------------------
     //==================================================================================================================
@@ -115,30 +206,50 @@ Crypto Wallet | IBay
             url: "/api/ibay/products",
             success: function (response) {
                 render_products(response)
-                if (user_wallets) {
-                    console.log(user_wallets)
-                    $(user_wallets).each(function (index, wallet) {
+                get_user_wallets()
+                init_wallets_select2_for_order()
+            },
+            error: function (response) {}
+        })
+        $.ajax({
+            type: "GET",
+            url: "/api/ibay/orders",
+            success: function (response) {
+                render_orders(response)
+                handle_statuses()
+            },
+            error: function (response) {}
+        })
+
+        $('.content-wrapper').fadeIn("normal")
+    });
+
+    function get_user_wallets() {
+        $.ajax({
+            type: "GET",
+            url: "/api/ethereum/wallets",
+            success: function (response) {
+                if (response) {
+                    $(response).each(function (index, wallet) {
                         $('#product_address').append(
                             "<option value=" + wallet.id + ">" + wallet.address + " (" + wallet.balance + " ETH)</option>"
                         )
                     })
                 }
-
             },
-            error: function (response) {
-            }
+            error: function (response) {}
         })
-        $('.content-wrapper').fadeIn("normal")
-    });
+    }
 
-    // render all wallets for user
+    // render all products
     function render_products(products) {
         if (products.length > 0) {
+            $('#no_products').css('display', 'none')
             for (let product of products) {
-                $("#products_list").append(
-                    "<div class=\"col-xl-6 col-md-12 col-sm-12\">\n" +
+                $("#products_list").prepend(
+                    "<div id=\"block_" + product.id + "\" class=\"product col-xl-6 col-md-12 col-sm-12\">\n" +
                     "    <div class=\"card shadow-none border cursor-pointer\">\n" +
-                    "        <div id=\"\" class=\"card-body\">\n" +
+                    "        <div class=\"card-body\">\n" +
                     "            <div class=\"d-flex\">\n" +
                     "                <span class=\"me-25\">\n" +
                     "                    <img style='margin-top: 5px' class='product-image' src=\"https://cryptowallet.fra1.digitaloceanspaces.com/" + product.image + "\" alt=\"product_image\" height=\"100\">\n" +
@@ -149,7 +260,7 @@ Crypto Wallet | IBay
                     "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Адрес: </b><span style=\"font-size: calc(8px + 0.3vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + product.wallet.address + "\">" + product.wallet.address + "</a></span></p>\n" +
                     "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Цена: <span style=\"font-size: 15px\">" + product.price + " ETH</span></b></p></b>\n" +
                     "                        <div style=\"\">\n" +
-                    "                            <button id=\"" + product.wallet.id + "\" style=\"min-width: 150px\" type=\"button\" class=\"mt-75 btn btn-primary waves-effect waves-float waves-light\">\n" +
+                    "                            <button onclick=\"get_allowed_wallets(this.id)\" id=\"" + product.id + "\" style=\"min-width: 150px\" type=\"button\" class=\"mt-75 btn btn-primary waves-effect waves-float waves-light\" data-bs-toggle=\"modal\" data-bs-target=\"#order_" + product.id + "\">\n" +
                     "                                <font style=\"vertical-align: inherit;\">\n" +
                     "                                    <font style=\"vertical-align: inherit;\">\n" +
                     "                                        Купить\n" +
@@ -162,12 +273,41 @@ Crypto Wallet | IBay
                     "            </div>\n" +
                     "        </div>\n" +
                     "    </div>\n" +
+                    "</div>\n" +
+                    "<div class=\"modal fade\" id=\"order_" + product.id + "\" tabindex=\"-1\" data-bs-backdrop=\"static\" style=\"display: none\"\n" +
+                    "     aria-hidden=\"true\">\n" +
+                    "    <div class=\"modal-dialog modal-dialog-centered\">\n" +
+                    "        <div class=\"modal-content\">\n" +
+                    "            <div class=\"modal-header bg-transparent\">\n" +
+                    "                <button type=\"reset\" class=\"btn-close close-import-modal\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>\n" +
+                    "            </div>\n" +
+                    "            <div class=\"modal-body px-sm-5 mx-50 pb-5\">\n" +
+                    "                <h4 class=\"text-center mb-1\">Оплата товара " + product.title + "</h4>\n" +
+                    "                <!-- form -->\n" +
+                    "                <form id=\"create_order_form_" + product.id + "\" class=\"row gy-1 gx-2 mt-75\" onsubmit=\"return false\" novalidate=\"novalidate\">\n" +
+                    "                    <div class=\"mb-2\">\n" +
+                    "                        <label id=\"" + product.price + "\" for=\"wallet_address_" + product.id + "\" class=\"wallets_select_label_" + product.id + " form-label\">Кошелёк</label>\n" +
+                    "                        <select style=\"min-width: 380px\" id=\"wallet_address_" + product.id + "\" class=\"select_for_order hide-search form-select select2-hidden-accessible\"></select>\n" +
+                    "                        <span style='display: none' id=\"wallet_error_" + product.id + "\" class=\"error\">У вас нет доступных кошельков для оплаты данного товара.</span>\n" +
+                    "                        <div class=\"text-center mt-2\" id=\"loading_import_" + product.id + "\" style=\"display: none;\">\n" +
+                    "                            <div class=\"spinner-border text-primary\" role=\"status\">\n" +
+                    "                                <span class=\"visually-hidden\">Loading...</span>\n" +
+                    "                            </div>\n" +
+                    "                        </div>\n" +
+                    "                    </div>\n" +
+                    "                    <div style=\"text-align: center\">\n" +
+                    "                        <input onclick=\"buy_product()\" style=\"min-width: 150px\" type=\"submit\" class=\"btn btn-gradient-success waves-effect waves-float waves-light\" value=\"Купить\">\n" +
+                    "                    </div>\n" +
+                    "                </form>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
                     "</div>"
                 )
             }
         } else {
             $("#products_list").append(
-                '<h4 class="card-title text-center">Нет доступных лотов для покупки... Но вы можете создать свой продукт!</h4>'
+                '<h4 id=\"no_products\" class="card-title text-center">Нет доступных лотов для покупки... Но вы можете создать свой продукт!</h4>'
             )
         }
     }
@@ -180,43 +320,75 @@ Crypto Wallet | IBay
       if (this.files[0]) {
           filename = this.files[0].name;
           $('#image_label').attr('title', filename)
+          product_image = this.files[0]
+          $('#choose_image').css('color', 'green')
       } else {
           $('#image_label').attr('title', "Файл не выбран")
+          $('#choose_image').css('color', 'red')
+          product_image = null
       }
     });
 
+    // validate form for create product
     let product_validator = $("#create_product_form").validate({
         submitHandler: function (e) {
-            let form_data = new Map()
+            let form_data = new FormData()
+            form_data.append('walletId', wallet.val())
+            form_data.append('title', product_title.val())
+            form_data.append('price', product_price.val())
+            form_data.append('image', product_image)
+            if (!product_image) {
+                $('#choose_image').css('color', 'red')
+            }
             $.ajax({
-                type: "PUT",
-                url: "/api/profile/update",
+                type: "POST",
+                url: "/api/ibay/products/create",
                 enctype: 'multipart/form-data',
                 data: form_data,
                 success: function (response) {
-
+                    toastr.success('Создан новый продукт', 'Успех')
+                    $("#hidden_reset").trigger('click');
+                    $('#choose_image').css('color', 'black')
+                    $('#image_label').attr('title', "Файл не выбран")
+                    $("#product_image").val('')
                 },
                 error: function (response) {
-
+                    if (response.status === 400 || response.status === 422) {
+                        let res = response.responseJSON
+                        if (res[0].code === 'format_error') {
+                            toastr.error(
+                                'Формат картинки не валиден.',
+                                'Ошибка'
+                            )
+                        } else if (res[0].code === 'value_error') {
+                            toastr.error(
+                                'Введённое значение некорректно или превышает баланс кошелька.',
+                                'Ошибка'
+                            )
+                        } else {
+                            toastr.error(
+                                'Все поля обязательны к заполнению. Перепроверьте корректность введённых данных.',
+                                'Ошибка'
+                            )
+                        }
+                    }
                 },
                 cache: false,
                 contentType: false,
                 processData: false
             })
-            content.fadeIn(1000)
-            user_content.fadeIn(1000)
-            profile_image = null;
-            delete_image = false
+            product_image = null
         },
         rules: {
             product_name: {
                 required: true
             },
             product_address: {
-                required: false
+                required: true
             },
             product_price: {
-                required: true
+                required: true,
+                min: 0
             },
             product_image: {
                 required: true
@@ -230,36 +402,184 @@ Crypto Wallet | IBay
                 required: "Это поле обязательно к заполнению."
             },
             product_price: {
-                required: "Это поле обязательно к заполнению."
+                required: "Это поле обязательно к заполнению.",
+                min: "Введённое значение некорректно."
             },
             product_image: {
                 required: "Это поле обязательно к заполнению."
-            },
-            errorElement: 'span',
-            highlight: function (element, errorClass, validClass) {
-                $(element).addClass('error');
-                if ($(element).parent().hasClass('input-group')) {
-                $(element).parent().addClass('is-invalid');
-            }
-            },
-            unhighlight: function (element, errorClass, validClass) {
-                $(element).removeClass('error');
-                if ($(element).parent().hasClass('input-group')) {
-                    $(element).parent().removeClass('is-invalid');
-                }
             }
         }
     });
 
+    // reset jquery validate for form
+    function close_create_modal() {
+        product_validator.resetForm()
+        $('#choose_image').css('color', 'black')
+    }
 
 
+    // region Create Order----------------------------------------------------------------------------------------------
+    //==================================================================================================================
+    // init select2 in modal for create order
+    function init_wallets_select2_for_order() {
+        $('.select_for_order').each(function() {
+            $(this).select2({
+                minimumResultsForSearch: -1
+            });
+        })
+    }
+
+    // get allowed wallets for create order
+    function get_allowed_wallets(value) {
+        product_id = value
+        $('#wallet_address_' + value).find('option').remove()
+        let price_of_product = +$('.wallets_select_label_' + value).attr('id')
+        $.ajax({
+            type: "GET",
+            url: "/api/ethereum/wallets",
+            success: function (response) {
+                $(response).each(function (index, wallet) {
+                    if (+wallet.balance > price_of_product){
+                        $('#wallet_address_' + value).append(
+                            "<option value=" + wallet.id + ">" + wallet.address + " (" + wallet.balance + " ETH)</option>"
+                        )
+                    } else {
+                        $('#wallet_address_' + value).append(
+                            "<option disabled value=" + wallet.id + ">" + wallet.address + " (" + wallet.balance + " ETH)</option>"
+                        )
+                    }
+                })
+                if ($('#wallet_address_' + value + ' option:disabled').length === response.length) {
+                    $('#buy_' + value).attr('disabled', true)
+                    $('#wallet_error_' + value).css('display', 'block')
+                }
+            },
+            error: function (response) {}
+        })
+    }
+
+    // create new order(buy product)
+    function buy_product() {
+        let wallet_select = $('#wallet_address_' + product_id)
+        let wallet_id = wallet_select.val()
+        wallet_select.attr('disabled', true)
+        $('#loading_import_' + product_id).css('display', 'block')
+        $("button").attr('disabled', true)
+        $("input").attr('disabled', true)
+        $.ajax({
+            type: "POST",
+            url: "/api/ibay/orders/create",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify({
+                walletId: wallet_id,
+                productId: product_id,
+            }),
+            success: function (response) {
+                wallet_select.removeAttr('disabled')
+                $('#loading_import_' + product_id).css('display', 'none')
+                $("button").removeAttr('disabled')
+                $("input").removeAttr('disabled')
+                $("button[type='reset']").trigger('click');
+                toastr_options()
+                toastr.success('Отправка произведена. <a style=\"color: #007aff; font-weight: bold\" target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/' + response.txnHash + '\">Ссылка на транзакцию', 'Успех')
+            },
+            error: function (response) {
+                wallet_select.removeAttr('disabled')
+                $('#loading_import_' + product_id).css('display', 'none')
+                $("button").removeAttr('disabled')
+                $("input").removeAttr('disabled')
+            }
+        })
+    }
+
+
+    // region Render Orders---------------------------------------------------------------------------------------------
+    //==================================================================================================================
+    // render all user's orders
+    function render_orders(orders) {
+        if (orders.length > 0) {
+            $('#no_orders').css('display', 'none')
+            for (let order of orders) {
+                $("#orders_list").prepend(
+                    "<div class=\"col-xl-6 col-md-12 col-sm-12\">\n" +
+                    "    <div class=\"card shadow-none border cursor-pointer\">\n" +
+                    "        <div class=\"card-body\">\n" +
+                    "            <div class=\"d-flex\">\n" +
+                    "                <span class=\"me-25\">\n" +
+                    "                    <img style=\"margin-top: 5px\" class=\"order-image\" src=\"https://cryptowallet.fra1.digitaloceanspaces.com/" + order.product.image + "\" alt=\"order_image\" height=\"100\">\n" +
+                    "                </span>\n" +
+                    "                <div style=\"font-size: 14px\">\n" +
+                    "                    <div class=\" align-items-top ms-1\">\n" +
+                    "                        <p style=\"margin: 0\"><b>Название: <span style=\"font-size: 15px\">" + order.product.title + "</span></b></p></b>\n" +
+                    "                        <p style=\"margin: 0; overflow: hidden\" class=\"mt-75 txn_width\"><b>Транзакция: </b><span style=\"font-size: calc(7px + 0.2vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/" + order.txnHash + "\">" + order.txnHash + "</a></span></p>\n" +
+                    "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Цена: <span style=\"font-size: 15px\">" + order.product.price + " ETH</span></b></p></b>\n" +
+                    "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Время заказа: <span style=\"font-size: 15px\">" + order.date + "</span></b></p></b>\n" +
+                    "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Статус: <span id=\"order_status_" + order.id + "\" class=\"order_status " + order.status + "\">" + order.status + "</span></b></p></b>\n" +
+                    "                        <p style=\"margin: 0; overflow: hidden\" class=\"mt-75 txn_width\"><b>Возврат: </b><span class=\"txn_returns\" id=\"order_return_" + order.id + "\" style=\"font-size: calc(7px + 0.2vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/" + order.txnHashReturn + "\">" + order.txnHashReturn + "</a></span></p>\n" +
+                    "                    </div>\n" +
+                    "                </div>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</div>"
+                )
+            }
+        } else {
+            $("#orders_list").append(
+                '<h4 id=\"no_orders\" class="card-title text-center">У вас нет активных заказов. Вы можете оформить заказ купив один из лотов!</h4>'
+            )
+        }
+    }
+
+    // correct statuses for orders
+    function handle_statuses() {
+        $('.NEW').each(function () {
+            $(this).html('Новый')
+        })
+        $('.DELIVERY').each(function () {
+            $(this).html('Доставка')
+        })
+        $('.COMPLETE').each(function () {
+            $(this).html('Завершено')
+        })
+        $('.FAILED').each(function () {
+            $(this).html('Провалено')
+        })
+        $('.RETURN').each(function () {
+            $(this).html('Возврат')
+        })
+        // remove 'null' for None txn returns
+        $('.txn_returns').each(function () {
+            if ($(this).text().indexOf('null')) {
+                $(this).html('')
+            }
+        })
+    }
 
 
     // socket.io -------------------------------------------------------------------------------------------------------
     // =================================================================================================================
-    // event for update balance for user wallet
-    socket.on("pass", function (data) {
+    // event for new product
+    socket.on("front_new_product", function (data) {
+        render_products([data])
+        init_wallets_select2_for_order()
+    })
 
+    // event for new order for current user
+    socket.on("front_new_order", function (data) {
+        $('#block_' + data.product.id).css('display', 'none')
+        if ($('.product:visible').length < 1) {
+            $('#no_products').css('display', 'block')
+        }
+        let addresses = []
+        $(user_wallets).each(function (index, wallet) {
+            addresses.push(wallet.address)
+        })
+        if (addresses.includes(data.buyerAddress)) {
+            render_orders([data])
+            handle_statuses()
+        }
     })
 </script>
 {% endblock %}

@@ -82,7 +82,7 @@ async def get_my_orders(
     Get all user's orders\n
     Permission: Is authenticated.
     """
-    return await product_manager.get_users_orders(db, user.id)
+    return await product_manager.get_users_orders(db, user.wallets)
 
 
 @product_router.post(
