@@ -95,6 +95,7 @@ Crypto Wallet | IBay
                         </div>
                         <div id="products_list" class="row card-body py-2 my-25">
                             <!-- Products -->
+                            <h4 style="display: block" id="no_products" class="card-title text-center">Нет доступных лотов для покупки... Но вы можете создать свой продукт!</h4>
 <!--                            <input type="button" id="test" value="test" data-bs-toggle="modal" data-bs-target="#createOrder">-->
                             <!-- Products end -->
                         </div>
@@ -196,6 +197,7 @@ Crypto Wallet | IBay
     // $('#test').click(function (){
     //     console.log($('.product').length)
     // })
+
 
     // region Render Products-------------------------------------------------------------------------------------------
     //==================================================================================================================
@@ -305,10 +307,6 @@ Crypto Wallet | IBay
                     "</div>"
                 )
             }
-        } else {
-            $("#products_list").append(
-                '<h4 id=\"no_products\" class="card-title text-center">Нет доступных лотов для покупки... Но вы можете создать свой продукт!</h4>'
-            )
         }
     }
 
