@@ -106,61 +106,20 @@
 
 <script>
     let user_wallets
+    let user_data = {}
+    let file_host = "https://cryptowallet.fra1.digitaloceanspaces.com/"
 
-    $("#logout").on('click', function () {
-        ajax_logout()
-    });
 
-    function ajax_logout() {
-        $.ajax({
-            type: "POST",
-            url: "/api/auth/logout",
-            success: function () {
-                location.reload()
-            },
-            error: function (response) {
-                console.log(response)
-            }
-        })
-    }
-
-    $(window).on('load', function () {
-        if (feather) {
-            feather.replace({
-                width: 14,
-                height: 14
-            });
+    // socket connect
+    let socket = io("ws://127.0.0.1:8000",
+        {
+            path: '/ws/socket.io',
+            autoConnect: false
         }
-        $.ajax({
-            type: "GET",
-            url: "/api/profile/get",
-            success: function (response) {
-                if ('id' in response) {
-                    localStorage.setItem('user_id', response.id)
-                    if (response.avatar) {
-                        $(".round").attr(
-                            "src",
-                            "https://cryptowallet.fra1.digitaloceanspaces.com/" + response.avatar + ""
-                        )
-                    }
-                    $(".user-name").html(response.username)
-                    user_wallets = response.wallets
-                }
-            },
-            error: function (response) {
-            }
-        })
-        $('.dropdown-user').fadeIn(1000)
-    })
-
-    // sockets ---------------------------------------------------------------------------------------------------------
-    //==================================================================================================================
-
-    const socket = io("ws://127.0.0.1:8000", {path: '/ws/socket.io'});
-
+    );
 
     // event for connect
-    socket.on("connect", function () {
+    socket.on("connect", () => {
         console.log('connect')
     });
 
@@ -168,6 +127,12 @@
     socket.on("connect_error", (error) => {
         console.log(error)
     });
+
+    // event for disconnect
+    socket.on("disconnect", () => {
+        console.log("disconnect")
+    })
+    //
 
     // event for getting new transaction for user
     socket.on("front_new_transactions", function (data) {
@@ -195,6 +160,54 @@
             })
         })
     })
+    //
+
+    $(window).on('load', function () {
+        if (feather) {
+            feather.replace({
+                width: 14,
+                height: 14
+            });
+        }
+        $.ajax({
+            type: "GET",
+            url: "/api/profile/get",
+            success: function (response) {
+                if ('id' in response) {
+                    user_data['id'] = response.id
+                    user_data['username'] = response.username
+                    user_data['email'] = response.email
+                    if (response.avatar) {
+                        user_data['avatar'] = response.avatar
+                        $(".round").attr("src", file_host + response.avatar + "")
+                    }
+                    $(".user-name").html(response.username)
+                    user_wallets = response.wallets
+                    socket.auth = user_data;
+                    socket.connect();
+                }
+            },
+            error: function (response) {
+            }
+        })
+        $('.dropdown-user').fadeIn(1000)
+    })
+
+
+    $("#logout").on('click', function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/auth/logout",
+            success: function () {
+                location.reload()
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+    });
+
+
 </script>
 
 {% block scripts %}{% endblock %}

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from uuid import UUID
 
 from apps.socketio_app.database import ChatDatabase
@@ -13,6 +14,7 @@ class ChatManager:
         self.database = database
 
     async def new_message(self, message: ChatMessage) -> None:
+        message.date = datetime.datetime.now()
         await self.database.create_message(message)
 
     async def get_user(self, user_id: UUID):
@@ -30,7 +32,7 @@ class ChatManager:
                 {
                     "message": message.message,
                     "image": message.image,
-                    "date": message.date.strftime("%d-%m, %H:%M"),
+                    "date": message.date.strftime("%d.%m, %H:%M"),
                     "user_id": str(user.id),
                     "username": user.username,
                     "avatar": user.avatar,
