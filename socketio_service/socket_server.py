@@ -12,17 +12,30 @@ sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
 @sio.event
 async def connect(sid, environ, auth):
     await sio.save_session(sid, {"auth": auth, "sid": sid})
-    if await get_path(environ):
+    if await get_path(auth):
         sio.enter_room(sid, "chat_users")
         session = await sio.get_session(sid)
         manager = await get_chat_manager()
+        # user = ChatUser(
+        #     id=session.get('auth').get('id'),
+        #     username=session.get('auth').get('username'),
+        #     avatar=session.get('auth').get('avatar'),
+        #     online=False
+        # )
+        # await manager.create_user(user)
+        await manager.connect_user(session)
         history = await manager.get_history_chat()
+        users = await manager.get_online_users()
         await sio.emit("connect_user", session, room="chat_users")
+        await sio.emit("get_online_users", users, to=sid)
         await sio.emit("get_history", {"history": history, "user": session}, to=sid)
 
 
 @sio.event
 async def disconnect(sid):
+    session = await sio.get_session(sid)
+    manager = await get_chat_manager()
+    await manager.disconnect_user(session)
     await sio.emit(
         "disconnect_user",
         {"sid": sid},

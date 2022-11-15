@@ -2,6 +2,8 @@
 from typing import Type
 from uuid import UUID
 
+from beanie import PydanticObjectId
+
 from socketio_service.apps.chat.models import ChatMessage, ChatUser
 
 
@@ -38,3 +40,18 @@ class ChatDatabase:
         user: ChatUser,
     ):
         await user.create()
+
+    async def get_online_users(
+        self,
+    ):
+        return await self.chat_user.find({"online": True}, {}).to_list()
+
+    async def update_user_status(
+        self,
+        data: dict,
+        online: bool,
+    ):
+        user_id: PydanticObjectId = data.get("auth").get("id")
+        user = await self.chat_user.get(user_id)
+        update_query = {"$set": {"online": online}}
+        await user.update(update_query)

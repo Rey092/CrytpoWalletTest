@@ -11,6 +11,7 @@ class ChatUser(Document):
     id: UUID
     username: str
     avatar: Optional[str] = None
+    online: Optional[bool]
 
     class Settings:
         name = "chat_user"
@@ -26,14 +27,8 @@ class ChatMessage(Document):
         name = "chat_message"
 
 
-class User(BaseModel):
+class UserModel(BaseModel):
     id: UUID
     avatar: Optional[str] = None
     username: str
-
-
-class ListChatMessage(BaseModel):
-    user: User
-    message: str
-    image: Optional[str] = None
-    date: Optional[datetime]
+    online: bool

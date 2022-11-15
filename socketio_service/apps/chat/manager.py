@@ -23,6 +23,16 @@ class ChatManager:
     async def create_user(self, user: ChatUser):
         await self.database.create_user(user)
 
+    async def connect_user(self, data: dict):
+        await self.database.update_user_status(data, True)
+
+    async def disconnect_user(self, data: dict):
+        await self.database.update_user_status(data, False)
+
+    async def get_online_users(self):
+        data = await self.database.get_online_users()
+        return [{"id": str(user.id), "username": user.username, "avatar": user.avatar} for user in data]
+
     async def get_history_chat(self):
         history = []
         list_messages = await self.database.list_message()
