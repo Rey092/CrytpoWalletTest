@@ -4,7 +4,7 @@ from aio_pika.abc import AbstractChannel, AbstractRobustConnection
 from aio_pika.pool import Pool
 from fastapi import FastAPI
 
-from config.settings import settings
+from api_service.config import settings
 
 
 async def init_rabbit(app: FastAPI) -> None:  # pragma: no cover

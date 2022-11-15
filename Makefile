@@ -8,8 +8,16 @@ init:
 
 
 run:
-	uvicorn config.app:app --reload
+	uvicorn api_service.config.app:app --reload
 
 
-run_parser:
-	python manage.py ethereum-blocks-parser
+run_sio:
+	uvicorn socketio_service.config.app:app --reload --port 8002
+
+
+run_eth:
+	python eth_network_service/eth_block_parser.py
+
+
+run_ibay:
+	uvicorn ibay_service.config.app:app --reload --port 8001
