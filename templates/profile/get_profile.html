@@ -166,7 +166,8 @@ Crypto Wallet|Profile
         </div>
     </div>
 </div>
-<div class="modal fade" id="addWallet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addNewCardTitle" style="display: none;"
+<div class="modal fade" id="addWallet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addNewCardTitle"
+     style="display: none;"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -192,7 +193,8 @@ Crypto Wallet|Profile
         </div>
     </div>
 </div>
-<div class="modal fade" id="importWallet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="importNew" style="display: none;"
+<div class="modal fade" id="importWallet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="importNew"
+     style="display: none;"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -246,7 +248,35 @@ Crypto Wallet|Profile
 
 
 {% block scripts %}
+<script src="https://cdn.socket.io/3.1.3/socket.io.min.js"
+        integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
+        crossorigin="anonymous"></script>
+
 <script>
+
+    // sockets events for chat
+    socket.on('connect_user', function (data) {
+        console.log('connect_user')
+    })
+
+    socket.on('disconnect_user', function (data) {
+        console.log('disconnect_user')
+    })
+
+    socket.on('writes_message', function (data) {
+        console.log('writes_message')
+    })
+
+    socket.on('get_history', function (data) {
+        console.log('get_history')
+    })
+
+
+    socket.on('update_message', (data) => {
+        console.log(data)
+    })
+
+
     // initial
     const username = $("#username")
     const email = $("#email")
