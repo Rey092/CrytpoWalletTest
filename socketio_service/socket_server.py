@@ -75,13 +75,13 @@ async def new_order(sid, data):
 @sio.event
 async def new_message(sid, data):
     manager = await get_chat_manager()
-    message = ChatMessage(**data)
-    await manager.new_message(message)
+    message_chat = ChatMessage(**data)
+    message = await manager.new_message(message_chat)
     session = await sio.get_session(sid)
     await sio.emit(
-        "update_message",
+        "add_message",
         {
-            "message": data,
+            "message": message,
             "user": session,
         },
         room="chat_users",

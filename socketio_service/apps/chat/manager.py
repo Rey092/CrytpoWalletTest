@@ -1,21 +1,41 @@
 # -*- coding: utf-8 -*-
+import base64
 import datetime
 from uuid import UUID
 
 from socketio_service.apps.chat.database import ChatDatabase
 from socketio_service.apps.chat.models import ChatMessage, ChatUser
+from socketio_service.apps.chat.storage import MongoStorage
 
 
 class ChatManager:
     def __init__(
         self,
         database: ChatDatabase,
+        storage: MongoStorage,
     ):
         self.database = database
+        self.storage = storage
 
-    async def new_message(self, message: ChatMessage) -> None:
+    async def new_message(self, message: ChatMessage) -> dict:
         message.date = datetime.datetime.now()
-        await self.database.create_message(message)
+        if message.image is not None:
+            path = await self.storage.upload(
+                file=base64.b64decode(message.image),
+                upload_to="chat",
+                sizes=(300, 300),
+                content_types=["png", "jpg", "jpeg"],
+            )
+            message.image = path
+        data = await self.database.create_message(message)
+        data_message = {
+            "id": str(data.id),
+            "user_id": str(data.user_id),
+            "message": data.message,
+            "date": data.date.strftime("%d.%m, %H:%M"),
+            "image": data.image,
+        }
+        return data_message
 
     async def get_user(self, user_id: UUID):
         return await self.database.get_user(user_id)
@@ -29,11 +49,11 @@ class ChatManager:
     async def disconnect_user(self, data: dict):
         await self.database.update_user_status(data, False)
 
-    async def get_online_users(self):
+    async def get_online_users(self) -> list:
         data = await self.database.get_online_users()
         return [{"id": str(user.id), "username": user.username, "avatar": user.avatar} for user in data]
 
-    async def get_history_chat(self):
+    async def get_history_chat(self) -> list:
         history = []
         list_messages = await self.database.list_message()
         for message in list_messages:

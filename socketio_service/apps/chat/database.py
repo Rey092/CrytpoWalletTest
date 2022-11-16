@@ -24,7 +24,7 @@ class ChatDatabase:
     async def create_message(
         message: ChatMessage,
     ):
-        await message.create()
+        return await message.create()
 
     async def list_message(self):
         return await self.chat_message.find_all().sort(-self.chat_message.date).limit(10).to_list()  # noqa
