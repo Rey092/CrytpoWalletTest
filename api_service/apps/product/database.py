@@ -7,7 +7,7 @@ from sqlalchemy import asc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from api_service.apps.crypto.models import Wallet
+from api_service.apps.crypto.models import Transaction, Wallet
 from api_service.apps.product.models import Order, Product
 from api_service.apps.product.schemas import ProductCreate
 from api_service.apps.product.utils.format_date import format_date
@@ -25,11 +25,13 @@ class ProductDatabase:
         order_model: Type[Order],
         wallet_model: Type[Wallet],
         user_model: Type[User],
+        transaction_model: Type[Transaction],
     ):
         self.product = product_model
         self.order = order_model
         self.wallet = wallet_model
         self.user = user_model
+        self.transaction = transaction_model
 
     async def create_product(self, db: Session, product_create: ProductCreate) -> Union[Product, None]:
         db_product = self.product(
@@ -88,3 +90,20 @@ class ProductDatabase:
         orders = db.query(self.order).order_by(asc(self.order.date)).filter(self.order.buyer_address.in_(addresses))
         orders = [format_date(order) for order in orders]
         return orders
+
+    async def update_order_by_id(self, db: Session, order: dict) -> Order:
+        db_order = db.query(self.order).filter(self.order.id == order["order"]).first()
+        db_order.status = order["status"]
+        db.add(db_order)
+        db.commit()
+        db.refresh(db_order)
+        return db_order
+
+    @staticmethod
+    async def update_order(db: Session, order: Order) -> None:
+        db.add(order)
+        db.commit()
+        db.refresh(order)
+
+    async def get_transaction(self, db, txn_hash: str) -> Transaction:
+        return db.query(self.transaction).filter(self.transaction.txn_hash == txn_hash).first()

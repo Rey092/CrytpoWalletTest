@@ -2,8 +2,8 @@
 from async_lru import alru_cache
 from fastapi_helper.schemas.examples_generate import ExamplesGenerate
 
-from api_service.apps.crypto.api_service_producer import ApiServiceProducer
-from api_service.apps.crypto.models import Wallet
+from api_service.api_service_producer import ApiServiceProducer
+from api_service.apps.crypto.models import Transaction, Wallet
 from api_service.apps.crypto.web3_clients import EthereumProviderClient
 from api_service.apps.product.database import ProductDatabase
 from api_service.apps.product.manager import ProductManager
@@ -25,7 +25,7 @@ def get_db():
 
 @alru_cache()
 async def get_product_db() -> ProductDatabase:
-    return ProductDatabase(Product, Order, Wallet, User)
+    return ProductDatabase(Product, Order, Wallet, User, Transaction)
 
 
 @alru_cache()

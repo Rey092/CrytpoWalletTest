@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 
 from ibay_service.apps.order import models
+from ibay_service.apps.order.order_handler import order_handler_thread
 from ibay_service.config.db import engine
 from ibay_service.ibay_service_consumer import ibay_consumer_thread
 
@@ -18,6 +19,7 @@ def create_app() -> FastAPI:
 
     # start needed threads
     ibay_consumer_thread.start()
+    order_handler_thread.start()
 
     return app_
 

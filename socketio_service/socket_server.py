@@ -55,6 +55,11 @@ async def new_order(sid, data):
     await sio.emit("front_new_order", data)
 
 
+@sio.event
+async def update_order(sid, data):
+    await sio.emit("front_update_order", data)
+
+
 # endregion IBay
 
 
