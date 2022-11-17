@@ -52,12 +52,12 @@ Crypto Wallet | IBay
     }
     .FAILED {
         font-size: 16px;
-        color: red;
+        color: blue;
         font-weight: bold
     }
     .RETURN {
         font-size: 16px;
-        color: blue;
+        color: red;
         font-weight: bold
     }
     .DELIVERY {
@@ -84,7 +84,7 @@ Crypto Wallet | IBay
                                 Продукты
                             </h4>
                             <span style="text-align: right">
-                                <button id="create_product" type="button" class="btn btn-gradient-primary" data-bs-toggle="modal" data-bs-target="#createProduct">
+                                <button onclick="get_user_wallets()" id="create_product" type="button" class="btn btn-gradient-primary" data-bs-toggle="modal" data-bs-target="#createProduct">
                                     <font style="vertical-align: inherit;">
                                         <font style="vertical-align: inherit;">
                                             Создать товар
@@ -96,7 +96,6 @@ Crypto Wallet | IBay
                         <div id="products_list" class="row card-body py-2 my-25">
                             <!-- Products -->
                             <h4 style="display: block" id="no_products" class="card-title text-center">Нет доступных лотов для покупки... Но вы можете создать свой продукт!</h4>
-<!--                            <input type="button" id="test" value="test" data-bs-toggle="modal" data-bs-target="#createOrder">-->
                             <!-- Products end -->
                         </div>
                     </div>
@@ -114,27 +113,6 @@ Crypto Wallet | IBay
                         </div>
                         <div id="orders_list" class="row card-body py-2 my-25">
                             <!-- Orders -->
-<!--                            <div class="col-xl-6 col-md-12 col-sm-12">-->
-<!--                                <div class="card shadow-none border cursor-pointer">-->
-<!--                                    <div class="card-body">-->
-<!--                                        <div class="d-flex">-->
-<!--                                            <span class="me-25">-->
-<!--                                                <img style="margin-top: 5px" class="order-image" src="https://cryptowallet.fra1.digitaloceanspaces.com/ibay/image_ebaa835a-9c17-47fb-81d2-91c520c46901.png" alt="order_image" height="100">-->
-<!--                                            </span>-->
-<!--                                            <div style="font-size: 14px">-->
-<!--                                                <div class=" align-items-top ms-1">-->
-<!--                                                    <p style="margin: 0"><b>Название: <span style="font-size: 15px">Red Car</span></b></p></b>-->
-<!--                                                    <p style="margin: 0; overflow: hidden" class="mt-75 txn_width"><b>Транзакция: </b><span style="font-size: calc(7px + 0.2vw)"> <a target="_blank" href="https://sepolia.etherscan.io/tx/0xa10ce728c85fae0dd3774e6468b32e03d655af7c4eb472e6d3c7bd15b049ad11">0xa10ce728c85fae0dd3774e6468b32e03d655af7c4eb472e6d3c7bd15b049ad11</a></span></p>-->
-<!--                                                    <p style="margin: 0" class="mt-75"><b>Цена: <span style="font-size: 15px">0.12345678 ETH</span></b></p></b>-->
-<!--                                                    <p style="margin: 0" class="mt-75"><b>Время заказа: <span style="font-size: 15px">10.12.2022 15:42</span></b></p></b>-->
-<!--                                                    <p style="margin: 0" class="mt-75"><b>Статус: <span id="order_status" class="new_order">Новый</span></b></p></b>-->
-<!--                                                    <p style="margin: 0; overflow: hidden" class="mt-75 txn_width"><b>Возврат: </b><span id="order_return" style="font-size: calc(7px + 0.2vw)"> <a target="_blank" href="https://sepolia.etherscan.io/tx/0xa10ce728c85fae0dd3774e6468b32e03d655af7c4eb472e6d3c7bd15b049ad11">0xa10ce728c85fae0dd3774e6468b32e03d655af7c4eb472e6d3c7bd15b049ad11</a></span></p>-->
-<!--                                                </div>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
                             <!-- Orders end -->
                         </div>
                     </div>
@@ -194,10 +172,6 @@ Crypto Wallet | IBay
     let product_image
     let product_id
 
-    // $('#test').click(function (){
-    //     console.log($('.product').length)
-    // })
-
 
     // region Render Products-------------------------------------------------------------------------------------------
     //==================================================================================================================
@@ -227,6 +201,7 @@ Crypto Wallet | IBay
     });
 
     function get_user_wallets() {
+        $('#product_address').find('option').remove()
         $.ajax({
             type: "GET",
             url: "/api/ethereum/wallets",
@@ -514,7 +489,7 @@ Crypto Wallet | IBay
                     "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Цена: <span style=\"font-size: 15px\">" + order.product.price + " ETH</span></b></p></b>\n" +
                     "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Время заказа: <span style=\"font-size: 15px\">" + order.date + "</span></b></p></b>\n" +
                     "                        <p style=\"margin: 0\" class=\"mt-75\"><b>Статус: <span id=\"order_status_" + order.id + "\" class=\"order_status " + order.status + "\">" + order.status + "</span></b></p></b>\n" +
-                    "                        <p style=\"margin: 0; overflow: hidden\" class=\"mt-75 txn_width\"><b>Возврат: </b><span class=\"txn_returns\" id=\"order_return_" + order.id + "\" style=\"font-size: calc(7px + 0.2vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/" + order.txnHashReturn + "\">" + order.txnHashReturn + "</a></span></p>\n" +
+                    "                        <p style=\"margin: 0; overflow: hidden\" class=\"mt-75 txn_width\"><b>Возврат: </b><span style=\"font-size: calc(7px + 0.2vw)\"> <a id=\"order_return_" + order.id + "\" class=\"txn_returns\" target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/" + order.txnHashReturn + "\">" + order.txnHashReturn + "</a></span></p>\n" +
                     "                    </div>\n" +
                     "                </div>\n" +
                     "            </div>\n" +
@@ -549,7 +524,7 @@ Crypto Wallet | IBay
         })
         // remove 'null' for None txn returns
         $('.txn_returns').each(function () {
-            if ($(this).text().indexOf('null')) {
+            if ($(this).text() === 'null') {
                 $(this).html('')
             }
         })
@@ -558,6 +533,18 @@ Crypto Wallet | IBay
 
     // socket.io -------------------------------------------------------------------------------------------------------
     // =================================================================================================================
+    // update order by event from sockets
+    function update_order(order) {
+        $('#order_status_' + order.order).removeClass('NEW DELIVERY FAILED').addClass(order.status).html(order.status)
+        if (order.txnHashReturn) {
+            $('#order_return_' + order.order)
+                .attr('href', 'https://sepolia.etherscan.io/tx/' + order.txnHashReturn)
+                .text(order.txnHashReturn)
+        }
+        handle_statuses()
+    }
+
+
     // event for new product
     socket.on("front_new_product", function (data) {
         render_products([data])
@@ -579,5 +566,11 @@ Crypto Wallet | IBay
             handle_statuses()
         }
     })
+
+    // event for new product
+    socket.on("front_update_order", function (data) {
+        update_order(data)
+    })
+
 </script>
 {% endblock %}

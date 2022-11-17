@@ -4,13 +4,14 @@ from typing import List
 
 import socketio
 
-from socketio_service.config.settings import settings
+# from socketio_service.config.settings import settings
 
 sio = socketio.AsyncClient()
 
 
 class ClientDispatcher:
-    url = settings.base_host
+    # url = settings.base_host
+    url = "http://127.0.0.1:8002"
 
     @staticmethod
     @sio.event
@@ -63,6 +64,12 @@ class ClientDispatcher:
         await sio.emit("new_order", data)
         await self.sio_disconnect()
 
+    @sio.event
+    async def update_order(self, data: dict):
+        await self.sio_connect()
+        await sio.emit("update_order", data)
+        await self.sio_disconnect()
+
 
 if __name__ == "__main__":
     client_manager = ClientDispatcher()
@@ -78,4 +85,11 @@ if __name__ == "__main__":
     #             ],
     #         ),
     #     )
-    asyncio.run(client_manager.new_product({"wallet_id": "66c5aea0-25e6-432c-a1e8-1ff3951fde06", "value": "10"}))
+    asyncio.run(
+        client_manager.order_to_delivery(
+            {
+                "id": "66c5aea0-25e6-432c-a1e8-1ff3951fde06",
+                "status": "DELIVERY",
+            },
+        ),
+    )

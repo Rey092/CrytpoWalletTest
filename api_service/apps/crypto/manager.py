@@ -6,9 +6,9 @@ from typing import List
 from eth_account import Account
 from sqlalchemy.orm import Session
 
+from api_service.api_service_producer import ApiServiceProducer
 from api_service.apps.crypto.web3_clients import EthereumProviderClient, EtherscanClient
 
-from .api_service_producer import ApiServiceProducer
 from .database import BaseCryptoDatabase
 from .exceptions import (
     InvalidPrivateKeyException,

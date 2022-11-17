@@ -12,7 +12,7 @@ from fastapi_helper import DefaultHTTPException
 from fastapi_helper.exceptions.validation_exceptions import init_validation_handler
 from starlette.staticfiles import StaticFiles
 
-from api_service.apps.crypto.api_service_consumer import api_consumer_thread
+from api_service.api_service_consumer import api_consumer_thread
 from api_service.apps.crypto.wallets_balance_parser import parsing_balances_thread
 from api_service.apps.front.router import front_router
 from api_service.apps.users import models

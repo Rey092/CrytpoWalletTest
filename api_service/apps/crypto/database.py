@@ -138,6 +138,7 @@ class EthereumDatabase(BaseCryptoDatabase):
                 # TODO: remove print
                 print("before commit")
                 db.commit()
+                db.refresh(db_transaction)
                 print("ok")
             except Exception as ex:
                 print(str(ex))

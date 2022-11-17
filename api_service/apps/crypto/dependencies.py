@@ -2,7 +2,7 @@
 from async_lru import alru_cache
 from fastapi_helper.schemas.examples_generate import ExamplesGenerate
 
-from api_service.apps.crypto.api_service_producer import ApiServiceProducer
+from api_service.api_service_producer import ApiServiceProducer
 from api_service.apps.crypto.database import EthereumDatabase
 from api_service.apps.crypto.manager import EthereumManager
 from api_service.apps.crypto.models import Asset, Transaction, Wallet

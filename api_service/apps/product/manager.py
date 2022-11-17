@@ -4,7 +4,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from api_service.apps.crypto.api_service_producer import ApiServiceProducer
+from api_service.api_service_producer import ApiServiceProducer
 from api_service.apps.crypto.models import Wallet
 from api_service.apps.crypto.schemas import TransactionCreate
 from api_service.apps.crypto.web3_clients import EthereumProviderClient
@@ -108,3 +108,32 @@ class ProductManager:
     async def get_users_orders(self, db: Session, wallets: List[Wallet]) -> List[Order]:
         addresses = [wallet.address for wallet in wallets]
         return await self.product_db.get_orders(db, addresses)
+
+    async def update_order_by_id(self, db: Session, order: dict) -> Order:
+        return await self.product_db.update_order_by_id(db, order)
+
+    async def handle_order_failed(self, db: Session, order: dict):
+        updated_order = await self.update_order_by_id(db, order)
+        order_txn = await self.product_db.get_transaction(db, updated_order.txn_hash)
+        updated_value = order_txn.value - (order_txn.txn_fee * 1.5)
+
+        transaction_create = TransactionCreate(
+            address_from=updated_order.product.wallet.address,
+            address_to=updated_order.buyer_address,
+            value=updated_value,
+        )
+        txn_hash = await self.ethereum_provider.send_raw_transaction(transaction_create, updated_order.product.wallet)
+
+        if txn_hash:
+            updated_order.status = "RETURN"
+            updated_order.txn_hash_return = txn_hash
+            await self.product_db.update_order(db, updated_order)
+            message = {
+                "order": str(updated_order.id),
+                "status": "RETURN",
+                "txnHashReturn": txn_hash,
+            }
+            await self.api_service_producer.publish_message(
+                exchange_name="order_return_exchange",
+                message=message,
+            )

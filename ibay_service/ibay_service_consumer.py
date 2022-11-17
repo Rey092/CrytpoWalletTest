@@ -19,6 +19,14 @@ async def handle_new_order(message: AbstractIncomingMessage) -> None:
         await ibay_manager.create_new_order(db, json.loads(message.body.decode("utf-8")))
 
 
+async def handle_return_order(message: AbstractIncomingMessage) -> None:
+    db = SessionLocal()
+    ibay_manager = await get_ibay_manager()
+    async with message.process():
+        print("========== Order Returned ==========")
+        await ibay_manager.handle_returned_order(db, json.loads(message.body.decode("utf-8")))
+
+
 async def consumer() -> None:
     connection = await connect_robust(settings.rabbit_url)
     async with connection:
@@ -29,15 +37,22 @@ async def consumer() -> None:
             "new_order_exchange",
             ExchangeType.FANOUT,
         )
+        order_return_exchange = await channel.declare_exchange(
+            "order_failed_exchange",
+            ExchangeType.FANOUT,
+        )
 
         # Declaring queue
         new_order_queue = await channel.declare_queue(exclusive=True)
+        order_return_queue = await channel.declare_queue(exclusive=True)
 
         # Binding the queue to the exchange
         await new_order_queue.bind(new_order_exchange)
+        await order_return_queue.bind(order_return_exchange)
 
         # Start listening the queue
         await new_order_queue.consume(handle_new_order)
+        await order_return_queue.consume(handle_return_order)
 
         print("========== [*] Waiting for messages from API service ==========")
         await asyncio.Future()
