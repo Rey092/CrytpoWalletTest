@@ -33,14 +33,15 @@ async def connect(sid, environ, auth):
 
 @sio.event
 async def disconnect(sid):
-    session = await sio.get_session(sid)
-    manager = await get_chat_manager()
-    await manager.disconnect_user(session)
-    await sio.emit(
-        "disconnect_user",
-        {"sid": sid},
-        room="chat_users",
-    )
+    pass
+    # session = await sio.get_session(sid)
+    # manager = await get_chat_manager()
+    # await manager.disconnect_user(session)
+    # await sio.emit(
+    #     "disconnect_user",
+    #     {"sid": sid},
+    #     room="chat_users",
+    # )
 
 
 # region Wallets

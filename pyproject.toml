@@ -39,6 +39,8 @@ beanie = "^1.15.2"
 fastapi-socketio = "^0.0.9"
 python-socketio = "^5.7.2"
 mongoengine = "^0.24.2"
+sqladmin = "^0.7.0"
+itsdangerous = "^2.1.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1.3"
