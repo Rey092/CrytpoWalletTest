@@ -60,3 +60,13 @@ class ClientDispatcher:
     async def update_order(self, data: dict):
         await self.sio_connect()
         await sio.emit("update_order", data)
+
+    @sio.event
+    async def create_user(self, data: dict):
+        await self.sio_connect()
+        await sio.emit("create_user", data)
+
+    @sio.event
+    async def update_user(self, data: dict):
+        await self.sio_connect()
+        await sio.emit("update_user", data)

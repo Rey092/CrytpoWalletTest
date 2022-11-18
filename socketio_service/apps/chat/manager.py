@@ -43,6 +43,9 @@ class ChatManager:
     async def create_user(self, user: ChatUser):
         await self.database.create_user(user)
 
+    async def update_user(self, user: dict):
+        await self.database.update_user(user)
+
     async def connect_user(self, data: dict):
         await self.database.update_user_status(data, True)
 
@@ -51,21 +54,30 @@ class ChatManager:
 
     async def get_online_users(self) -> list:
         data = await self.database.get_online_users()
-        return [{"id": str(user.id), "username": user.username, "avatar": user.avatar} for user in data]
+        return [
+            {
+                "id": str(user.id),
+                "username": user.username,
+                "avatar": user.avatar,
+                "sid": user.sid,
+            }
+            for user in data
+        ]
 
     async def get_history_chat(self) -> list:
         history = []
         list_messages = await self.database.list_message()
         for message in list_messages:
             user = await self.get_user(message.user_id)
-            history.append(
-                {
-                    "message": message.message,
-                    "image": message.image,
-                    "date": message.date.strftime("%d.%m, %H:%M"),
-                    "user_id": str(user.id),
-                    "username": user.username,
-                    "avatar": user.avatar,
-                },
-            )
+            if user:
+                history.append(
+                    {
+                        "message": message.message,
+                        "image": message.image,
+                        "date": message.date.strftime("%d.%m, %H:%M"),
+                        "user_id": str(user.id),
+                        "username": user.username,
+                        "avatar": user.avatar,
+                    },
+                )
         return history

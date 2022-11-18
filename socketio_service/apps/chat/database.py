@@ -39,7 +39,10 @@ class ChatDatabase:
     async def create_user(
         user: ChatUser,
     ):
-        await user.create()
+        try:
+            await user.create()
+        except Exception as ex:
+            print(ex)
 
     async def get_online_users(
         self,
@@ -52,6 +55,21 @@ class ChatDatabase:
         online: bool,
     ):
         user_id: PydanticObjectId = data.get("auth").get("id")
+        sid = data.get("sid")
         user = await self.chat_user.get(user_id)
-        update_query = {"$set": {"online": online}}
+        update_query = {"$set": {"online": online, "sid": sid}}
+        await user.update(update_query)
+
+    async def update_user(
+        self,
+        user_data: dict,
+    ):
+        user_id: PydanticObjectId = user_data.get("id")
+        user = await self.chat_user.get(user_id)
+        update_query = {
+            "$set": {
+                "username": user_data.get("username"),
+                "avatar": user_data.get("avatar"),
+            },
+        }
         await user.update(update_query)

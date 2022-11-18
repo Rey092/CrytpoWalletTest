@@ -39,7 +39,7 @@ class EmailClient:
             MAIL_FROM=mail_from,
             MAIL_STARTTLS=use_tls,
             MAIL_SSL_TLS=use_ssl,
-            TEMPLATE_FOLDER=Path(__file__).parent.parent.parent / "templates/emails",
+            TEMPLATE_FOLDER=Path(__file__).parent.parent.parent.parent / "templates/emails",
         )
         self._connection = FastMail(self._conf)
         self.mail_from = mail_from

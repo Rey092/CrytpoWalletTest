@@ -253,6 +253,7 @@ Crypto Wallet|Profile
         crossorigin="anonymous"></script>
 
 <script>
+    console.log("{{ request.redirect }}")
 
     // initial
     const username = $("#username")
@@ -427,6 +428,9 @@ Crypto Wallet|Profile
                     $("#account-upload-img").attr(
                         "src", profile_image_def
                     )
+                    if (response.status === 401) {
+                        location.reload()
+                    }
                     if (response.status === 400 || response.status === 422) {
                         let res = response.responseJSON
                         if (res.length > 0) {
@@ -543,6 +547,9 @@ Crypto Wallet|Profile
                 error: function (response) {
                     $("#loading_import").css('display', 'none')
                     $("button").removeAttr('disabled')
+                    if (response.status === 401) {
+                        location.reload()
+                    }
                     if (response.status === 400 || response.status === 422) {
                         let res = response.responseJSON
                         if (res.length > 0) {
@@ -618,6 +625,9 @@ Crypto Wallet|Profile
 
             },
             error: function (response) {
+                if (response.status === 401) {
+                    location.reload()
+                }
                 console.log(response)
             }
         })

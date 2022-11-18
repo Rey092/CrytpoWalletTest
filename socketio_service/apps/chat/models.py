@@ -11,7 +11,8 @@ class ChatUser(Document):
     id: UUID
     username: str
     avatar: Optional[str] = None
-    online: Optional[bool]
+    online: Optional[bool] = False
+    sid: Optional[str] = None
 
     class Settings:
         name = "chat_user"

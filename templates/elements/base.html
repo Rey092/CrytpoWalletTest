@@ -43,6 +43,14 @@
           href="{{ url_for('static', path='/app-assets/css/plugins/forms/form-validation.css') }}">
     <title>{% block title %}Crypto Wallet{% endblock %}</title>
     {% block style %}{% endblock %}
+    <style>
+        .isDisabled {
+            color: currentColor;
+            cursor: not-allowed;
+            opacity: 0.5;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <!-- END: Head-->
 
@@ -99,6 +107,7 @@
 <script src="{{ url_for('static', path='/app-assets/js/core/app.js') }}"></script>
 <script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-toastr.js') }}"></script>
 <script src="{{ url_for('static', path='/scripts/base.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/js/scripts/components/components-popovers.js') }}"></script>
 <script src="https://cdn.socket.io/4.5.3/socket.io.min.js"
         integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi"
         crossorigin="anonymous">
@@ -130,7 +139,7 @@
 
     // event for disconnect
     socket.on("disconnect", () => {
-        console.log("disconnect")
+        console.log('disconnect')
     })
     //
 
@@ -174,6 +183,10 @@
             url: "/api/profile/get",
             success: function (response) {
                 if ('id' in response) {
+                    if (response.permission.hasAccessChat) {
+                        $("#chat_link").removeClass('disabled');
+                    }
+                    console.log(response)
                     user_data['id'] = response.id
                     user_data['username'] = response.username
                     user_data['email'] = response.email
@@ -191,6 +204,7 @@
             }
         })
         $('.dropdown-user').fadeIn(1000)
+        $("#main-menu-navigation").fadeIn(500)
     })
 
 
