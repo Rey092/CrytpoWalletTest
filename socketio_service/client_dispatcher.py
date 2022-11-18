@@ -19,8 +19,7 @@ class ClientDispatcher:
     @staticmethod
     @sio.event
     async def connect_error(data):
-        print("The connection failed!")
-        print(data)
+        print(f"The connection failed! from connect_error -- {data}")
 
     @staticmethod
     @sio.event
@@ -31,7 +30,7 @@ class ClientDispatcher:
         try:
             await sio.connect(self.url, socketio_path="/ws/socket.io")
         except Exception as ex:
-            print(ex)
+            print(f"This exception from connect in Client Dispatcher -- {str(ex)}")
 
     @staticmethod
     async def sio_disconnect():

@@ -273,7 +273,7 @@ Crypto Wallet | IBay
                     "                        </div>\n" +
                     "                    </div>\n" +
                     "                    <div style=\"text-align: center\">\n" +
-                    "                        <input onclick=\"buy_product()\" style=\"min-width: 150px\" type=\"submit\" class=\"btn btn-gradient-success waves-effect waves-float waves-light\" value=\"Купить\">\n" +
+                    "                        <input id=\"buy_" + product.id + "\" onclick=\"buy_product()\" style=\"min-width: 150px\" type=\"submit\" class=\"btn btn-gradient-success waves-effect waves-float waves-light\" value=\"Купить\">\n" +
                     "                    </div>\n" +
                     "                </form>\n" +
                     "            </div>\n" +
@@ -319,6 +319,7 @@ Crypto Wallet | IBay
                 enctype: 'multipart/form-data',
                 data: form_data,
                 success: function (response) {
+                    default_toastr()
                     toastr.success('Создан новый продукт', 'Успех')
                     $("#hidden_reset").trigger('click');
                     $('#choose_image').css('color', 'black')
@@ -326,6 +327,7 @@ Crypto Wallet | IBay
                     $("#product_image").val('')
                 },
                 error: function (response) {
+                    default_toastr()
                     if (response.status === 400 || response.status === 422) {
                         let res = response.responseJSON
                         if (res[0].code === 'format_error') {
@@ -333,9 +335,14 @@ Crypto Wallet | IBay
                                 'Формат картинки не валиден.',
                                 'Ошибка'
                             )
-                        } else if (res[0].code === 'value_error') {
+                        } else if (res[0].code === 'price_error') {
                             toastr.error(
-                                'Введённое значение некорректно или превышает баланс кошелька.',
+                                'Введённая цена некорректна.',
+                                'Ошибка'
+                            )
+                        } else if (res[0].code === 'storage_error') {
+                            toastr.error(
+                                'Не удалось установить соединение с хранилищем DO Spaces.',
                                 'Ошибка'
                             )
                         } else {
@@ -372,7 +379,8 @@ Crypto Wallet | IBay
                 required: "Это поле обязательно к заполнению."
             },
             product_address: {
-                required: "Это поле обязательно к заполнению."
+                required: "Это поле обязательно к заполнению.",
+                required_accounts: "Обязательное поле",
             },
             product_price: {
                 required: "Это поле обязательно к заполнению.",
@@ -381,7 +389,7 @@ Crypto Wallet | IBay
             product_image: {
                 required: "Это поле обязательно к заполнению."
             }
-        }
+        },
     });
 
     // reset jquery validate for form
@@ -397,6 +405,12 @@ Crypto Wallet | IBay
     function init_wallets_select2_for_order() {
         $('.select_for_order').each(function() {
             $(this).select2({
+                placeholder: 'Выберите кошелёк',
+                language: {
+                    "noResults": function () {
+                        return 'Ничего не найдено.'
+                    }
+                },
                 minimumResultsForSearch: -1
             });
         })
@@ -407,10 +421,12 @@ Crypto Wallet | IBay
         product_id = value
         $('#wallet_address_' + value).find('option').remove()
         let price_of_product = +$('.wallets_select_label_' + value).attr('id')
+        console.log('try get wallets')
         $.ajax({
             type: "GET",
             url: "/api/ethereum/wallets",
             success: function (response) {
+                console.log(response)
                 $(response).each(function (index, wallet) {
                     if (+wallet.balance > price_of_product){
                         $('#wallet_address_' + value).append(
@@ -422,12 +438,14 @@ Crypto Wallet | IBay
                         )
                     }
                 })
-                if ($('#wallet_address_' + value + ' option:disabled').length === response.length) {
+                if (($('#wallet_address_' + value + ' option:disabled').length === response.length) || (response.length < 1)) {
                     $('#buy_' + value).attr('disabled', true)
                     $('#wallet_error_' + value).css('display', 'block')
                 }
             },
-            error: function (response) {}
+            error: function (response) {
+                console.log('error for get wallets')
+            }
         })
     }
 
@@ -462,6 +480,26 @@ Crypto Wallet | IBay
                 $('#loading_import_' + product_id).css('display', 'none')
                 $("button").removeAttr('disabled')
                 $("input").removeAttr('disabled')
+                default_toastr()
+                if (response.status === 400 || response.status === 422) {
+                    let res = response.responseJSON
+                    if (res[0].code === 'balance_error') {
+                        toastr.error(
+                            'Недостаточно средств на кошельке.',
+                            'Ошибка'
+                        )
+                    } else if (res[0].code === 'product_error') {
+                        toastr.error(
+                            'Товара не существует или он был продан.',
+                            'Ошибка'
+                        )
+                    } else {
+                        toastr.error(
+                            'Что-то пошло не так. Перепроверьте баланс вашего кошелька или наличие товара для вашего заказа',
+                            'Ошибка'
+                        )
+                    }
+                }
             }
         })
     }

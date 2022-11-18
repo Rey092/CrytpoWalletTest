@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import asyncio
 from abc import ABC
 from typing import List
 
@@ -6,7 +7,7 @@ import httpx
 from web3 import Web3
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 
-from api_service.apps.crypto.exceptions import InvalidRecipientException, SendTransactionException
+from api_service.apps.crypto.exceptions import InvalidRecipientException
 from api_service.apps.crypto.models import Wallet
 from api_service.apps.crypto.schemas import TransactionCreate
 from api_service.apps.crypto.utils.decoders import BaseDecoder
@@ -66,8 +67,10 @@ class EthereumProviderClient(BaseClient, BaseDecoder):
             tx_hash = self.provider.eth.send_raw_transaction(tx.rawTransaction)
             tx_receipt = self.provider.eth.wait_for_transaction_receipt(tx_hash)
         except Exception as ex:
-            raise SendTransactionException(message=str(ex))
-        return str(tx_receipt.transactionHash.hex())
+            print(f"Web3 got some exception - {str(ex)}")
+            await asyncio.sleep(10)
+            await self.send_raw_transaction(transaction_create, wallet)
+        return str(tx_receipt.transactionHash.hex())  # noqa
 
     async def get_transactions_from_block(self, block_hash, addresses: List[str]):
         try:
