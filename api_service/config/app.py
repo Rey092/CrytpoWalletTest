@@ -13,6 +13,7 @@ from fastapi_helper.exceptions.validation_exceptions import init_validation_hand
 from starlette.staticfiles import StaticFiles
 
 from api_service.api_service_consumer import api_consumer_thread
+from api_service.apps.admin.auto_sqladmin import init_sqladmin
 from api_service.apps.crypto.wallets_balance_parser import parsing_balances_thread
 from api_service.apps.front.router import front_router
 from api_service.apps.users import models
@@ -32,8 +33,9 @@ def init_routers(app_: FastAPI) -> None:
     app_.include_router(front_router)
 
 
-def init_database() -> None:
+def init_database(app) -> None:
     models.Base.metadata.create_all(bind=engine)
+    init_sqladmin(app, engine)
 
 
 def make_middleware() -> List[Middleware]:
@@ -90,7 +92,7 @@ def create_app() -> FastAPI:
     # Initialize other utils.
     init_routers(app_=app_)
     init_validation_handler(app=app_)
-    init_database()
+    init_database(app=app_)
 
     init_cache()
     init_logging()
