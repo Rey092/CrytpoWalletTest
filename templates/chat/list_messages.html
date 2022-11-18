@@ -127,8 +127,9 @@ Crypto Wallet|Chat
                                     <input type="text" class="form-control message"
                                            placeholder="Введите свое сообщение"/>
                                     <span class="input-group-text">
+                                            <small id="file_name" style="color: green; padding-right: 5px; cursor: pointer;"></small>
                                             <label for="file_chat" id="file_chat_label"
-                                                   title="Файл не выбран"
+                                                   title="Выберите файл (Доступный формат png, jpg, jpeg)"
                                                    class="attachment-icon form-label mb-0">
                                                 <i data-feather="image" class="cursor-pointer text-secondary"></i>
                                                 <input type="file" id="file_chat"
@@ -200,10 +201,6 @@ Crypto Wallet|Chat
 
 <script>
 
-    let profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
-    let chat = $(".chats")
-    let chat_image
-
 
     // sockets events for chat
     socket.on('connect_user', (data) => {
@@ -211,7 +208,7 @@ Crypto Wallet|Chat
     })
 
     socket.on('disconnect_user', (data) => {
-        renderUsers(data, user_data, false)
+       renderUsers(data, user_data, false)
     })
 
     socket.on('data_user', (data) => {
@@ -227,19 +224,22 @@ Crypto Wallet|Chat
     })
 
     socket.on('get_history', (data) => {
-        if (chat.html() === '') {
+        if ($(".chats").html() === '') {
             renderHistory(data)
         }
     })
     //
 
+    let def_profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+    let chat_image
 
     // get all online users
     function getOnlineUser(data) {
+        $(".chat-list-users").empty();
         for (let user of data) {
             if (user.id !== user_data.id) {
                 $(".no-users").css('display', 'none')
-                let src = profile_image
+                let src = def_profile_image
                 if (user.avatar) {
                     src = file_host + user.avatar
                 }
@@ -264,13 +264,16 @@ Crypto Wallet|Chat
     // add or remove users from active chat
     function renderUsers(data, user_data, connect) {
         if (connect) {
-            let src = profile_image
+            // if ($('.chat-list-users').find("." + data.auth.id + "").length < 1){
+            //
+            // }
+            let src = def_profile_image
             if (data.auth.avatar) {
                 src = file_host + data.auth.avatar
             }
             if (data.auth.id !== user_data.id) {
                 $(".no-users").css('display', 'none')
-                let li = '<li class="user-profile-toggle" onclick="getProfile(this)" id="' + data.sid + '"></li>'
+                let li = '<li class="user-profile-toggle' + " " + data.auth.id + '" onclick="getProfile(this)" id="' + data.sid + '"></li>'
                 let username = ' <div class="chat-info">\n' +
                     '<h5 class="mb-0">' + data.auth.username + '</h5>\n' +
                     '</div>'
@@ -283,12 +286,14 @@ Crypto Wallet|Chat
                 $(".chat-list-users").append(li)
                 $(".user-profile-toggle:last-child").append(avatar).append(username)
             }
+
         } else {
             $("#" + data.sid + "").remove()
         }
     }
 
     //
+
 
 
     // get profile in chat
@@ -311,8 +316,65 @@ Crypto Wallet|Chat
     }
 
     // end show profile in chat
-
     // end get profile in chat
+
+
+    // render history in chat
+    function renderHistory(data) {
+        let current_date
+        for (let message of data.history.reverse()) {
+            let this_date = message.date.split(',')[0]
+            let this_time = message.date.split(',')[1]
+            let src = def_profile_image
+            if (current_date !== this_date) {
+                let date_divider = '<div class="divider"><div class="divider-text">' + this_date + '</div></div>'
+                $(".chats").append(date_divider)
+            }
+            if (message.avatar) {
+                src = file_host + message.avatar
+            }
+            let username = '<p style="color: #0a6aa1">' + message.username + '</p>'
+            let html_message = '<div class="chat-content">' + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>';
+            let first_html_message = '<div class="chat-content">' + username + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>'
+            if (message.image) {
+                let message_image = '<img src="' + file_host + message.image + '" alt="image" height="200" width="200" class="message-image">'
+                html_message = '<div class="chat-content">' + message_image + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px;">' + this_time + '</small>' + '</p>' + '</div>';
+                first_html_message = '<div class="chat-content">' + username + message_image + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px">' + this_time + '</small>' + '</p>' + '</div>'
+            }
+            let chat_right = '<div class="chat chat-right"></div>'
+            let chat_left = '<div class="chat chat-left user-' + message.user_id + '"></div>'
+            let chat_body = '<div class="chat-body"></div>'
+            let chat_avatar = '<div class="chat-avatar">\n' +
+                '<span class="avatar box-shadow-1 cursor-pointer">\n' +
+                '<img src=' + src + ' + alt="avatar" height="36" width="36"/>\n' +
+                '</span>\n' +
+                '</div>'
+            if (message.user_id === data.user.auth.id) {
+                let chat_block = ('.chat-right:last-child')
+                if ($(chat_block).length) {
+                    $('.chat-right:last-child .chat-body').append(html_message);
+                } else {
+                    $(".chats").append(chat_right)
+                    $(chat_block).append(chat_avatar).append(chat_body)
+                    $('.chat-right:last-child .chat-body').append(html_message);
+                }
+            } else {
+                let user_block = ('.user-' + message.user_id + ':last-child')
+                if ($(user_block).length) {
+                    $('.user-' + message.user_id + ':last-child .chat-body').append(html_message);
+                } else {
+                    $(".chats").append(chat_left)
+                    $(user_block).append(chat_avatar).append(chat_body)
+                    $('.user-' + message.user_id + ':last-child .chat-body').append(first_html_message)
+                }
+            }
+            current_date = this_date
+        }
+        $(".content-area-wrapper").fadeIn(1000)
+        $('.user-chats').scrollTop($('.user-chats > .chats').height());
+    }
+
+    // end render history in chat
 
 
     // send message
@@ -322,13 +384,16 @@ Crypto Wallet|Chat
         if (element.files[0]) {
             let image = element.files[0]
             $('#file_chat_label').attr('title', image.name)
+            $('#file_name').html('Выбран файл').attr('title', image.name)
             const reader = new FileReader();
             reader.addEventListener("load", () => {
                 chat_image = reader.result.split(',')[1];
             });
             reader.readAsDataURL(image);
         } else {
-            $('#file_chat_label').attr('title', "Файл не выбран")
+            $('#file_chat_label').attr('title', "Выберите файл (Доступный формат png, jpg, jpeg)")
+            $('#file_name').html('')
+
             chat_image = null
         }
     }
@@ -344,18 +409,28 @@ Crypto Wallet|Chat
                 'image': chat_image,
                 'date': new Date()
             })
+            $('.message').val('');
+            $('#file_chat_label').attr('title', "Выберите файл (Доступный формат png, jpg, jpeg)")
+            $('#file_name').html('')
+            $('#file_chat').val('')
+            chat_image = null
         }
     })
 
-    //
+    // end send message
 
 
     function addMessage(data) {
         let this_date = data.message.date.split(',')[0]
         let this_time = data.message.date.split(',')[1]
+        let src = def_profile_image
+        if (data.user.auth.avatar) {
+            src = file_host + data.user.auth.avatar
+        }
         let username = '<p style="color: #0a6aa1">' + data.user.auth.username + '</p>'
         let html_message = '<div class="chat-content">' + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>';
         let first_html_message = '<div class="chat-content">' + username + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>'
+
         if (data.message.image) {
             let message_image = '<img src="' + file_host + data.message.image + '" alt="image" height="200" width="200" class="message-image">'
             html_message = '<div class="chat-content">' + message_image + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px;">' + this_time + '</small>' + '</p>' + '</div>';
@@ -366,120 +441,31 @@ Crypto Wallet|Chat
         let chat_body = '<div class="chat-body"></div>'
         let chat_avatar = '<div class="chat-avatar">\n' +
             '<span class="avatar box-shadow-1 cursor-pointer">\n' +
-            '<img src=' + profile_image + '\n' +
-            '     alt="avatar" height="36" width="36"/>\n' +
+            '<img src=' + src + ' + alt="avatar" height="36" width="36"/>\n' +
             '</span>\n' +
             '</div>'
-
         if (data.message.user_id === user_data.id) {
-            if ($('.chat-right:last-child').length) {
+            let chat_block = ('.chat-right:last-child')
+            if ($(chat_block).length) {
                 $('.chat-right:last-child .chat-body').append(html_message);
             } else {
                 $(".chats").append(chat_right)
-                $('.chat-right:last-child').append(chat_avatar).append(chat_body)
+                $(chat_block).append(chat_avatar).append(chat_body)
                 $('.chat-right:last-child .chat-body').append(html_message);
             }
         } else {
-            if ($('.user-' + data.message.user_id + ':last-child').length) {
+            let user_block = ('.user-' + data.message.user_id + ':last-child')
+            if ($(user_block).length) {
                 $('.user-' + data.message.user_id + ':last-child .chat-body').append(html_message);
             } else {
                 $(".chats").append(chat_left)
-                $('.user-' + data.message.user_id + ':last-child').append(chat_avatar).append(chat_body)
+                $(user_block).append(chat_avatar).append(chat_body)
                 $('.user-' + data.message.user_id + ':last-child .chat-body').append(first_html_message)
             }
         }
-
-        $('.message').val('');
-        $('#file_chat_label').attr('title', "Файл не выбран")
-        $('#file_chat').val('')
-        chat_image = null
-
         $('.user-chats').scrollTop($('.user-chats > .chats').height());
 
     }
-
-
-    function renderHistory(data) {
-        let current_date
-        for (let message of data.history.reverse()) {
-            let this_date = message.date.split(',')[0]
-            let this_time = message.date.split(',')[1]
-            if (current_date !== this_date) {
-                let date_divider = '<div class="divider"><div class="divider-text">' + this_date + '</div></div>'
-                $(".chats").append(date_divider)
-            }
-            if (message.avatar) {
-                profile_image = file_host + message.avatar
-            }
-            let username = '<p style="color: #0a6aa1">' + message.username + '</p>'
-            let html_message = '<div class="chat-content">' + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>';
-            let first_html_message = '<div class="chat-content">' + username + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>'
-            if (message.image) {
-                let message_image = '<img src="' + file_host + message.image + '" alt="image" height="200" width="200" class="message-image">'
-                html_message = '<div class="chat-content">' + message_image + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px;">' + this_time + '</small>' + '</p>' + '</div>';
-                first_html_message = '<div class="chat-content">' + username + message_image + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px">' + this_time + '</small>' + '</p>' + '</div>'
-            }
-            let chat_right = '<div class="chat chat-right"></div>'
-            let chat_left = '<div class="chat chat-left user-' + message.user_id + '"></div>'
-            let chat_body = '<div class="chat-body"></div>'
-            let chat_avatar = '<div class="chat-avatar">\n' +
-                '<span class="avatar box-shadow-1 cursor-pointer">\n' +
-                '<img src=' + profile_image + '\n' +
-                '     alt="avatar" height="36" width="36"/>\n' +
-                '</span>\n' +
-                '</div>'
-
-            if (message.user_id === data.user.auth.id) {
-                if ($('.chat-right:last-child').length) {
-                    $('.chat-right:last-child .chat-body').append(html_message);
-                } else {
-                    $(".chats").append(chat_right)
-                    $('.chat-right:last-child').append(chat_avatar).append(chat_body)
-                    $('.chat-right:last-child .chat-body').append(html_message);
-                }
-            } else {
-                if ($('.user-' + message.user_id + ':last-child').length) {
-                    $('.user-' + message.user_id + ':last-child .chat-body').append(html_message);
-                } else {
-                    $(".chats").append(chat_left)
-                    $('.user-' + message.user_id + ':last-child').append(chat_avatar).append(chat_body)
-                    $('.user-' + message.user_id + ':last-child .chat-body').append(first_html_message)
-                }
-            }
-            current_date = this_date
-        }
-        $(".content-area-wrapper").fadeIn(1000)
-        $('.user-chats').scrollTop($('.user-chats > .chats').height());
-    }
-
-
-    // $(".close-icon, .content-area-wrapper").on("click", function () {
-    //     $('li').removeClass('active');
-    // })
-
-
-    // const section = $("#block")
-    //
-    // // function myGreeting() {
-    // //     $(".chat-application").css('display', 'block')
-    // // }
-    //
-    // test(section, 1000)
-    //
-    // function test(section, time) {
-    //     section.block({
-    //         message: '<div class="spinner-border text-primary" role="status"></div>',
-    //         timeout: time,
-    //         css: {
-    //             backgroundColor: 'transparent',
-    //             border: '0'
-    //         },
-    //         overlayCSS: {
-    //             backgroundColor: '#EBE9E9',
-    //             opacity: 0.9
-    //         }
-    //     })
-    // }
 
 
 </script>

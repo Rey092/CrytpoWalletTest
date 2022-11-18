@@ -21,7 +21,10 @@ async def login(
 
 
 @auth_front_router.get("/registration", response_class=HTMLResponse, include_in_schema=False)
-async def registration(request: Request):
-    if request.cookies.get("Authorization"):
+async def registration(
+    request: Request,
+    token=Depends(check_user_token),
+):
+    if token:
         return RedirectResponse("/profile/get")
     return templates.TemplateResponse("users/registration.html", {"request": request})

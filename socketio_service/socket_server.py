@@ -104,7 +104,7 @@ async def create_user(sid, data):
 @sio.event
 async def update_user(sid, data):
     manager = await get_chat_manager()
-    await manager.create_user(ChatUser(**data))
+    await manager.update_user(data)
 
 
 # @sio.event

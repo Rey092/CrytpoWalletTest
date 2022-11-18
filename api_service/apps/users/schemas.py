@@ -52,10 +52,15 @@ class UserPayload(ApiSchema):
     token: Union[str, None]
 
 
+class UserPermission(ApiSchema):
+    has_access_chat: bool
+
+
 class UserProfile(ApiSchema):
     id: UUID
     email: EmailStr
     username: str
     avatar: Union[str, None]
+    permission: UserPermission
     count_messages: int
     wallets: List[WalletDetail]
