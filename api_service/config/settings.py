@@ -106,6 +106,10 @@ class Settings(BaseSettings):
     spaces_secret_key: str
     spaces_region_name: str
 
+    # superuser for sqladmin
+    superuser_username: str
+    superuser_password: str
+
     @property
     def db_url(self) -> URL:
         """

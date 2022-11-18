@@ -2,13 +2,15 @@
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 
+from api_service.config.settings import settings
+
 
 class MyBackend(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
         username, password = form["username"], form["password"]
 
-        if username == "admin" and password == "Zaqwerty123":
+        if username == settings.superuser_username and password == settings.superuser_password:
             request.session.update({"token": "..."})
             return True
 

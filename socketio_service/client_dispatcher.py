@@ -19,7 +19,7 @@ class ClientDispatcher:
     @staticmethod
     @sio.event
     async def connect_error(data):
-        print("The connection failed!")
+        print(f"The connection failed! from connect_error -- {data}")
 
     @staticmethod
     @sio.event
