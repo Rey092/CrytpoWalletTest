@@ -4,11 +4,13 @@ from typing import Optional, Union
 from fastapi import Depends
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
+from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from api_service.apps.users.dependencies import get_jwt_backend
+from api_service.apps.users.dependencies import get_db, get_jwt_backend, get_user_manager
 from api_service.apps.users.jwt_backend import JWTBackend
+from api_service.apps.users.manager import UserManager
 from api_service.apps.users.schemas import UserPayload
 
 
@@ -40,3 +42,15 @@ async def check_user_token(
         return UserPayload(**payload)
     except Exception:
         return None
+
+
+async def check_permission(
+    token: UserPayload = Depends(check_user_token),
+    manager: UserManager = Depends(get_user_manager),
+    db: Session = Depends(get_db),
+):
+    try:
+        user_id = token.id
+    except Exception:
+        return None
+    return await manager.get_user(user_id, db)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from typing import Union
+from typing import Optional, Union
 
 import aio_pika
 from aio_pika import DeliveryMode, ExchangeType, Message
@@ -13,6 +13,7 @@ class ApiServiceProducer:
         self,
         exchange_name: str,
         message: Union[str, list, dict],
+        routing_key: Optional[str] = "info",
         exchange_type: Union[ExchangeType, None] = ExchangeType.FANOUT,
         delivery_mode: Union[DeliveryMode, int, None] = DeliveryMode.PERSISTENT,
     ):
@@ -22,7 +23,7 @@ class ApiServiceProducer:
             channel = await connection.channel()
             exchange = await self.create_exchange(channel, exchange_name, exchange_type)
             message = await self.create_message(message, delivery_mode)
-            await exchange.publish(message, routing_key="info")
+            await exchange.publish(message, routing_key=routing_key)
 
     @staticmethod
     async def create_exchange(channel, exchange_name, exchange_type):

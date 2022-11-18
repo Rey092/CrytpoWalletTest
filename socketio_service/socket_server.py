@@ -3,7 +3,7 @@
 import socketio
 
 from socketio_service.apps.chat.dependencies import get_chat_manager
-from socketio_service.apps.chat.models import ChatMessage
+from socketio_service.apps.chat.models import ChatMessage, ChatUser
 from socketio_service.config.utils.service_path import get_path
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
@@ -16,13 +16,6 @@ async def connect(sid, environ, auth):
         sio.enter_room(sid, "chat_users")
         session = await sio.get_session(sid)
         manager = await get_chat_manager()
-        # user = ChatUser(
-        #     id=session.get('auth').get('id'),
-        #     username=session.get('auth').get('username'),
-        #     avatar=session.get('auth').get('avatar'),
-        #     online=False
-        # )
-        # await manager.create_user(user)
         await manager.connect_user(session)
         history = await manager.get_history_chat()
         users = await manager.get_online_users()
@@ -34,13 +27,14 @@ async def connect(sid, environ, auth):
 @sio.event
 async def disconnect(sid):
     session = await sio.get_session(sid)
-    manager = await get_chat_manager()
-    await manager.disconnect_user(session)
-    await sio.emit(
-        "disconnect_user",
-        {"sid": sid},
-        room="chat_users",
-    )
+    if await get_path(session.get("auth")):
+        manager = await get_chat_manager()
+        await manager.disconnect_user(session)
+        await sio.emit(
+            "disconnect_user",
+            {"sid": sid},
+            room="chat_users",
+        )
 
 
 # region Wallets
@@ -99,6 +93,18 @@ async def detail_user(sid, data):
         data.get("sid"),
     )
     await sio.emit("data_user", session, room="chat_users", to=sid)
+
+
+@sio.event
+async def create_user(sid, data):
+    manager = await get_chat_manager()
+    await manager.create_user(ChatUser(**data))
+
+
+@sio.event
+async def update_user(sid, data):
+    manager = await get_chat_manager()
+    await manager.create_user(ChatUser(**data))
 
 
 # @sio.event

@@ -4,6 +4,7 @@ from boto3 import Session
 from botocore.client import Config
 from fastapi_helper.utilities.password_helper import PasswordHelper
 
+from api_service.apps.crypto.dependencies import get_api_service_producer
 from api_service.apps.users.database import UserDatabase
 from api_service.apps.users.jwt_backend import JWTBackend
 from api_service.apps.users.manager import UserManager
@@ -56,4 +57,5 @@ async def get_user_manager() -> UserManager:
     jwt_backend = await get_jwt_backend()
     user_db = await get_user_db()
     storage = await get_storage()
-    return UserManager(user_db, jwt_backend, password_helper, storage)
+    api_service_producer = await get_api_service_producer()
+    return UserManager(user_db, jwt_backend, password_helper, storage, api_service_producer)

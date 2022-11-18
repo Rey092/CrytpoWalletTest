@@ -45,6 +45,20 @@ async def handle_update_order(message: AbstractIncomingMessage) -> None:
         await client.update_order(json.loads(message.body.decode("utf-8")))
 
 
+async def handle_user_update(message: AbstractIncomingMessage) -> None:
+    client = await get_client_dispatcher()
+    async with message.process():
+        print(f"========== Update User {json.loads(message.body.decode('utf-8'))} ==========")
+        await client.update_user(json.loads(message.body.decode("utf-8")))
+
+
+async def handle_user_create(message: AbstractIncomingMessage) -> None:
+    client = await get_client_dispatcher()
+    async with message.process():
+        print(f"========== Create User {json.loads(message.body.decode('utf-8'))} ==========")
+        await client.create_user(json.loads(message.body.decode("utf-8")))
+
+
 async def consumer() -> None:
     connection = await connect_robust(settings.rabbit_url)
     async with connection:
@@ -85,6 +99,11 @@ async def consumer() -> None:
             "order_complete_exchange",
             ExchangeType.FANOUT,
         )
+        # update or create user in chat
+        user_topic_exchange = await channel.declare_exchange(
+            "user_topic_exchange",
+            ExchangeType.TOPIC,
+        )
 
         # Declaring queue
         wallet_balance_queue = await channel.declare_queue(exclusive=True)
@@ -97,6 +116,9 @@ async def consumer() -> None:
         order_failed_queue = await channel.declare_queue(exclusive=True)
         order_return_queue = await channel.declare_queue(exclusive=True)
         order_complete_queue = await channel.declare_queue(exclusive=True)
+        # update or create user in chat
+        user_create_queue = await channel.declare_queue(exclusive=True)
+        user_update_queue = await channel.declare_queue(exclusive=True)
 
         # Binding the queue to the exchange
         await wallet_balance_queue.bind(wallet_balance_exchange)
@@ -109,6 +131,9 @@ async def consumer() -> None:
         await order_failed_queue.bind(order_failed_exchange)
         await order_return_queue.bind(order_return_exchange)
         await order_complete_queue.bind(order_complete_exchange)
+        # update or create user in chat
+        await user_create_queue.bind(user_topic_exchange, routing_key="#.create")
+        await user_update_queue.bind(user_topic_exchange, routing_key="#.update")
 
         # Start listening the queue
         await wallet_balance_queue.consume(handle_updating_wallet_balance)
@@ -121,6 +146,9 @@ async def consumer() -> None:
         await order_failed_queue.consume(handle_update_order)
         await order_return_queue.consume(handle_update_order)
         await order_complete_queue.consume(handle_update_order)
+        # update or create user in chat
+        await user_update_queue.consume(handle_user_update)
+        await user_create_queue.consume(handle_user_create)
 
         print("========== [*] Waiting for messages from services ==========")
         await asyncio.Future()

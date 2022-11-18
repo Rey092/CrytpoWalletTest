@@ -2,6 +2,7 @@
 from typing import Tuple
 from uuid import UUID
 
+from aio_pika import ExchangeType
 from fastapi_helper.exceptions.auth_http_exceptions import InvalidCredentialsException
 from fastapi_helper.utilities.password_helper import PasswordHelper
 from sqlalchemy.orm import Session
@@ -11,6 +12,7 @@ from api_service.config.settings import settings
 from api_service.config.storage import SqlAlchemyStorage
 from api_service.config.utils.email_client import EmailSchema, create_email_client
 
+from ...api_service_producer import ApiServiceProducer
 from .database import UserDatabase
 from .exceptions import (
     DeleteImageInvalidException,
@@ -34,11 +36,13 @@ class UserManager:
         jwt_backend: JWTBackend,
         pass_helper: PasswordHelper,
         storage: SqlAlchemyStorage,
+        producer: ApiServiceProducer,
     ):
         self.user_db = database
         self.jwt_backend = jwt_backend
         self.password_helper = pass_helper
         self.storage = storage
+        self.producer = producer
 
     @staticmethod
     async def get_payload(user_data):
@@ -90,6 +94,12 @@ class UserManager:
         user_create.password1 = self.password_helper.hash(user_create.password1)
         created_user = await self.user_db.create(user_create, db=db)
         payload = await self.get_payload(created_user)
+        await self.producer.publish_message(
+            exchange_name="user_topic_exchange",
+            message=payload,
+            routing_key="id.username.avatar.create",
+            exchange_type=ExchangeType.TOPIC,
+        )
         access_token = self.jwt_backend.create_access_token(payload, False)
         email_client = create_email_client()
         background_tasks.add_task(
@@ -167,6 +177,12 @@ class UserManager:
             db=db,
         )
         payload = await self.get_payload(user)
+        await self.producer.publish_message(
+            exchange_name="user_topic_exchange",
+            message=payload,
+            routing_key="id.username.avatar.update",
+            exchange_type=ExchangeType.TOPIC,
+        )
         old_token = await self.jwt_backend.decode_token(user_token)
         access_token = self.jwt_backend.create_access_token(payload, False)
         if timestamp_to_period(old_token.get("iat"), old_token.get("exp")) == settings.jwt_access_not_expiration:

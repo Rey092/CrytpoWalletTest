@@ -13,8 +13,8 @@ Crypto Wallet|Chat
     .message-image {
         padding: 5px 0 5px 0;
     }
-    .chat-content p small {
-        color: red;
+
+    .chat-content {
     }
 </style>
 {% endblock %}
@@ -158,7 +158,7 @@ Crypto Wallet|Chat
                             <div class="header-profile-sidebar">
                                 <div class="avatar box-shadow-1 avatar-border avatar-xl">
                                     <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
-                                         alt="user_avatar" height="70" width="70"/>
+                                         alt="user_avatar" class="detail-user-profile" height="70" width="70"/>
                                     <span class="avatar-status-online"></span>
                                 </div>
                                 <h4 class="chat-user-name"></h4>
@@ -219,7 +219,7 @@ Crypto Wallet|Chat
     })
 
     socket.on('get_online_users', (data) => {
-        console.log(data)
+        getOnlineUser(data)
     })
 
     socket.on('add_message', (data) => {
@@ -233,6 +233,90 @@ Crypto Wallet|Chat
     })
     //
 
+
+    // get all online users
+    function getOnlineUser(data) {
+        for (let user of data) {
+            if (user.id !== user_data.id) {
+                $(".no-users").css('display', 'none')
+                let src = profile_image
+                if (user.avatar) {
+                    src = file_host + user.avatar
+                }
+                let li = '<li class="user-profile-toggle" onclick="getProfile(this)" id="' + user.sid + '"></li>'
+                let username = '<div class="chat-info">\n' +
+                    '<h5 class="mb-0">' + user.username + '</h5>\n' +
+                    '</div>'
+                let avatar = '<span class="avatar">\n' +
+                    '<img src=' + src + '\n' +
+                    '     height="42"\n' +
+                    '     width="42" alt="Generic placeholder image"/>\n' +
+                    '     <span class="avatar-status-online"></span>\n' +
+                    '</span>'
+                $(".chat-list-users").append(li)
+                $(".user-profile-toggle:last-child").append(avatar).append(username)
+            }
+        }
+    }
+
+    //
+
+    // add or remove users from active chat
+    function renderUsers(data, user_data, connect) {
+        if (connect) {
+            let src = profile_image
+            if (data.auth.avatar) {
+                src = file_host + data.auth.avatar
+            }
+            if (data.auth.id !== user_data.id) {
+                $(".no-users").css('display', 'none')
+                let li = '<li class="user-profile-toggle" onclick="getProfile(this)" id="' + data.sid + '"></li>'
+                let username = ' <div class="chat-info">\n' +
+                    '<h5 class="mb-0">' + data.auth.username + '</h5>\n' +
+                    '</div>'
+                let avatar = '<span class="avatar">\n' +
+                    '<img src=' + src + '\n' +
+                    '     height="42"\n' +
+                    '     width="42" alt="Generic placeholder image"/>\n' +
+                    '     <span class="avatar-status-online"></span>\n' +
+                    '</span>'
+                $(".chat-list-users").append(li)
+                $(".user-profile-toggle:last-child").append(avatar).append(username)
+            }
+        } else {
+            $("#" + data.sid + "").remove()
+        }
+    }
+
+    //
+
+
+    // get profile in chat
+    function getProfile(element) {
+        socket.emit('detail_user', {
+            'sid': element.id,
+        })
+    }
+
+    // show profile in chat
+    function showProfile(data) {
+        if (data.auth.avatar) {
+            $(".detail-user-profile").attr("src", file_host + data.auth.avatar)
+        }
+        $(".chat-user-name").html(data.auth.username)
+        $(".align-middle").html(data.auth.email)
+        $(".body-content-overlay").addClass('show')
+        $(".user-profile-sidebar").addClass('show')
+
+    }
+
+    // end show profile in chat
+
+    // end get profile in chat
+
+
+    // send message
+
     // load images
     function loadImage(element) {
         if (element.files[0]) {
@@ -243,8 +327,6 @@ Crypto Wallet|Chat
                 chat_image = reader.result.split(',')[1];
             });
             reader.readAsDataURL(image);
-
-
         } else {
             $('#file_chat_label').attr('title', "Файл не выбран")
             chat_image = null
@@ -253,8 +335,6 @@ Crypto Wallet|Chat
 
     // loads images end
 
-
-    // send message
     $(".chat-app-form").submit(function () {
         let message = $('.message').val();
         if (/\S/.test(message)) {
@@ -270,33 +350,17 @@ Crypto Wallet|Chat
     //
 
 
-    // get profile in chat
-    function getProfile(element) {
-        socket.emit('detail_user', {
-            'sid': element.id,
-        })
-    }
-
-    function showProfile(data) {
-        if (data.auth.avatar) {
-            $("img").attr("src", file_host + data.auth.avatar)
-        }
-        $(".chat-user-name").html(data.auth.username)
-        $(".align-middle").html(data.auth.email)
-        $(".body-content-overlay").addClass('show')
-        $(".user-profile-sidebar").addClass('show')
-
-    }
-
-    //
-
-
     function addMessage(data) {
         let this_date = data.message.date.split(',')[0]
         let this_time = data.message.date.split(',')[1]
         let username = '<p style="color: #0a6aa1">' + data.user.auth.username + '</p>'
         let html_message = '<div class="chat-content">' + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>';
         let first_html_message = '<div class="chat-content">' + username + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>'
+        if (data.message.image) {
+            let message_image = '<img src="' + file_host + data.message.image + '" alt="image" height="200" width="200" class="message-image">'
+            html_message = '<div class="chat-content">' + message_image + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px;">' + this_time + '</small>' + '</p>' + '</div>';
+            first_html_message = '<div class="chat-content">' + username + message_image + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px">' + this_time + '</small>' + '</p>' + '</div>'
+        }
         let chat_right = '<div class="chat chat-right"></div>'
         let chat_left = '<div class="chat chat-left user-' + data.user.auth.id + '"></div>'
         let chat_body = '<div class="chat-body"></div>'
@@ -335,31 +399,6 @@ Crypto Wallet|Chat
     }
 
 
-    function renderUsers(data, user_data, connect) {
-        let host_file = "https://cryptowallet.fra1.digitaloceanspaces.com/"
-        if (connect) {
-            let src = host_file + data.auth.avatar + ""
-            if (data.auth.id !== user_data.id) {
-                $(".no-users").css('display', 'none')
-                let li = '<li class="user-profile-toggle" onclick="getProfile(this)" id="' + data.sid + '"></li>'
-                let username = ' <div class="chat-info">\n' +
-                    '<h5 class="mb-0">' + data.auth.username + '</h5>\n' +
-                    '</div>'
-                let avatar = '<span class="avatar">\n' +
-                    '<img src=' + src + '\n' +
-                    '     height="42"\n' +
-                    '     width="42" alt="Generic placeholder image"/>\n' +
-                    '     <span class="avatar-status-online"></span>\n' +
-                    '</span>'
-                $(".chat-list-users").append(li)
-                $(".user-profile-toggle:last-child").append(avatar).append(username)
-            }
-        } else {
-            $("#" + data.sid + "").remove()
-        }
-    }
-
-
     function renderHistory(data) {
         let current_date
         for (let message of data.history.reverse()) {
@@ -372,14 +411,13 @@ Crypto Wallet|Chat
             if (message.avatar) {
                 profile_image = file_host + message.avatar
             }
-
             let username = '<p style="color: #0a6aa1">' + message.username + '</p>'
             let html_message = '<div class="chat-content">' + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>';
             let first_html_message = '<div class="chat-content">' + username + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>'
             if (message.image) {
                 let message_image = '<img src="' + file_host + message.image + '" alt="image" height="200" width="200" class="message-image">'
-                html_message = '<div class="chat-content">' + message_image + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8;">' + this_time + '</small>' + '</p>' + '</div>';
-                first_html_message = '<div class="chat-content">' + username + message_image + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8">' + this_time + '</small>' + '</p>' + '</div>'
+                html_message = '<div class="chat-content">' + message_image + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px;">' + this_time + '</small>' + '</p>' + '</div>';
+                first_html_message = '<div class="chat-content">' + username + message_image + '<p>' + message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px">' + this_time + '</small>' + '</p>' + '</div>'
             }
             let chat_right = '<div class="chat chat-right"></div>'
             let chat_left = '<div class="chat chat-left user-' + message.user_id + '"></div>'
@@ -409,16 +447,10 @@ Crypto Wallet|Chat
                 }
             }
             current_date = this_date
-
         }
         $(".content-area-wrapper").fadeIn(1000)
-    }
-
-
-    $(document).ready(function () {
         $('.user-chats').scrollTop($('.user-chats > .chats').height());
-    });
-
+    }
 
 
     // $(".close-icon, .content-area-wrapper").on("click", function () {
