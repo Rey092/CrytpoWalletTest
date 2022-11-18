@@ -25,7 +25,7 @@ class PermissionAdmin(ModelView, model=Permission):
         Permission.user_id,
         Permission.has_access_chat,
     ]
-    column_searchable_list = [Permission.user_id, Permission.user_id]
+    column_searchable_list = [Permission.id, Permission.user_id]
     icon = "fa-solid fa-key"
 
 
