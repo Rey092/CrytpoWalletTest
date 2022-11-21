@@ -36,6 +36,7 @@ async def disconnect(sid):
             room="chat_users",
         )
 
+
 # region Wallets
 @sio.event
 async def new_transactions(sid, data):

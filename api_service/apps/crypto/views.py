@@ -1,11 +1,19 @@
 # -*- coding: utf-8 -*-
-from typing import List
+import json
+from typing import Any, List
 
 from fastapi import APIRouter, Depends
+from fastapi_cache import JsonCoder
 from sqlalchemy.orm import Session
 from starlette import status
 
-from api_service.apps.crypto.dependencies import examples_generate, get_db, get_ethereum_manager
+from api_service.apps.crypto.dependencies import (
+    examples_generate,
+    get_db,
+    get_ethereum_manager,
+    get_fastapi_cache_backend,
+    get_fastapi_cache_coder,
+)
 from api_service.apps.crypto.exceptions import (
     InvalidPrivateKeyException,
     InvalidRecipientException,
@@ -27,6 +35,7 @@ from api_service.apps.crypto.schemas import (
 )
 from api_service.apps.users.models import User
 from api_service.apps.users.user import get_current_user_payload
+from api_service.config.utils.redis_key_builder import my_key_builder
 
 ethereum_router = APIRouter()
 
@@ -101,6 +110,8 @@ async def get_wallets(
 )
 async def get_transactions(
     wallet_address: str,
+    cache_backend: Any = Depends(get_fastapi_cache_backend),
+    cache_coder: JsonCoder = Depends(get_fastapi_cache_coder),
     user: User = Depends(get_current_user_payload),  # noqa
     db: Session = Depends(get_db),
     ethereum_manager: EthereumManager = Depends(get_ethereum_manager),
@@ -109,7 +120,13 @@ async def get_transactions(
     Get all transactions by wallet address\n
     Permission: Is authenticated.
     """
-    return await ethereum_manager.get_transactions_by_wallet_address(db, wallet_address)
+    cache_key = my_key_builder(get_transactions, f"wallet-history:{wallet_address}")
+    cache = await cache_backend.get(cache_key)
+    if cache:
+        return json.loads(cache)
+    transactions = await ethereum_manager.get_transactions_by_wallet_address(db, wallet_address)
+    await cache_backend.set(cache_key, cache_coder.encode(transactions), 120)
+    return transactions
 
 
 @ethereum_router.post(

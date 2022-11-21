@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from async_lru import alru_cache
+from fastapi_cache import FastAPICache
 from fastapi_helper.schemas.examples_generate import ExamplesGenerate
 
 from api_service.api_service_producer import ApiServiceProducer
@@ -19,6 +20,14 @@ def get_db():
 
 
 examples_generate = ExamplesGenerate()
+
+
+def get_fastapi_cache_backend():
+    return FastAPICache.get_backend()
+
+
+def get_fastapi_cache_coder():
+    return FastAPICache.get_coder()
 
 
 @alru_cache()

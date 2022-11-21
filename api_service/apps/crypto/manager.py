@@ -93,14 +93,15 @@ class EthereumManager(BaseCryptoManager):
         return {"txn_hash": txn_hash}
 
     async def check_transactions_in_block(self, db: Session, block_hash: str):
+        # cache_backend = FastAPICache.get_backend()
         wallets = await self.get_all_wallets(db)
         addresses = [wallet.address for wallet in wallets]
         checked_transactions = await self.ethereum_provider.get_transactions_from_block(block_hash, addresses)
         if checked_transactions:
-            # TODO: remove print
-            print(checked_transactions)
+            # for txn in checked_transactions:
+            #     address = txn['to'] if txn['to'] in addresses else txn['from']
+            #     await cache_backend.clear(f"fastapi-cache:wallet-history:{address}")
             transactions = await self.etherscan_client.get_result({"result": checked_transactions})
-            print(transactions)
             await self.ethereum_db.create_transaction(db, transactions)
             couples_for_update_balance = [
                 (wallet, transaction)

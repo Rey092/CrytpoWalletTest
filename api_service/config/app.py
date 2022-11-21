@@ -3,16 +3,19 @@
 import pathlib
 from typing import List
 
+import aioredis
 import toml
 from fastapi import FastAPI, Request
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from fastapi_helper import DefaultHTTPException
 from fastapi_helper.exceptions.validation_exceptions import init_validation_handler
 from starlette.staticfiles import StaticFiles
 
-from api_service.api_service_consumer import api_consumer_thread
+from api_service.api_service_consumer import consumer_thread
 from api_service.apps.admin.auto_sqladmin import init_sqladmin
 from api_service.apps.crypto.wallets_balance_parser import parsing_balances_thread
 from api_service.apps.front.router import front_router
@@ -21,6 +24,7 @@ from api_service.config.costum_logging import CustomizeLogger
 from api_service.config.db import engine
 from api_service.config.openapi import metadata_tags
 from api_service.config.router import api_router
+from api_service.config.settings import settings
 
 # from config.settings import settings
 
@@ -33,9 +37,9 @@ def init_routers(app_: FastAPI) -> None:
     app_.include_router(front_router)
 
 
-def init_database(app) -> None:
+def init_database(app_) -> None:
     models.Base.metadata.create_all(bind=engine)
-    init_sqladmin(app, engine)
+    init_sqladmin(app_, engine)
 
 
 def make_middleware() -> List[Middleware]:
@@ -92,13 +96,13 @@ def create_app() -> FastAPI:
     # Initialize other utils.
     init_routers(app_=app_)
     init_validation_handler(app=app_)
-    init_database(app=app_)
+    init_database(app_=app_)
 
     init_cache()
     init_logging()
 
     # Start needed threads
-    api_consumer_thread.start()
+    consumer_thread.start()
     parsing_balances_thread.start()
 
     app_.mount("/static", StaticFiles(directory="static"), name="static")
@@ -107,6 +111,12 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+@app.on_event("startup")
+async def startup():
+    redis = aioredis.from_url(str(settings.redis_url), encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 @app.exception_handler(DefaultHTTPException)
