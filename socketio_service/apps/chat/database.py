@@ -60,6 +60,10 @@ class ChatDatabase:
         update_query = {"$set": {"online": online, "sid": sid}}
         await user.update(update_query)
 
+    async def disconnect_all_users(self):
+        update_query = {"$set": {"online": False}}
+        await self.chat_user.update_all(update_query)
+
     async def update_user(
         self,
         user_data: dict,
@@ -73,3 +77,9 @@ class ChatDatabase:
             },
         }
         await user.update(update_query)
+
+    async def get_count_message(
+        self,
+        user_id: UUID,
+    ):
+        return await self.chat_message.find({"user_id": user_id}, {}).to_list()

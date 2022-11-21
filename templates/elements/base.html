@@ -143,6 +143,11 @@
     })
     //
 
+    // event open_chat to access the chat
+    socket.on('open_chat', function (data) {
+        open_chat(data)
+    })
+
     // event for getting new transaction for user
     socket.on("front_new_transactions", function (data) {
         $(data).each(function (list_index, dict) {
@@ -171,6 +176,15 @@
     })
     //
 
+    // open chat
+    function open_chat(data) {
+        if (data.user_id === user_data.id) {
+            $("#chat_link").removeClass('disabled').popover('dispose')
+            toastr.info("Поздравляем теперь вам доступен чат", "Уведомление")
+        }
+    }
+    //
+
     $(window).on('load', function () {
         if (feather) {
             feather.replace({
@@ -183,10 +197,11 @@
             url: "/api/profile/get",
             success: function (response) {
                 if ('id' in response) {
-                    if (response.permission.hasAccessChat) {
-                        $("#chat_link").removeClass('disabled');
-                    }
                     console.log(response)
+                    if (response.permission.hasAccessChat) {
+                        $("#chat_link").removeClass('disabled').popover('dispose')
+
+                    }
                     user_data['id'] = response.id
                     user_data['username'] = response.username
                     user_data['email'] = response.email

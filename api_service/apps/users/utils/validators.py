@@ -19,4 +19,6 @@ async def validate_password(password):
 
 
 async def validate_username(username):
-    return True if re.match(r"^[\w\d +]{5,40}$", username) else False
+    if re.match(r"^[\w\d +]{5,40}$", username) and len([letter for letter in username if letter.isalpha()]) >= 4:
+        return True
+    return False

@@ -5,8 +5,10 @@ import socketio
 from socketio_service.apps.chat.dependencies import get_chat_manager
 from socketio_service.apps.chat.models import ChatMessage, ChatUser
 from socketio_service.config.utils.service_path import get_path
+from socketio_service.socket_service_producer import SocketServiceProducer
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
+producer = SocketServiceProducer()
 
 
 @sio.event
@@ -30,11 +32,17 @@ async def disconnect(sid):
     if await get_path(session.get("auth")):
         manager = await get_chat_manager()
         await manager.disconnect_user(session)
+        count_message = await manager.get_count_messages(session)
         await sio.emit(
             "disconnect_user",
             {"sid": sid},
             room="chat_users",
         )
+        await producer.publish_message(
+            exchange_name="count_messages_exchange",
+            message=count_message,
+        )
+
 
 # region Wallets
 @sio.event
@@ -104,6 +112,11 @@ async def create_user(sid, data):
 async def update_user(sid, data):
     manager = await get_chat_manager()
     await manager.update_user(data)
+
+
+@sio.event
+async def update_permission(sid, data):
+    await sio.emit("open_chat", data)
 
 
 # @sio.event

@@ -52,6 +52,9 @@ class ChatManager:
     async def disconnect_user(self, data: dict):
         await self.database.update_user_status(data, False)
 
+    async def disconnect_all_users(self):
+        await self.database.disconnect_all_users()
+
     async def get_online_users(self) -> list:
         data = await self.database.get_online_users()
         return [
@@ -81,3 +84,11 @@ class ChatManager:
                     },
                 )
         return history
+
+    async def get_count_messages(
+        self,
+        data: dict,
+    ):
+        user_id: UUID = UUID(data.get("auth").get("id"))
+        messages = await self.database.get_count_message(user_id)
+        return {"count": len(messages), "user_id": str(user_id)}

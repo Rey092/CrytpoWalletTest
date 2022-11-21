@@ -195,4 +195,30 @@ class UserManager:
         :param db:
         :return: None
         """
+        message = {
+            "user_id": user_id,
+        }
         await self.user_db.change_access_chat_permission(user_id, db)
+        await self.producer.publish_message(
+            exchange_name="update_permission_exchange",
+            message=message,
+        )
+
+    async def update_count_message(
+        self,
+        db: Session,
+        data,
+    ):
+        """
+
+        :param data:
+        :param db:
+        :return: None
+        """
+        user_id: UUID = UUID(data.get("user_id"))
+        count: int = data.get("count")
+        await self.user_db.change_count_messages(
+            user_id,
+            count,
+            db,
+        )

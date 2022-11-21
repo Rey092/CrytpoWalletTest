@@ -127,7 +127,8 @@ Crypto Wallet|Chat
                                     <input type="text" class="form-control message"
                                            placeholder="Введите свое сообщение"/>
                                     <span class="input-group-text">
-                                            <small id="file_name" style="color: green; padding-right: 5px; cursor: pointer;"></small>
+                                            <small id="file_name"
+                                                   style="color: green; padding-right: 5px; cursor: pointer;"></small>
                                             <label for="file_chat" id="file_chat_label"
                                                    title="Выберите файл (Доступный формат png, jpg, jpeg)"
                                                    class="attachment-icon form-label mb-0">
@@ -198,7 +199,6 @@ Crypto Wallet|Chat
         crossorigin="anonymous"></script>
 <script src="{{ url_for('static', path='/app-assets/js/scripts/pages/app-chat.js') }}"></script>
 <script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-blockui.js') }}"></script>
-
 <script>
 
 
@@ -208,8 +208,18 @@ Crypto Wallet|Chat
     })
 
     socket.on('disconnect_user', (data) => {
-       renderUsers(data, user_data, false)
+        renderUsers(data, user_data, false)
     })
+
+    socket.on("connect_error", (error) => {
+        $('.app-content').html(
+            '<div class="w-100 text-center">\n' +
+            '<h2 class="mb-1">Сервис временно недоступен</h2>\n' +
+            '<p class="mb-3">Мы стараемся исправить это как можно скорее</p>\n' +
+            '<img class="img-fluid" src="{{ url_for('static', path='/app-assets/images/pages/coming-soon.svg') }}" alt="Coming soon page">\n' +
+            '</div>'
+        )
+    });
 
     socket.on('data_user', (data) => {
         showProfile(data)
@@ -293,7 +303,6 @@ Crypto Wallet|Chat
     }
 
     //
-
 
 
     // get profile in chat

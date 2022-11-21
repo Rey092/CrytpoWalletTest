@@ -3,6 +3,7 @@ import socketio
 from beanie import init_beanie
 from fastapi import FastAPI
 
+from socketio_service.apps.chat.dependencies import get_chat_manager
 from socketio_service.config.db import collections, db
 from socketio_service.socket_server import sio
 from socketio_service.socket_service_consumer import socket_consumer_thread
@@ -29,3 +30,9 @@ app = create_app()
 @app.on_event("startup")
 async def start_mongodb():
     await init_mongodb()
+
+
+@app.on_event("shutdown")
+async def close_mongodb():
+    chat_manager = await get_chat_manager()
+    await chat_manager.disconnect_all_users()
