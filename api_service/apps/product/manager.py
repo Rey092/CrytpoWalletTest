@@ -123,6 +123,7 @@ class ProductManager:
             value=updated_value,
         )
         txn_hash = await self.ethereum_provider.send_raw_transaction(transaction_create, updated_order.product.wallet)
+        await self.product_db.update_wallet_balance(db, updated_order.product.wallet, updated_value)
 
         if txn_hash:
             updated_order.status = "RETURN"
