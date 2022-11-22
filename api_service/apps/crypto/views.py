@@ -125,7 +125,7 @@ async def get_transactions(
     if cache:
         return json.loads(cache)
     transactions = await ethereum_manager.get_transactions_by_wallet_address(db, wallet_address)
-    await cache_backend.set(cache_key, cache_coder.encode(transactions), 120)
+    await cache_backend.set(cache_key, cache_coder.encode(transactions))
     return transactions
 
 

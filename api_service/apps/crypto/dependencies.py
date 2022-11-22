@@ -9,6 +9,7 @@ from api_service.apps.crypto.manager import EthereumManager
 from api_service.apps.crypto.models import Asset, Transaction, Wallet
 from api_service.apps.crypto.web3_clients import EthereumProviderClient, EtherscanClient
 from api_service.config.db import SessionLocal
+from services.redis.dependency import get_redis
 
 
 def get_db():
@@ -56,4 +57,5 @@ async def get_ethereum_manager() -> EthereumManager:
     etherscan_client = await get_etherscan_client()
     ethereum_provider = await get_ethereum_provider_client()
     api_service_producer = await get_api_service_producer()
-    return EthereumManager(ethereum_db, etherscan_client, ethereum_provider, api_service_producer)
+    redis = await get_redis()
+    return EthereumManager(ethereum_db, etherscan_client, ethereum_provider, api_service_producer, redis)

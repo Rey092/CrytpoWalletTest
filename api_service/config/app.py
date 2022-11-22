@@ -3,7 +3,6 @@
 import pathlib
 from typing import List
 
-import aioredis
 import toml
 from fastapi import FastAPI, Request
 from fastapi.middleware import Middleware
@@ -24,7 +23,7 @@ from api_service.config.costum_logging import CustomizeLogger
 from api_service.config.db import engine
 from api_service.config.openapi import metadata_tags
 from api_service.config.router import api_router
-from api_service.config.settings import settings
+from services.redis.dependency import get_redis
 
 # from config.settings import settings
 
@@ -115,7 +114,7 @@ app = create_app()
 
 @app.on_event("startup")
 async def startup():
-    redis = aioredis.from_url(str(settings.redis_url), encoding="utf8", decode_responses=True)
+    redis = await get_redis()
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
