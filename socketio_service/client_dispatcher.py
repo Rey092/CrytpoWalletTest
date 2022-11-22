@@ -70,3 +70,8 @@ class ClientDispatcher:
     async def update_user(self, data: dict):
         await self.sio_connect()
         await sio.emit("update_user", data)
+
+    @sio.event
+    async def update_permission(self, data: dict):
+        await self.sio_connect()
+        await sio.emit("update_permission", data)

@@ -52,6 +52,10 @@ class UserDatabase:
         db.query(self.permission).filter(self.permission.user_id == user_id).update({"has_access_chat": True})
         db.commit()
 
+    async def change_count_messages(self, user_id, count, db: Session) -> None:
+        db.query(self.model).filter(self.model.id == user_id).update({"count_messages": count})
+        db.commit()
+
     async def update(self, user_id: UUID, user_data: UserUpdate, db: Session) -> User:
         user = db.query(self.model).filter(self.model.id == user_id)
         if user_data.password:

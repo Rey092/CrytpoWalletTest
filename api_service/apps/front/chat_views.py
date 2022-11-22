@@ -10,7 +10,11 @@ chat_front_router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@chat_front_router.get("/messages", response_class=HTMLResponse, include_in_schema=False)
+@chat_front_router.get(
+    "/messages",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
 async def get_chat(
     request: Request,
     token=Depends(check_user_token),
