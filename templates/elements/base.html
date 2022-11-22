@@ -197,7 +197,6 @@
             url: "/api/profile/get",
             success: function (response) {
                 if ('id' in response) {
-                    console.log(response)
                     if (response.permission.hasAccessChat) {
                         $("#chat_link").removeClass('disabled').popover('dispose')
 

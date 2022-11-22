@@ -30,6 +30,8 @@ app = create_app()
 @app.on_event("startup")
 async def start_mongodb():
     await init_mongodb()
+    chat_manager = await get_chat_manager()
+    await chat_manager.disconnect_all_users()
 
 
 @app.on_event("shutdown")
