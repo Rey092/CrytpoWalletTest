@@ -111,4 +111,4 @@ async def consumer() -> None:
         await asyncio.Future()
 
 
-api_consumer_thread = Thread(target=asyncio.run, args=(consumer(),))
+consumer_thread = Thread(target=asyncio.run, args=(consumer(),))

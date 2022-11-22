@@ -9,6 +9,7 @@ init:
 
 run:
 	uvicorn api_service.config.app:app --reload
+	# uvicorn api_service.config.app:app --workers 2
 
 
 run_sio:

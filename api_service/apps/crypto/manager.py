@@ -3,6 +3,7 @@ import secrets
 from abc import abstractmethod
 from typing import List
 
+from aioredis import Redis
 from eth_account import Account
 from sqlalchemy.orm import Session
 
@@ -27,11 +28,13 @@ class BaseCryptoManager:
         etherscan_client: EtherscanClient,
         ethereum_provider: EthereumProviderClient,
         api_service_producer: ApiServiceProducer,
+        redis: Redis,
     ):
         self.ethereum_db = database
         self.etherscan_client = etherscan_client
         self.ethereum_provider = ethereum_provider
         self.api_service_producer = api_service_producer
+        self.redis = redis
 
     async def generate_private_key(self, wallet: WalletCreate) -> WalletCreate:
         hex_string = secrets.token_hex(32)
@@ -97,10 +100,10 @@ class EthereumManager(BaseCryptoManager):
         addresses = [wallet.address for wallet in wallets]
         checked_transactions = await self.ethereum_provider.get_transactions_from_block(block_hash, addresses)
         if checked_transactions:
-            # TODO: remove print
-            print(checked_transactions)
+            delete_cache_list = [txn["to"] for txn in checked_transactions if txn["to"] in addresses]
+            [delete_cache_list.append(txn["from"]) for txn in checked_transactions if txn["from"] in addresses]
+            await self.clear_cache(delete_cache_list)
             transactions = await self.etherscan_client.get_result({"result": checked_transactions})
-            print(transactions)
             await self.ethereum_db.create_transaction(db, transactions)
             couples_for_update_balance = [
                 (wallet, transaction)
@@ -131,3 +134,9 @@ class EthereumManager(BaseCryptoManager):
 
     async def update_wallets_balances(self, db: Session, wallets: List[Wallet]):
         await self.ethereum_db.update_balances(db, wallets)
+
+    async def clear_cache(self, addresses):
+        for address in addresses:
+            cursor, keys = await self.redis.scan(match=f"fastapi-cache:wallet-history:{address}:*")
+            for key in keys:
+                await self.redis.delete(key)

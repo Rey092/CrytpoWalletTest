@@ -1,28 +1,14 @@
 # -*- coding: utf-8 -*-
-from typing import AsyncGenerator
-
+import aioredis
 from aioredis import Redis
-from starlette.requests import Request
+
+from api_service.config.settings import settings
 
 
-async def get_redis(
-    request: Request,
-) -> AsyncGenerator[Redis, None]:  # pragma: no cover
-    """
-    Returns connection pool.
-
-    You can use it like this:
-
-    # >>> from redis.asyncio import ConnectionPool, Redis
-    # >>>
-    # >>> async def handler(redis_pool: ConnectionPool = Depends(get_redis_pool)):
-    # >>>     async with Redis(connection_pool=redis_pool) as redis:
-    # >>>         await redis.get('key')
-
-    I use pools, so you don't acquire connection till the end of the handler.
-
-    :param request: current request.
-    :returns:  redis connection pool.
-
-    """
-    return request.app.state.redis
+async def get_redis() -> Redis:
+    redis = aioredis.from_url(
+        url=str(settings.redis_url),
+        encoding="utf8",
+        decode_responses=True,
+    )
+    return redis

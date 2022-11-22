@@ -43,3 +43,6 @@ async def send_requests():
     if COUNT_FAILED == 0:
         print("OK")
         return True
+    else:
+        print("NOT OK")
+        return False
