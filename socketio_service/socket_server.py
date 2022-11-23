@@ -44,7 +44,6 @@ async def disconnect(sid):
         )
 
 
-
 # region Wallets
 @sio.event
 async def new_transactions(sid, data):

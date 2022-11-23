@@ -90,6 +90,14 @@ Login
                             '<span id="login-email-error" class="error">Недействительные учетные данные.</span>'
                         )
                     }
+                    if (response.status === 429) {
+                        let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                        $(".form-error").html(
+                            '<span id="login-email-error" class="error">' +
+                            'Слишком много запросов. Повторить через ' + time + ' сек.' +
+                            '</span>'
+                        )
+                    }
                 }
             })
         },

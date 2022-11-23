@@ -5,23 +5,28 @@ Crypto Wallet | My Wallets
 {% endblock %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css') }}">
 <style>
     .trans_row {
         max-width: 200px;
         min-width: 160px;
         overflow: hidden;
     }
+
     @media (max-width: 576px) {
-      .eth-image {
-        width: 50px;
-        height: 50px;
-        margin: 15px -15px 0 -10px;
-        padding: 0;
-      }
+        .eth-image {
+            width: 50px;
+            height: 50px;
+            margin: 15px -15px 0 -10px;
+            padding: 0;
+        }
     }
 </style>
 {% endblock %}
@@ -53,24 +58,26 @@ Crypto Wallet | My Wallets
 </div>
 <div class="modal fade" id="allTransactions" tabindex="-1" aria-labelledby="addNewCardTitle" style="display: none;"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl" >
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-transparent">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body px-sm-5 mx-50 pb-5 table-responsive">
-                <h5 class="text-center">Список транзакций <b>ETH</b> кошелька по адресу <b><span id="some_address"></span></b></h5>
-                <table class="table dataTable no-footer dtr-column" id="trans_datatable" role="grid" aria-describedby="DataTables_Table_3_info">
+                <h5 class="text-center">Список транзакций <b>ETH</b> кошелька по адресу <b><span
+                        id="some_address"></span></b></h5>
+                <table class="table dataTable no-footer dtr-column" id="trans_datatable" role="grid"
+                       aria-describedby="DataTables_Table_3_info">
                     <thead>
-                        <tr>
-                            <th style="min-width: 200px; width: 20%; overflow: hidden">Txn Hash</th>
-                            <th style="min-width: 200px; width: 20%; overflow: hidden">From</th>
-                            <th style="min-width: 200px; width: 20%; overflow: hidden">To</th>
-                            <th>Value</th>
-                            <th style="color: #0d6cb1">Age</th>
-                            <th>Txn Fee</th>
-                            <th>Status</th>
-                        </tr>
+                    <tr>
+                        <th style="min-width: 200px; width: 20%; overflow: hidden">Txn Hash</th>
+                        <th style="min-width: 200px; width: 20%; overflow: hidden">From</th>
+                        <th style="min-width: 200px; width: 20%; overflow: hidden">To</th>
+                        <th>Value</th>
+                        <th style="color: #0d6cb1">Age</th>
+                        <th>Txn Fee</th>
+                        <th>Status</th>
+                    </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -112,8 +119,11 @@ Crypto Wallet | My Wallets
                 // init all popovers on page
                 let popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
                 popoverTriggerList.map(function (popoverTriggerEl) {
-                  return new bootstrap.Popover(popoverTriggerEl)
+                    return new bootstrap.Popover(popoverTriggerEl)
                 })
+                if (!$('#chat_link').hasClass('disabled')) {
+                    $("#chat_link").popover('dispose')
+                }
             },
             error: function (response) {
             }
@@ -215,12 +225,12 @@ Crypto Wallet | My Wallets
     // region Send Transaction------------------------------------------------------------------------------------------
     //==================================================================================================================
     // after click on button get address of this wallet for send transactions
-    function get_wallet_address(value){
+    function get_wallet_address(value) {
         wallet_address = value
     }
 
     // send transaction on another wallet + validation
-    function submit_trans(value){
+    function submit_trans(value) {
         validator = $("#form_" + value).validate({
             submitHandler: function () {
                 $('#loading_import_' + value).css('display', 'block')
@@ -299,8 +309,8 @@ Crypto Wallet | My Wallets
             highlight: function (element, errorClass, validClass) {
                 $(element).addClass('error');
                 if ($(element).parent().hasClass('input-group')) {
-                $(element).parent().addClass('is-invalid');
-            }
+                    $(element).parent().addClass('is-invalid');
+                }
             },
             unhighlight: function (element, errorClass, validClass) {
                 $(element).removeClass('error');
@@ -312,14 +322,14 @@ Crypto Wallet | My Wallets
     }
 
     // reset jquery validate for form
-    function close_send_modal(){
+    function close_send_modal() {
         validator.resetForm()
     }
 
     // region Watch Transactions ---------------------------------------------------------------------------------------
     // =================================================================================================================
     // watch transactions by wallet
-    function watch_transactions(value){
+    function watch_transactions(value) {
         localStorage.address = value
         $('#some_address').html(value)
         $.ajax({
@@ -335,37 +345,37 @@ Crypto Wallet | My Wallets
 
     // init datatable
     table = $('#trans_datatable').DataTable({
-            "responsive": false,
-            "lengthChange": false,
-            "autoWidth": false,
-            "ordering": true,
-            "searching": false,
-            'columnDefs': [
-                {
-                    'orderable': false,
-                    'targets': [0, 1, 2, 3, 5, 6]
-                }
-            ],
-            order: [],
-            "language": {
-                "infoFiltered": "(Отфильтровано _MAX_ записей)",
-                "zeroRecords": "Записей не найдено",
-                "info": "Показано с _START_ по _END_ записей из _TOTAL_",
-                "infoEmpty": "Нет записей.",
-                "search": "Поиск:",
-                "paginate": {
-                    "previous": "Предыдущая",
-                    "last": "Последняя",
-                    "next": "Следующая"
-                }
+        "responsive": false,
+        "lengthChange": false,
+        "autoWidth": false,
+        "ordering": true,
+        "searching": false,
+        'columnDefs': [
+            {
+                'orderable': false,
+                'targets': [0, 1, 2, 3, 5, 6]
             }
-        })
+        ],
+        order: [],
+        "language": {
+            "infoFiltered": "(Отфильтровано _MAX_ записей)",
+            "zeroRecords": "Записей не найдено",
+            "info": "Показано с _START_ по _END_ записей из _TOTAL_",
+            "infoEmpty": "Нет записей.",
+            "search": "Поиск:",
+            "paginate": {
+                "previous": "Предыдущая",
+                "last": "Последняя",
+                "next": "Следующая"
+            }
+        }
+    })
 
     // render transactions in datatable
-    function render_wallet_transaction(transactions){
+    function render_wallet_transaction(transactions) {
         table.clear().draw()
         if (transactions.length > 0) {
-            for (let trans of transactions){
+            for (let trans of transactions) {
                 table.row.add([
                     "<a target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/" + trans.txnHash + "\">" + trans.txnHash + "</a>",
                     "<a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + trans.addressFrom + "\">" + trans.addressFrom + "</a>",
