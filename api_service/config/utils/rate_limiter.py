@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 from math import ceil
 
+from fastapi_helper import DefaultHTTPException
+from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
-from starlette.status import HTTP_429_TOO_MANY_REQUESTS
 
-from api_service.config.openapi import ApiError
 
-RATE_LIMIT_ERROR = ApiError(
-    code="ratelimit-001",
-    type="TOO_MANY_REQUESTS",
-    message="Too Many Requests.",
-    exception=Exception,
-    status_code=HTTP_429_TOO_MANY_REQUESTS,
-)
+class RateLimitException(DefaultHTTPException):
+    code = "ratelimit-001"
+    type = "TOO_MANY_REQUESTS"
+    message = "Too Many Requests"
+    status_code = status.HTTP_429_TOO_MANY_REQUESTS
 
 
 async def rate_limit_callback(request: Request, response: Response, pexpire: int):  # noqa
@@ -27,4 +25,4 @@ async def rate_limit_callback(request: Request, response: Response, pexpire: int
 
     """
     expire = ceil(pexpire / 1000)
-    raise RATE_LIMIT_ERROR.http_exception(headers={"Retry-After": str(expire)})
+    raise RateLimitException(message=f"Too Many Requests. Retry-After {str(expire)} secs")

@@ -4,6 +4,7 @@ from typing import Any, List
 
 from fastapi import APIRouter, Depends
 from fastapi_cache import JsonCoder
+from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -35,6 +36,7 @@ from api_service.apps.crypto.schemas import (
 )
 from api_service.apps.users.models import User
 from api_service.apps.users.user import get_current_user_payload
+from api_service.config.utils.rate_limiter import RateLimitException, rate_limit_callback
 from api_service.config.utils.redis_key_builder import my_key_builder
 
 ethereum_router = APIRouter()
@@ -42,8 +44,12 @@ ethereum_router = APIRouter()
 
 @ethereum_router.post(
     "/wallets/create",
+    dependencies=[Depends(RateLimiter(times=2, seconds=60, callback=rate_limit_callback))],
     status_code=status.HTTP_201_CREATED,
-    responses=examples_generate.get_error_responses(auth=True),
+    responses=examples_generate.get_error_responses(
+        RateLimitException,
+        auth=True,
+    ),
     response_model=WalletCreateResponse,
 )
 async def create_wallet(
@@ -61,10 +67,12 @@ async def create_wallet(
 
 @ethereum_router.post(
     "/wallets/import",
+    dependencies=[Depends(RateLimiter(times=2, seconds=30, callback=rate_limit_callback))],
     status_code=status.HTTP_201_CREATED,
     responses=examples_generate.get_error_responses(
         WalletAlreadyExistException,
         InvalidPrivateKeyException,
+        RateLimitException,
         auth=True,
     ),
     response_model=WalletImportResponse,
@@ -131,11 +139,13 @@ async def get_transactions(
 
 @ethereum_router.post(
     "/transactions/send",
+    dependencies=[Depends(RateLimiter(times=1, seconds=5, callback=rate_limit_callback))],
     responses=examples_generate.get_error_responses(
         InvalidSenderException,
         InvalidRecipientException,
         SendTransactionException,
         InvalidValueException,
+        RateLimitException,
         auth=True,
     ),
     response_model=TransactionCreateResponse,
