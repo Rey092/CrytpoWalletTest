@@ -100,17 +100,21 @@ class EthereumManager(BaseCryptoManager):
         addresses = [wallet.address for wallet in wallets]
         checked_transactions = await self.ethereum_provider.get_transactions_from_block(block_hash, addresses)
         if checked_transactions:
+            # clear cache
             delete_cache_list = [txn["to"] for txn in checked_transactions if txn["to"] in addresses]
             [delete_cache_list.append(txn["from"]) for txn in checked_transactions if txn["from"] in addresses]
             await self.clear_cache(delete_cache_list)
+            # create txn in db
             transactions = await self.etherscan_client.get_result({"result": checked_transactions})
             await self.ethereum_db.create_transaction(db, transactions)
+
             couples_for_update_balance = [
                 (wallet, transaction)
                 for wallet in wallets
                 for transaction in transactions
                 if wallet.address.lower() == transaction["address_to"].lower()
             ]
+            # publish new message
             message = [
                 {
                     "address_to": couple[1]["address_to"],
@@ -120,10 +124,16 @@ class EthereumManager(BaseCryptoManager):
                 }
                 for couple in couples_for_update_balance
             ]
+            # remove duplicates txn im message
+            for obj in message:
+                for obj_ in message[1:]:
+                    if obj["txn_hash"] == obj_["txn_hash"]:
+                        message.remove(obj_)
             await self.api_service_producer.publish_message(
                 exchange_name="new_transactions_exchange",
                 message=message,
             )
+            # update balances
             await self.ethereum_db.update_wallet_balance_by_transaction(db, couples_for_update_balance)
 
     async def get_all_wallets(self, db: Session) -> List[Wallet]:

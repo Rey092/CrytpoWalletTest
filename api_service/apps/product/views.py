@@ -2,6 +2,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
+from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -17,6 +18,7 @@ from api_service.apps.product.schemas import OrderCreate, OrderDetail, ProductCr
 from api_service.apps.users.models import User
 from api_service.apps.users.user import get_current_user, get_current_user_payload
 from api_service.config.storage import StorageException, ValidateFormatException
+from api_service.config.utils.rate_limiter import RateLimitException, rate_limit_callback
 
 product_router = APIRouter()
 
@@ -41,12 +43,14 @@ async def get_products(
 
 @product_router.post(
     "/products/create",
+    dependencies=[Depends(RateLimiter(times=2, seconds=10, callback=rate_limit_callback))],
     status_code=status.HTTP_201_CREATED,
     responses=examples_generate.get_error_responses(
         InvalidPriceException,
         InvalidWalletException,
         ValidateFormatException,
         StorageException,
+        RateLimitException,
         auth=True,
     ),
     response_model=ProductDetail,
@@ -87,11 +91,13 @@ async def get_my_orders(
 
 @product_router.post(
     "/orders/create",
+    dependencies=[Depends(RateLimiter(times=1, seconds=5, callback=rate_limit_callback))],
     status_code=status.HTTP_201_CREATED,
     responses=examples_generate.get_error_responses(
         InvalidProductException,
         InvalidWalletException,
         InvalidBalanceException,
+        RateLimitException,
         auth=True,
     ),
     response_model=OrderDetail,

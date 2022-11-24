@@ -139,7 +139,7 @@ Crypto Wallet | IBay
 
                         <div>
                             <label for="product_address" class="form-label mt-75">Кошелёк</label>
-                            <select name="product_address" style="min-width: 380px" id="product_address" class="hide-search form-select select2-hidden-accessible"></select>
+                            <select name="product_address" id="product_address" class="hide-search select2 form-select select2-hidden-accessible"></select>
                         </div>
 
                         <label for="product_price" class="form-label mt-75">Цена</label>
@@ -214,7 +214,11 @@ Crypto Wallet | IBay
                     })
                 }
             },
-            error: function (response) {}
+            error: function (response) {
+                if (response.status === 401) {
+                    location.reload()
+                }
+            }
         })
     }
 
@@ -352,6 +356,14 @@ Crypto Wallet | IBay
                             )
                         }
                     }
+                    if (response.status === 401) {
+                        location.reload()
+                    }
+                    if (response.status === 429) {
+                        let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                        default_toastr()
+                        toastr.warning('Слишком много запросов. Повторить через ' + time + ' сек.', 'Ограничение запросов')
+                    }
                 },
                 cache: false,
                 contentType: false,
@@ -390,6 +402,18 @@ Crypto Wallet | IBay
                 required: "Это поле обязательно к заполнению."
             }
         },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('error');
+            if ($(element).parent().hasClass('input-group')) {
+                $(element).parent().addClass('is-invalid');
+            }
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('error');
+            if ($(element).parent().hasClass('input-group')) {
+                $(element).parent().removeClass('is-invalid');
+            }
+        }
     });
 
     // reset jquery validate for form
@@ -419,14 +443,14 @@ Crypto Wallet | IBay
     // get allowed wallets for create order
     function get_allowed_wallets(value) {
         product_id = value
+        $('#buy_' + value).attr('disabled', false)
+        $('#wallet_error_' + value).css('display', 'none')
         $('#wallet_address_' + value).find('option').remove()
         let price_of_product = +$('.wallets_select_label_' + value).attr('id')
-        console.log('try get wallets')
         $.ajax({
             type: "GET",
             url: "/api/ethereum/wallets",
             success: function (response) {
-                console.log(response)
                 $(response).each(function (index, wallet) {
                     if (+wallet.balance > price_of_product){
                         $('#wallet_address_' + value).append(
@@ -444,7 +468,9 @@ Crypto Wallet | IBay
                 }
             },
             error: function (response) {
-                console.log('error for get wallets')
+                if (response.status === 401) {
+                    location.reload()
+                }
             }
         })
     }
@@ -499,6 +525,14 @@ Crypto Wallet | IBay
                             'Ошибка'
                         )
                     }
+                }
+                if (response.status === 401) {
+                    location.reload()
+                }
+                if (response.status === 429) {
+                    let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                    default_toastr()
+                    toastr.warning('Слишком много запросов. Повторить через ' + time + ' сек.', 'Ограничение запросов')
                 }
             }
         })
