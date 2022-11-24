@@ -114,9 +114,11 @@ Crypto Wallet | My Wallets
                 popoverTriggerList.map(function (popoverTriggerEl) {
                   return new bootstrap.Popover(popoverTriggerEl)
                 })
+                if (!$('#chat_link').hasClass('disabled')) {
+                    $("#chat_link").popover('dispose')
+                }
             },
-            error: function (response) {
-            }
+            error: function (response) {}
         })
         $('.content-wrapper').fadeIn("normal")
     });
@@ -272,6 +274,14 @@ Crypto Wallet | My Wallets
                                 )
                             }
                         }
+                        if (response.status === 401) {
+                            location.reload()
+                        }
+                        if (response.status === 429) {
+                            let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                            default_toastr()
+                            toastr.warning('Слишком много запросов. Повторить через ' + time + ' сек.', 'Ограничение запросов')
+                        }
                     }
                 })
             },
@@ -329,6 +339,9 @@ Crypto Wallet | My Wallets
                 render_wallet_transaction(response)
             },
             error: function (response) {
+                if (response.status === 401) {
+                    location.reload()
+                }
             }
         })
     }

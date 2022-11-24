@@ -12,6 +12,7 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_helper import DefaultHTTPException
 from fastapi_helper.exceptions.validation_exceptions import init_validation_handler
+from fastapi_limiter import FastAPILimiter
 from starlette.staticfiles import StaticFiles
 
 from api_service.api_service_consumer import consumer_thread
@@ -116,6 +117,7 @@ app = create_app()
 async def startup():
     redis = await get_redis()
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    await FastAPILimiter.init(redis)
 
 
 @app.exception_handler(DefaultHTTPException)

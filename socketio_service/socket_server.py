@@ -44,7 +44,6 @@ async def disconnect(sid):
         )
 
 
-
 # region Wallets
 @sio.event
 async def new_transactions(sid, data):
@@ -73,6 +72,11 @@ async def new_order(sid, data):
 @sio.event
 async def update_order(sid, data):
     await sio.emit("front_update_order", data)
+
+
+@sio.event
+async def returned_transaction(sid, data):
+    await sio.emit("front_returned_transaction", data)
 
 
 # endregion IBay

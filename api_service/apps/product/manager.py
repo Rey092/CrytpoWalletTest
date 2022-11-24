@@ -125,16 +125,26 @@ class ProductManager:
         txn_hash = await self.ethereum_provider.send_raw_transaction(transaction_create, updated_order.product.wallet)
         await self.product_db.update_wallet_balance(db, updated_order.product.wallet, updated_value)
 
-        if txn_hash:
-            updated_order.status = "RETURN"
-            updated_order.txn_hash_return = txn_hash
-            await self.product_db.update_order(db, updated_order)
-            message = {
-                "order": str(updated_order.id),
-                "status": "RETURN",
-                "txnHashReturn": txn_hash,
-            }
-            await self.api_service_producer.publish_message(
-                exchange_name="order_return_exchange",
-                message=message,
-            )
+        updated_order.status = "RETURN"
+        updated_order.txn_hash_return = txn_hash
+        await self.product_db.update_order(db, updated_order)
+
+        order_return_message = {
+            "order": str(updated_order.id),
+            "status": "RETURN",
+            "txnHashReturn": txn_hash,
+        }
+        await self.api_service_producer.publish_message(
+            exchange_name="order_return_exchange",
+            message=order_return_message,
+        )
+
+        txn_return_message = {
+            "address_from": updated_order.product.wallet.address,
+            "value": updated_value,
+            "txn_hash": txn_hash,
+        }
+        await self.api_service_producer.publish_message(
+            exchange_name="txn_return_exchange",
+            message=txn_return_message,
+        )
