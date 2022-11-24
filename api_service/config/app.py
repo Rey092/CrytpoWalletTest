@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# import os
 import pathlib
 from typing import List
 
@@ -24,12 +23,7 @@ from api_service.config.costum_logging import CustomizeLogger
 from api_service.config.db import engine
 from api_service.config.openapi import metadata_tags
 from api_service.config.router import api_router
-from services.redis.dependency import get_redis
-
-# from config.settings import settings
-
-# from starlette.staticfiles import StaticFiles
-# from tortoise.contrib.fastapi import register_tortoise
+from services.redis.dependencies import get_redis
 
 
 def init_routers(app_: FastAPI) -> None:
@@ -54,11 +48,6 @@ def make_middleware() -> List[Middleware]:
         # Middleware(SQLAlchemyMiddleware),
     ]
     return middleware
-
-
-def init_cache() -> None:
-    pass
-    # Cache.init(backend=RedisBackend(), key_maker=CustomKeyMaker())
 
 
 def init_logging() -> None:
@@ -89,16 +78,11 @@ def create_app() -> FastAPI:
 
     # app_.celery_app = create_celery()
 
-    # Adds startup and shutdown events.
-    # register_startup_event(app_)
-    # register_shutdown_event(app_)
-
     # Initialize other utils.
     init_routers(app_=app_)
     init_validation_handler(app=app_)
     init_database(app_=app_)
 
-    init_cache()
     init_logging()
 
     # Start needed threads

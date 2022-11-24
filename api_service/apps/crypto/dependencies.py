@@ -9,7 +9,7 @@ from api_service.apps.crypto.manager import EthereumManager
 from api_service.apps.crypto.models import Asset, Transaction, Wallet
 from api_service.apps.crypto.web3_clients import EthereumProviderClient, EtherscanClient
 from api_service.config.db import SessionLocal
-from services.redis.dependency import get_redis
+from services.redis.dependencies import get_redis
 
 
 def get_db():
