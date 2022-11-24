@@ -2,6 +2,7 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi_helper.exceptions.auth_http_exceptions import UnauthorizedException
 from fastapi_helper.schemas.examples_generate import examples_generate
+from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -20,6 +21,7 @@ from api_service.apps.users.schemas import UserLogin, UserLoginResponse, UserLog
 from api_service.apps.users.tasks import update_permission
 from api_service.apps.users.user import get_current_user
 from api_service.config.settings import settings
+from api_service.config.utils.rate_limiter import RateLimitException, rate_limit_callback
 
 auth_router = APIRouter()
 
@@ -34,7 +36,9 @@ auth_router = APIRouter()
         PasswordMismatchException,
         PasswordInvalidException,
         UsernameInvalidException,
+        RateLimitException,
     ),
+    dependencies=[Depends(RateLimiter(times=1, seconds=60, callback=rate_limit_callback))],
 )
 async def register(
     user: schemas.UserRegister,
@@ -70,7 +74,11 @@ async def logout(response: Response, user: User = Depends(get_current_user)):
 @auth_router.post(
     "/login",
     response_model=UserLoginResponse,
-    responses=examples_generate.get_error_responses(auth=True),
+    responses=examples_generate.get_error_responses(
+        RateLimitException,
+        auth=True,
+    ),
+    dependencies=[Depends(RateLimiter(times=2, seconds=5, callback=rate_limit_callback))],
 )
 async def login(
     user: UserLogin,

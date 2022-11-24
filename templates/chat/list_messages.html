@@ -104,7 +104,7 @@ Crypto Wallet|Chat
                                 <div class="input-group input-group-merge me-1 form-send-message">
                                     <span class="speech-to-text input-group-text"><i data-feather="mic"
                                                                                      class="cursor-pointer"></i></span>
-                                    <input type="text" class="form-control message"
+                                    <input type="text" class="form-control message" name="message_text"
                                            placeholder="Введите свое сообщение"/>
                                     <span class="input-group-text">
                                             <small id="file_name"
@@ -115,6 +115,7 @@ Crypto Wallet|Chat
                                                 <i data-feather="image" class="cursor-pointer text-secondary"></i>
                                                 <input type="file" id="file_chat"
                                                        hidden accept="image/*"
+                                                       name="message_image"
                                                        onchange="loadImage(this)">
                                             </label>
                                     </span>
@@ -182,10 +183,9 @@ Crypto Wallet|Chat
 <script>
 
 
-    // sockets events for chat\
+    // sockets events for chat
     socket.on("connect", () => {
-        $("#service_error_connect").css('display', 'none')
-        $('.chat-application').css('display', 'block')
+        connectSuccess()
     });
 
     socket.on('connect_user', (data) => {
@@ -196,19 +196,8 @@ Crypto Wallet|Chat
         renderUsers(data, user_data, false)
     })
 
-    socket.on("connect_error", (error) => {
-        $('.chat-application').css('display', 'none')
-        let img = "{{ url_for('static', path='/app-assets/images/pages/coming-soon.svg') }}"
-        $("#service_error_connect").css('display', 'block')
-        $('#service_error_connect').html(
-            '<div class="w-100 text-center">\n' +
-            '<h2 class="mb-1">Сервис временно недоступен</h2>\n' +
-            '<p class="mb-3">Мы стараемся исправить это как можно скорее</p>\n' +
-            '<img class="img-fluid" ' +
-            'src="' + img + '" ' +
-            'alt="img">' +
-            '</div>'
-        )
+    socket.on("connect_error", () => {
+        connectError()
     });
 
     socket.on('data_user', (data) => {
@@ -230,16 +219,21 @@ Crypto Wallet|Chat
     })
     //
 
+    // global variables
     let def_profile_image = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+    let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
     let chat_image
+    // end
 
     // get all online users
     function getOnlineUser(data) {
-        $(".no-users").css('display', 'block')
-        $(".chat-list-users").empty();
+        let no_users_block = $(".no-users")
+        let chat_list_user_block = $(".chat-list-users")
+        no_users_block.css('display', 'block')
+        chat_list_user_block.empty();
         for (let user of data) {
             if (user.id !== user_data.id) {
-                $(".no-users").css('display', 'none')
+                no_users_block.css('display', 'none')
                 let src = def_profile_image
                 if (user.avatar) {
                     src = file_host + user.avatar
@@ -254,7 +248,7 @@ Crypto Wallet|Chat
                     '     width="42" alt="Generic placeholder image"/>\n' +
                     '     <span class="avatar-status-online"></span>\n' +
                     '</span>'
-                $(".chat-list-users").append(li)
+                chat_list_user_block.append(li)
                 $(".user-profile-toggle:last-child").append(avatar).append(username)
             }
         }
@@ -321,15 +315,30 @@ Crypto Wallet|Chat
 
     // render history in chat
     function renderHistory(data) {
-        let current_date
+        // variables
+        let current_date = new Date().getDate() + '.' + month[new Date().getMonth()]
+        let current_date_in_loop
+        //
+
+        // loop for add messages in chat
         for (let message of data.history.reverse()) {
             let this_date = message.date.split(',')[0]
             let this_time = message.date.split(',')[1]
             let src = def_profile_image
-            if (current_date !== this_date) {
-                let date_divider = '<div class="divider"><div class="divider-text">' + this_date + '</div></div>'
+
+            // date for divider
+            if (current_date_in_loop !== this_date && current_date_in_loop !== 'Сегодня') {
+                let date_divider = '<div class="divider"><div class="divider-text" id="' + this_date + '">' + this_date + '</div></div>'
+                if (current_date === this_date) {
+                    date_divider = '<div class="divider"><div class="divider-text" id="' + this_date + '">Сегодня</div></div>'
+                    this_date = 'Сегодня'
+                }
                 $(".chats").append(date_divider)
             }
+            current_date_in_loop = this_date
+            // end
+
+            // context for message
             if (message.avatar) {
                 src = file_host + message.avatar
             }
@@ -349,6 +358,9 @@ Crypto Wallet|Chat
                 '<img src=' + src + ' + alt="avatar" height="36" width="36"/>\n' +
                 '</span>\n' +
                 '</div>'
+            //
+
+            // add message in chat
             if (message.user_id === data.user.auth.id) {
                 let chat_block = ('.chat-right:last-child')
                 if ($(chat_block).length) {
@@ -368,10 +380,14 @@ Crypto Wallet|Chat
                     $('.user-' + message.user_id + ':last-child .chat-body').append(first_html_message)
                 }
             }
-            current_date = this_date
+            //
         }
+        // end loop
+
+        // fade content
         $(".content-area-wrapper").fadeIn(1000)
         $('.user-chats').scrollTop($('.user-chats > .chats').height());
+        //
     }
 
     // end render history in chat
@@ -400,37 +416,68 @@ Crypto Wallet|Chat
 
     // loads images end
 
-    $(".chat-app-form").submit(function () {
-        let message = $('.message').val();
-        if (/\S/.test(message)) {
-            socket.emit('new_message', {
-                'message': message,
-                'user_id': user_data.id,
-                'image': chat_image,
-                'date': new Date()
-            })
-            $('.message').val('');
-            $('#file_chat_label').attr('title', "Выберите файл (Доступный формат png, jpg, jpeg)")
-            $('#file_name').html('')
-            $('#file_chat').val('')
-            chat_image = null
-        }
+
+    let validator = $(".chat-app-form").validate({
+        submitHandler: function () {
+            let message = $('.message').val();
+            if (/\S/.test(message)) {
+                socket.emit('new_message', {
+                    'message': message,
+                    'user_id': user_data.id,
+                    'image': chat_image,
+                    'date': new Date()
+                })
+                $('.message').val('');
+                $('#file_chat_label').attr('title', "Выберите файл (Доступный формат png, jpg, jpeg)")
+                $('#file_name').html('')
+                $('#file_chat').val('')
+                chat_image = null
+            }
+        },
+        rules: {
+            message_text: {
+                required: true
+            }
+        },
+        messages: {
+            message_text: {
+                required: ''
+            }
+        },
+        errorElement: 'a',
     })
 
     // end send message
 
 
+    // add message
     function addMessage(data) {
+        // variables
+        let current_date = new Date().getDate() + '.' + month[new Date().getMonth()]
         let this_date = data.message.date.split(',')[0]
         let this_time = data.message.date.split(',')[1]
+        let divider_text = $('.divider-text:last')
+        let last_date_month = divider_text.attr('id')
         let src = def_profile_image
         if (data.user.auth.avatar) {
             src = file_host + data.user.auth.avatar
         }
+        // end
+
+        // date for divider
+        if (parseFloat(this_date) !== parseFloat(last_date_month)) {
+            $(".chats").append(
+                '<div class="divider"><div class="divider-text" id="' + current_date + ' ">Сегодня</div></div>'
+            )
+            divider_text.html(last_date_month)
+
+        }
+        // end
+
+        // context for message
         let username = '<p style="color: #0a6aa1">' + data.user.auth.username + '</p>'
         let html_message = '<div class="chat-content">' + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px;">' + this_time + '</small>' + '</p>' + '</div>';
         let first_html_message = '<div class="chat-content">' + username + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px;">' + this_time + '</small>' + '</p>' + '</div>'
-
         if (data.message.image) {
             let message_image = '<img src="' + file_host + data.message.image + '" alt="image" height="200" width="200" class="message-image">'
             html_message = '<div class="chat-content">' + message_image + '<p>' + data.message.message + ' ' + '<small style="color: #D8D8D8; float: right; margin-left: 5px;">' + this_time + '</small>' + '</p>' + '</div>';
@@ -444,6 +491,9 @@ Crypto Wallet|Chat
             '<img src=' + src + ' + alt="avatar" height="36" width="36"/>\n' +
             '</span>\n' +
             '</div>'
+        // end
+
+        // add message in chat
         if (data.message.user_id === user_data.id) {
             let chat_block = ('.chat-right:last-child')
             if ($(chat_block).length) {
@@ -464,8 +514,37 @@ Crypto Wallet|Chat
             }
         }
         $('.user-chats').scrollTop($('.user-chats > .chats').height());
+        //
 
     }
+
+    // end add message
+
+    // connect error
+    function connectError() {
+        $('.chat-application').css('display', 'none')
+        let img = "{{ url_for('static', path='/app-assets/images/pages/coming-soon.svg') }}"
+        $("#service_error_connect").css('display', 'block')
+        $('#service_error_connect').html(
+            '<div class="w-100 text-center">\n' +
+            '<h2 class="mb-1">Сервис временно недоступен</h2>\n' +
+            '<p class="mb-3">Мы стараемся исправить это как можно скорее</p>\n' +
+            '<img class="img-fluid" ' +
+            'src="' + img + '" ' +
+            'alt="img">' +
+            '</div>'
+        )
+    }
+
+    // end connect error
+
+    // connect success
+    function connectSuccess() {
+        $("#service_error_connect").css('display', 'none')
+        $('.chat-application').css('display', 'block')
+    }
+
+    // end connect success
 
 
 </script>

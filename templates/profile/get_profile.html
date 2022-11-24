@@ -577,6 +577,10 @@ Crypto Wallet|Profile
                             'Ошибка'
                         )
                     }
+                    if (response.status === 429) {
+                        let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                        toastr.warning('Слишком много запросов. Повторить через ' + time + ' сек.', 'Ограничение запросов')
+                    }
                 }
             })
         },
@@ -602,7 +606,6 @@ Crypto Wallet|Profile
 
     $("#addNewWallet").submit(function (e) {
         e.preventDefault();
-        $("button[type='reset']").trigger('click');
         $.ajax({
             type: "POST",
             url: "/api/ethereum/wallets/create",
@@ -619,15 +622,19 @@ Crypto Wallet|Profile
                     "      </a>\n" +
                     "</div>"
                 )
-
                 toastr.success('Добавлен новый кошелек', 'Успех')
+                $("button[type='reset']").trigger('click');
+
 
             },
             error: function (response) {
                 if (response.status === 401) {
                     location.reload()
                 }
-                console.log(response)
+                if (response.status === 429) {
+                    let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                    toastr.warning('Слишком много запросов. Повторить через ' + time + ' сек.', 'Ограничение запросов')
+                }
             }
         })
     });
