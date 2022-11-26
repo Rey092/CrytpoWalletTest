@@ -135,13 +135,9 @@ class EthereumDatabase(BaseCryptoDatabase):
             )
             db.add(db_transaction)
             try:
-                # TODO: remove print
-                print("before commit")
                 db.commit()
                 db.refresh(db_transaction)
-                print("ok")
-            except Exception as ex:
-                print(str(ex))
+            except Exception:
                 db.rollback()
 
     async def get_transactions(self, db: Session, address: str) -> List[Transaction]:

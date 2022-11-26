@@ -70,7 +70,8 @@ Crypto Wallet | IBay
 
 
 {% block content %}
-<div class="app-content content ">
+<div class="app-content content" id="service_error_connect" style="display: none;"></div>
+<div class="app-content content ibay_app">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper container-xxl p-0" style="display: none;">
@@ -643,6 +644,40 @@ Crypto Wallet | IBay
     socket.on("front_update_order", function (data) {
         update_order(data)
     })
+
+    socket.on("connect", () => {
+        connectSuccess()
+    });
+
+    socket.on("connect_error", () => {
+        connectError()
+    });
+
+    // connect error
+    function connectError() {
+        $('.ibay_app').css('display', 'none')
+        let img = "{{ url_for('static', path='/app-assets/images/pages/coming-soon.svg') }}"
+        $("#service_error_connect").css('display', 'block')
+        $('#service_error_connect').html(
+            '<div class="w-100 text-center">\n' +
+            '<h2 class="mb-1">Сервис временно недоступен</h2>\n' +
+            '<p class="mb-3">Мы стараемся исправить это как можно скорее</p>\n' +
+            '<img class="img-fluid" ' +
+            'src="' + img + '" ' +
+            'alt="img">' +
+            '</div>'
+        )
+    }
+
+    // end connect error
+
+    // connect success
+    function connectSuccess() {
+        $("#service_error_connect").css('display', 'none')
+        $('.ibay_app').css('display', 'block')
+    }
+
+    // end connect success
 
 </script>
 {% endblock %}

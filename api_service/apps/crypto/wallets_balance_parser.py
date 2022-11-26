@@ -14,6 +14,8 @@ async def parsing_balance():
     ethereum_manager = await get_ethereum_manager()
     producer = await get_api_service_producer()
 
+    logger.info("[*] Wallets balance parser started")
+
     while True:
         await asyncio.sleep(120)
         wallets = await ethereum_manager.get_all_wallets(db)

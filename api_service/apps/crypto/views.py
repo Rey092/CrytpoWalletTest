@@ -37,7 +37,7 @@ from api_service.apps.crypto.schemas import (
 from api_service.apps.users.models import User
 from api_service.apps.users.user import get_current_user_payload
 from api_service.config.utils.rate_limiter import RateLimitException, rate_limit_callback
-from api_service.config.utils.redis_key_builder import my_key_builder
+from services.redis.redis_key_builder import my_key_builder
 
 ethereum_router = APIRouter()
 
@@ -133,7 +133,7 @@ async def get_transactions(
     if cache:
         return json.loads(cache)
     transactions = await ethereum_manager.get_transactions_by_wallet_address(db, wallet_address)
-    await cache_backend.set(cache_key, cache_coder.encode(transactions))
+    await cache_backend.set(cache_key, cache_coder.encode(transactions), expire=60 * 60 * 2)
     return transactions
 
 
