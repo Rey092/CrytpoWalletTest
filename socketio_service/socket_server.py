@@ -124,12 +124,4 @@ async def update_permission(sid, data):
     await sio.emit("open_chat", data)
 
 
-# @sio.event
-# async def writes_message(sid, data):
-#     await sio.emit(
-#         "writes_message",
-#         {"sid": sid},
-#         room='chat_users'
-#     )
-
 # endregion Chat

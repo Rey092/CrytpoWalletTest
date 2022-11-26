@@ -19,6 +19,7 @@ from api_service.apps.admin.auto_sqladmin import init_sqladmin
 from api_service.apps.crypto.wallets_balance_parser import parsing_balances_thread
 from api_service.apps.front.router import front_router
 from api_service.apps.users import models
+from api_service.config.celery_utils import create_celery
 from api_service.config.costum_logging import CustomizeLogger
 from api_service.config.db import engine
 from api_service.config.openapi import metadata_tags
@@ -76,7 +77,7 @@ def create_app() -> FastAPI:
         openapi_tags=metadata_tags,
     )
 
-    # app_.celery_app = create_celery()
+    app_.celery_app = create_celery()
 
     # Initialize other utils.
     init_routers(app_=app_)
