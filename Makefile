@@ -22,3 +22,7 @@ run_eth:
 
 run_ibay:
 	uvicorn ibay_service.config.app:app --reload --port 8001
+
+
+start_worker:
+	celery -A celery worker --loglevel=info

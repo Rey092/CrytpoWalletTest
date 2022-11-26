@@ -1,24 +1,17 @@
 # -*- coding: utf-8 -*-
+from celery import Celery
 
-import services  # noqa
+from api_service.config.settings import settings
 
-# from apps.users.tasks import save_balance_task
+celery_app = Celery(
+    "worker",
+    backend=str(settings.redis_url),
+    broker=str(settings.redis_url),
+)
 
-# from celery.schedules import crontab
 
-
-# from config.app import app  # noqa
-
-
-# celery_app = Celery(
-#     "worker",
-#     backend=str(settings.redis_url),
-#     broker=str(settings.redis_url),
-# )
-#
 # celery_app.conf.update(task_track_started=True)
 # celery_app.autodiscover_tasks(["apps.users.tasks"])
-
 
 # @celery_app.on_after_configure.connect
 # def setup_periodic_tasks(sender, **kwargs):
