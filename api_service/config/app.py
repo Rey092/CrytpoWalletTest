@@ -85,10 +85,6 @@ def create_app() -> FastAPI:
 
     init_logging()
 
-    # Start needed threads
-    consumer_thread.start()
-    parsing_balances_thread.start()
-
     app_.mount("/static", StaticFiles(directory="static"), name="static")
 
     return app_
@@ -102,6 +98,18 @@ async def startup():
     redis = await get_redis()
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     await FastAPILimiter.init(redis)
+
+    # Start needed threads
+    if not await redis.get("threads_running"):
+        await redis.set("threads_running", 1)
+        consumer_thread.start()
+        parsing_balances_thread.start()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    redis = await get_redis()
+    await redis.delete("threads_running")
 
 
 @app.exception_handler(DefaultHTTPException)
