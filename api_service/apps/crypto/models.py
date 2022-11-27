@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from api_service.apps.crypto.enums import AssetCode, AssetNetwork, AssetStandard, AssetType, TransactionFee
+from api_service.apps.product.models import Product
 from api_service.config.db import Base
 
 
@@ -35,7 +36,7 @@ class Wallet(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
     date_created = Column(DateTime)
 
-    products = relationship("Product", backref="wallet")
+    products = relationship(Product, backref="wallet")
 
     __table_args__ = (UniqueConstraint("user_id", "private_key"),)
 

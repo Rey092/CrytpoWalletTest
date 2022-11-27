@@ -189,7 +189,7 @@ class UserManager:
             access_token = self.jwt_backend.create_access_token(payload, True)
         return user, access_token
 
-    async def update_permission(self, user_id: UUID, db: Session):
+    async def update_permission(self, user_id: str, db: Session):
         """
         :param user_id:
         :param db:
@@ -198,7 +198,8 @@ class UserManager:
         message = {
             "user_id": user_id,
         }
-        await self.user_db.change_access_chat_permission(user_id, db)
+        users_id: UUID = UUID(user_id)
+        await self.user_db.change_access_chat_permission(users_id, db)
         await self.producer.publish_message(
             exchange_name="update_permission_exchange",
             message=message,
