@@ -98,7 +98,7 @@ async def startup():
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     await FastAPILimiter.init(redis)
 
-    # Start needed threads
+    # # Start needed threads
     # if not await redis.get("threads_running"):
     #     await redis.set("threads_running", 1)
     #     consumer_thread.start()
