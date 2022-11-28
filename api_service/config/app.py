@@ -14,9 +14,7 @@ from fastapi_helper.exceptions.validation_exceptions import init_validation_hand
 from fastapi_limiter import FastAPILimiter
 from starlette.staticfiles import StaticFiles
 
-from api_service.api_service_consumer import consumer_thread
 from api_service.apps.admin.auto_sqladmin import init_sqladmin
-from api_service.apps.crypto.wallets_balance_parser import parsing_balances_thread
 from api_service.apps.front.router import front_router
 from api_service.apps.users import models
 from api_service.config.celery_utils import create_celery
@@ -100,11 +98,11 @@ async def startup():
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     await FastAPILimiter.init(redis)
 
-    # Start needed threads
-    if not await redis.get("threads_running"):
-        await redis.set("threads_running", 1)
-        consumer_thread.start()
-        parsing_balances_thread.start()
+    # # Start needed threads
+    # if not await redis.get("threads_running"):
+    #     await redis.set("threads_running", 1)
+    #     consumer_thread.start()
+    #     parsing_balances_thread.start()
 
 
 @app.on_event("shutdown")

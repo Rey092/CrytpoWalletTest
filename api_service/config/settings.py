@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     # Site (or project) name
     site_name: str = "Test"
     # Base URL for the API.
-    backend_url: str = "https://google.com"
+    backend_url: str = "http://127.0.0.1:8000"
     # The site name.
     frontend_url: str = "https://google.com"
     # quantity of workers for uvicorn
