@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi_helper.exceptions.auth_http_exceptions import UnauthorizedException
 from fastapi_helper.schemas.examples_generate import examples_generate
@@ -38,7 +39,7 @@ auth_router = APIRouter()
         UsernameInvalidException,
         RateLimitException,
     ),
-    dependencies=[Depends(RateLimiter(times=1, seconds=60, callback=rate_limit_callback))],
+    dependencies=[Depends(RateLimiter(times=4, seconds=60, callback=rate_limit_callback))],
 )
 async def register(
     user: schemas.UserRegister,
@@ -49,12 +50,13 @@ async def register(
 ):
     result = await user_manager.create(user, db, background_tasks)
     result[0]["access_token"] = result[-1]
-    background_tasks.add_task(update_permission, result[0]["id"], db, user_manager)
+    user_id = result[0]["id"]
     response.set_cookie(
         key="Authorization",
         value=f'Bearer {result[0]["access_token"]}',
         expires=settings.jwt_access_not_expiration,
     )
+    update_permission.apply_async(args=(user_id,), countdown=60)
     return result[0]
 
 
@@ -78,7 +80,7 @@ async def logout(response: Response, user: User = Depends(get_current_user)):
         RateLimitException,
         auth=True,
     ),
-    dependencies=[Depends(RateLimiter(times=2, seconds=5, callback=rate_limit_callback))],
+    dependencies=[Depends(RateLimiter(times=2, seconds=10, callback=rate_limit_callback))],
 )
 async def login(
     user: UserLogin,

@@ -60,6 +60,14 @@ class Settings(BaseSettings):
     postgres_db: str
     postgres_echo: bool = False
 
+    # Variables the database for testing
+    test_postgres_host: str = "localhost"
+    test_postgres_port: int = 5432
+    test_postgres_user: str
+    test_postgres_password: str
+    test_postgres_db: str
+    test_postgres_echo: bool = False
+
     # Variables for Redis
     redis_host: str
     redis_port: int
@@ -106,9 +114,9 @@ class Settings(BaseSettings):
     spaces_secret_key: str
     spaces_region_name: str
 
-    # superuser for sqladmin
-    superuser_username: str
-    superuser_password: str
+    # user for testing
+    user_email: str
+    user_password: str
 
     @property
     def db_url(self) -> URL:
@@ -125,6 +133,23 @@ class Settings(BaseSettings):
             user=self.postgres_user,
             password=self.postgres_password,
             path=f"/{self.postgres_db}",
+        )
+
+    @property
+    def test_db_url(self) -> URL:
+        """
+        Assemble database URL from settings.
+
+        :return: database URL.
+
+        """
+        return URL.build(
+            scheme="postgresql",
+            host=self.test_postgres_host,
+            port=self.test_postgres_port,
+            user=self.test_postgres_user,
+            password=self.test_postgres_password,
+            path=f"/{self.test_postgres_db}",
         )
 
     @property
