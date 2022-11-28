@@ -24,4 +24,4 @@ run_ibay:
 
 
 start_worker:
-	celery -A celery worker --loglevel=info
+	celery -A api_service.config.celery worker --loglevel=info
