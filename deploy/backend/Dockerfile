@@ -1,4 +1,4 @@
-FROM python:3.10 as base
+FROM python:3.8 as base
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
@@ -24,8 +24,8 @@ WORKDIR $PYTHONPATH
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
 ENV PATH "/root/.local/bin:$PATH"
 
-COPY pyproject.toml poetry.lock ./
+COPY ../../pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.in-project true --local
 RUN poetry install --no-root --only main --no-interaction --no-ansi
 
-COPY . .
+COPY ../.. .

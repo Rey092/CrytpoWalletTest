@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+
+  db:
+    build:
+      context: ./deploy/postgres
+      dockerfile: Dockerfile
+    volumes:
+      - ./deploy/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+
+  api_web:
+    build:
+      context: ./deploy/backend
+      dockerfile: Dockerfile
+    command: make run
+    volumes:
+      - static_volume:/usr/src/app/static
+    depends_on:
+      - db
+
+#  ibay_web:
+#    command: make run_ibay
+#    depends_on:
+#      - api_web
+
+volumes:
+  static_volume:

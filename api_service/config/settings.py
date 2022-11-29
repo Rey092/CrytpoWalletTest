@@ -115,6 +115,7 @@ class Settings(BaseSettings):
     spaces_region_name: str
 
     # user for testing
+    username: str
     user_email: str
     user_password: str
 

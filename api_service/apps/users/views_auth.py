@@ -80,7 +80,7 @@ async def logout(response: Response, user: User = Depends(get_current_user)):
         RateLimitException,
         auth=True,
     ),
-    dependencies=[Depends(RateLimiter(times=2, seconds=10, callback=rate_limit_callback))],
+    dependencies=[Depends(RateLimiter(times=4, seconds=10, callback=rate_limit_callback))],
 )
 async def login(
     user: UserLogin,
