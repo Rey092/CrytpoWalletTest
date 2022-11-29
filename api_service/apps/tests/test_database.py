@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from api_service.config.settings import settings
 
 SQLALCHEMY_DATABASE_URL = str(settings.test_db_url)

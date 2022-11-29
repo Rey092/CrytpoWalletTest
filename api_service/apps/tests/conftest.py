@@ -10,10 +10,10 @@ from sqlalchemy.orm import Session
 
 from api_service.apps.tests.test_database import SQLALCHEMY_DATABASE_URL
 from api_service.apps.users.dependencies import get_db
-from api_service.apps.users.schemas import UserLogin, UserLoginResponse
+from api_service.apps.users.schemas import UserRegister, UserRegisterResponse
 from api_service.config.app import app
 from api_service.config.commands.init import ProjectInitialization
-from api_service.config.db import Base
+from api_service.config.db import Base, SessionLocal
 from api_service.config.settings import settings
 
 
@@ -24,12 +24,12 @@ def db_engine():
     yield engine
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def db(db_engine):
     connection = db_engine.connect()
 
     # begin a non-ORM transaction
-    # transaction = connection.begin()
+    connection.begin()
 
     # bind an individual Session to the connection
     db = Session(bind=connection)
@@ -52,7 +52,7 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def fastapi_app() -> FastAPI:
     """
     Fixture for creating FastAPI app.
@@ -66,11 +66,12 @@ async def fastapi_app() -> FastAPI:
     return app
 
 
-@pytest.fixture
-async def client(db, fastapi_app: FastAPI) -> AsyncClient:
+@pytest.fixture(scope="session")
+async def client(db: SessionLocal, fastapi_app: FastAPI) -> AsyncClient:
     """
     Fixture for creating HTTP client.
 
+    :param db: Session of DB
     :param fastapi_app: FastAPI app.
     :return: HTTPX async client.
 
@@ -88,20 +89,20 @@ async def user_token(
     client: AsyncClient,
 ) -> AsyncGenerator:
     """
-    Fixture for login as superuser and get tokens.
+    Fixture for create user and get token.
     """
-    # prepare data
-    data = UserLogin(
+    data = UserRegister(
         email=settings.user_email,
-        password=settings.user_password,
-        remember_me=True,
+        username="Test User",
+        password1=settings.user_password,
+        password2=settings.user_password,
     )
 
-    # post data
-    # url = fastapi_app.url_path_for("crm_auth:login")
-    response = await client.post("/api/auth/login", json=data.dict())
-    assert response.status_code == 200
-    yield UserLoginResponse(**response.json())
+    url = fastapi_app.url_path_for("register")
+    response = await client.post(url, json=data.dict())
+    # TODO: if user already registered -- failing tests(status 400 Email already exist)
+    assert response.status_code == 201
+    yield UserRegisterResponse(**response.json())
 
 
 # @pytest.fixture(autouse=True)
