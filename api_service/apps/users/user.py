@@ -14,10 +14,15 @@ from api_service.apps.users.schemas import UserPayload
 async def get_current_user_payload(
     token: str = Depends(auth_bearer),
     jwt_backend: JWTBackend = Depends(get_jwt_backend),
+    manager: UserManager = Depends(get_user_manager),
+    db: Session = Depends(get_db),
 ) -> UserPayload:
     try:
         payload = await jwt_backend.decode_token(token)
         if payload is None:
+            raise InvalidCredentialsException()
+        user = await manager.get_user(user_id=payload.get("id"), db=db)
+        if not user:
             raise InvalidCredentialsException()
         return UserPayload(**payload, token=token)
     except Exception:
@@ -29,4 +34,7 @@ async def get_current_user(
     manager: UserManager = Depends(get_user_manager),
     db: Session = Depends(get_db),
 ) -> User:
-    return await manager.get_user(user_id=payload.id, db=db)
+    user = await manager.get_user(user_id=payload.id, db=db)
+    if not user:
+        raise InvalidCredentialsException()
+    return user

@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+
+  db:
+    build:
+      context: ./deploy/postgres
+      dockerfile: Dockerfile
+    volumes:
+      - ./deploy/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+
+  api_web:
+    build:
+      context: ./
+      dockerfile: deploy/backend/Dockerfile
+    command: poetry run make run-prod
+    ports:
+      - "8000:8000"
+    volumes:
+      - static_volume:/usr/src/app/static
+    depends_on:
+      - db
+
+  redis:
+    image: 'redis:alpine'
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: poetry run make start_worker
+    depends_on:
+      - api_web
+      - redis
+
+
+  rabbitmq:
+    image: rabbitmq:3.9.13-management-alpine
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+    depends_on:
+      - api_web
+
+
+#  eth_web:
+#    command: poetry run run_eth
+#    depends_on:
+#      - api_web
+
+
+volumes:
+  static_volume:

@@ -53,7 +53,9 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
 
     # Variables for the database
-    postgres_host: str = "localhost"
+    # postgres_host: str = "localhost"
+    postgres_host: str = "db"
+
     postgres_port: int = 5432
     postgres_user: str
     postgres_password: str
@@ -69,7 +71,8 @@ class Settings(BaseSettings):
     test_postgres_echo: bool = False
 
     # Variables for Redis
-    redis_host: str
+    # redis_host: str
+    redis_host: str = "redis"
     redis_port: int
     redis_user: Optional[str] = None
     redis_pass: Optional[str] = None
@@ -77,7 +80,8 @@ class Settings(BaseSettings):
     redis_pool_size: int
 
     # Variables for RabbitMQ
-    rabbit_host: str = "localhost"
+    # rabbit_host: str = "localhost"
+    rabbit_host: str = "rabbitmq"
     rabbit_port: int = 5672
     rabbit_user: str = "guest"
     rabbit_pass: str = "guest"
@@ -115,6 +119,7 @@ class Settings(BaseSettings):
     spaces_region_name: str
 
     # user for testing
+    username: str
     user_email: str
     user_password: str
 
