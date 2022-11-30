@@ -34,10 +34,15 @@ auth_front_bearer = FrontEndBearerCookie()
 async def check_user_token(
     token: str = Depends(auth_front_bearer),
     jwt_backend: JWTBackend = Depends(get_jwt_backend),
+    manager: UserManager = Depends(get_user_manager),
+    db: Session = Depends(get_db),
 ):
     try:
         payload = await jwt_backend.decode_token(token)
         if payload is None:
+            return None
+        user = await manager.get_user(user_id=payload.get("id"), db=db)
+        if not user:
             return None
         return UserPayload(**payload)
     except Exception:

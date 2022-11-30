@@ -25,3 +25,10 @@ run_ibay:
 
 start_worker:
 	celery -A api_service.config.celery worker --loglevel=info
+
+
+
+# prod
+
+run-prod:
+	uvicorn api_service.config.app:app --host 0.0.0.0 --workers 2

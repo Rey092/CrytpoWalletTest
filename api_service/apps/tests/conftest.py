@@ -107,3 +107,18 @@ async def user_token(
     response = await client.post(url, json=data.dict())
     assert response.status_code == 200
     yield UserLoginResponse(**response.json())
+
+
+@pytest.fixture(scope="session")
+async def get_user_data(
+    fastapi_app: FastAPI,
+) -> AsyncGenerator:
+    """
+    Fixture for get user data.
+    """
+    data = UserLogin(
+        email=settings.user_email,
+        password=settings.user_password,
+        remember_me=True,
+    )
+    yield data

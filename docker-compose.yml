@@ -13,18 +13,42 @@ services:
 
   api_web:
     build:
-      context: ./deploy/backend
-      dockerfile: Dockerfile
-    command: make run
+      context: ./
+      dockerfile: deploy/backend/Dockerfile
+    command: poetry run make run-prod
+    ports:
+      - "8000:8000"
     volumes:
       - static_volume:/usr/src/app/static
     depends_on:
       - db
 
-#  ibay_web:
-#    command: make run_ibay
+  redis:
+    image: 'redis:alpine'
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: poetry run make start_worker
+    depends_on:
+      - api_web
+      - redis
+
+
+  rabbitmq:
+    image: rabbitmq:3.9.13-management-alpine
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+    depends_on:
+      - api_web
+
+
+#  eth_web:
+#    command: poetry run run_eth
 #    depends_on:
 #      - api_web
+
 
 volumes:
   static_volume:

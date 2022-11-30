@@ -4,38 +4,35 @@ from fastapi import FastAPI
 from httpx import AsyncClient
 
 from api_service.apps.users.schemas import UserLogin, UserLoginResponse
-from api_service.config.settings import settings
 
 
 @pytest.mark.anyio
-async def test_login(client: AsyncClient, fastapi_app: FastAPI):
-    data = UserLogin(
-        email=settings.user_email,
-        password=settings.user_password,
-        remember_me=True,
-    )
-
+async def test_login_200(client: AsyncClient, fastapi_app: FastAPI, get_user_data: UserLogin):
     url = fastapi_app.url_path_for("login")
     response = await client.post(
         url,
-        json=data.dict(),
+        json=get_user_data.dict(),
     )
-
-    # 200
     assert response.status_code == 200
     assert UserLoginResponse(**response.json())
 
-    # 422
+
+@pytest.mark.anyio
+async def test_login_401(client: AsyncClient, fastapi_app: FastAPI, get_user_data: UserLogin):
+    url = fastapi_app.url_path_for("login")
+    get_user_data.password = "12345"
+    response = await client.post(
+        url,
+        json=get_user_data.dict(),
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_login_422(client: AsyncClient, fastapi_app: FastAPI):
+    url = fastapi_app.url_path_for("login")
     response = await client.post(
         url,
         json={},
     )
     assert response.status_code == 422
-
-    # 401
-    data.email = "test3@gmail.com"
-    response = await client.post(
-        url,
-        json=data.dict(),
-    )
-    assert response.status_code == 401
