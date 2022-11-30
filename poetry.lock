@@ -288,6 +288,22 @@ files = [
 ]
 
 [[package]]
+name = "asyncapi-schema-pydantic"
+version = "1.0.0"
+description = "AsyncAPI (v2) specification schema as pydantic class"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "asyncapi-schema-pydantic-1.0.0.tar.gz", hash = "sha256:97ee315249df15ea9c6befc24cdd69e29055ed9c2e5633003b62051005bc97ec"},
+    {file = "asyncapi_schema_pydantic-1.0.0-py3-none-any.whl", hash = "sha256:e811599567ffaeced794cfea6b0a4af283165c09f460f6b45f85318ed2c6cd0e"},
+]
+
+[package.dependencies]
+pydantic = ">=1.8.2"
+PyYAML = "6.0"
+
+[[package]]
 name = "attrs"
 version = "22.1.0"
 description = "Classes Without Boilerplate"
@@ -3422,4 +3438,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "b70ee89cbe2eabfb5f4ca2d405cfbd1502025156003493e9508cf145ddf781dc"
+content-hash = "920670188ff2c2b42359e7180b3a2025e998ac4f1c1c2ee4532b575487b1211e"
