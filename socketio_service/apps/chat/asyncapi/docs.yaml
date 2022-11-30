@@ -1,0 +1,510 @@
+{
+  "asyncapi": "2.3.0",
+  "info": {
+    "title": "Socket.IO chat service",
+    "version": "1.0.0",
+    "description": "Some description"
+  },
+  "servers": {
+    "socketio": {
+      "url": "http://127.0.0.1:8002/ws/socket.io",
+      "protocol": "wss",
+      "protocolVersion": "5",
+      "description": "Socketio development server"
+    },
+    "rabbitmq": {
+      "url": "amqp://localhost:5672",
+      "protocol": "amqp",
+      "protocolVersion": "0.9.1",
+      "description": "RabbitMQ development server"
+    }
+  },
+  "channels": {
+    "connect": {
+      "description": "This channel is used for connecting users",
+      "subscribe": {
+        "summary": "Server got new connection.",
+        "message": {
+          "$ref": "#/components/messages/UserData"
+        }
+      },
+      "publish": {
+        "summary": "User connected.",
+        "message": {
+          "$ref": "#/components/messages/UserData"
+        }
+      },
+      "bindings": {
+        "ws": {}
+      }
+    },
+    "success_connect": {
+      "description": "This channel is used for create session for users. Adding users to chat room",
+      "subscribe": {
+        "summary": "Get user session.",
+        "message": {
+          "$ref": "#/components/messages/SessionData"
+        }
+      },
+      "publish": {
+        "summary": "Server emit data and sid for new user.",
+        "message": {
+          "$ref": "#/components/messages/SessionData"
+        }
+      },
+      "bindings": {
+        "ws": {}
+      }
+    },
+    "get_online_users": {
+      "description": "This channel is used for check online user",
+      "subscribe": {
+        "summary": "Get online users.",
+        "message": {
+          "$ref": "#/components/messages/OnlineUsers"
+        }
+      },
+      "publish": {
+        "summary": "Server emit all online users.",
+        "message": {
+          "$ref": "#/components/messages/OnlineUsers"
+        }
+      },
+      "bindings": {
+        "ws": {}
+      }
+    },
+    "get_history": {
+      "description": "This channel is used for get chat history",
+      "subscribe": {
+        "summary": "Get chat history.",
+        "message": {
+          "$ref": "#/components/messages/ChatHistory"
+        }
+      },
+      "publish": {
+        "summary": "Server emit chat history.",
+        "message": {
+          "$ref": "#/components/messages/ChatHistory"
+        }
+      },
+      "bindings": {
+        "ws": {}
+      }
+    },
+    "new_message": {
+      "description": "This channel is used for exchange of new messages between users",
+      "subscribe": {
+        "summary": "User get new messages.",
+        "message": {
+          "$ref": "#/components/messages/NewMessage"
+        }
+      },
+      "publish": {
+        "summary": "User send new message.",
+        "message": {
+          "$ref": "#/components/messages/NewMessage"
+        }
+      },
+      "bindings": {
+        "ws": {}
+      }
+    },
+    "user_detail": {
+      "description": "This channel is used for get additional info about online user",
+      "subscribe": {
+        "summary": "User get additional info about another user.",
+        "message": {
+          "$ref": "#/components/messages/UserInfo"
+        }
+      },
+      "publish": {
+        "summary": "Server emit additional info about user.",
+        "message": {
+          "$ref": "#/components/messages/UserInfo"
+        }
+      },
+      "bindings": {
+        "ws": {}
+      }
+    },
+    "disconnect": {
+      "description": "This channel is used for disconnecting users",
+      "subscribe": {
+        "summary": "Server get session for deleting.",
+        "message": {
+          "$ref": "#/components/messages/SessionData"
+        }
+      },
+      "publish": {
+        "summary": "User disconnect from chat.",
+        "message": {
+          "$ref": "#/components/messages/SessionData"
+        }
+      },
+      "bindings": {
+        "ws": {}
+      }
+    },
+    "count_messages_exchange": {
+      "description": "This channel counts the number of messages after the current user disconnects",
+      "publish": {
+        "summary": "Publish updated count of messages for user.",
+        "message": {
+          "$ref": "#/components/messages/NewMessage"
+        }
+      },
+      "bindings": {
+        "amqp": {
+          "queue": {
+            "name": "message-queue",
+            "durable": true,
+            "exclusive": true,
+            "autoDelete": false,
+            "vhost": "/"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Id",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Id"
+            }
+          },
+          "username": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Username",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Username"
+            }
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Email",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Email"
+            }
+          },
+          "avatar": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Avatar",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Avatar"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "email"
+        ],
+        "nullable": false,
+        "x-enum-varnames": [],
+        "title": "User",
+        "#-special-path-#-extras-#-special-#": {
+          "title": "User"
+        },
+        "deprecated": false
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Id",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Id"
+            }
+          },
+          "username": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Username",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Username"
+            }
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Email",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Email"
+            }
+          },
+          "avatar": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Avatar",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Avatar"
+            }
+          },
+          "sid": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Sid",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Sid"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "email",
+          "sid"
+        ],
+        "nullable": false,
+        "x-enum-varnames": [],
+        "title": "Session",
+        "#-special-path-#-extras-#-special-#": {
+          "title": "Session"
+        },
+        "deprecated": false
+      },
+      "ChatMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Message",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Message"
+            }
+          },
+          "image": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Image",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Image"
+            }
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Date",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Date"
+            }
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "User Id",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "User Id"
+            }
+          },
+          "username": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Username",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Username"
+            }
+          },
+          "avatar": {
+            "type": "string",
+            "required": [],
+            "nullable": false,
+            "x-enum-varnames": [],
+            "title": "Avatar",
+            "#-special-path-#-extras-#-special-#": {
+              "title": "Avatar"
+            }
+          }
+        },
+        "required": [
+          "message",
+          "user_id",
+          "username"
+        ],
+        "nullable": false,
+        "x-enum-varnames": [],
+        "title": "ChatMessage",
+        "#-special-path-#-extras-#-special-#": {
+          "title": "ChatMessage"
+        },
+        "deprecated": false
+      }
+    },
+    "messages": {
+      "UserData": {
+        "payload": {
+          "required": [],
+          "$ref": "#/components/schemas/User",
+          "nullable": false,
+          "x-enum-varnames": [],
+          "#-special-path-#-extras-#-special-#": {},
+          "deprecated": false
+        },
+        "contentType": "application/json",
+        "name": "User",
+        "title": "User Data",
+        "summary": "Action to connect to server.",
+        "description": "Get user data after success connection",
+        "tags": [
+          {
+            "name": "User connect"
+          },
+          {
+            "name": "User data"
+          }
+        ]
+      },
+      "SessionData": {
+        "payload": {
+          "required": [],
+          "$ref": "#/components/schemas/Session",
+          "nullable": false,
+          "x-enum-varnames": [],
+          "#-special-path-#-extras-#-special-#": {},
+          "deprecated": false
+        },
+        "contentType": "application/json",
+        "name": "Session",
+        "title": "Session Data",
+        "summary": "Action to got session.",
+        "description": "Get user session after success connection",
+        "tags": [
+          {
+            "name": "User session"
+          }
+        ]
+      },
+      "OnlineUsers": {
+        "payload": {
+          "required": [],
+          "$ref": "#/components/schemas/User",
+          "nullable": false,
+          "x-enum-varnames": [],
+          "#-special-path-#-extras-#-special-#": {},
+          "deprecated": false
+        },
+        "contentType": "application/json",
+        "name": "OnlineUsers",
+        "title": "Online Users",
+        "summary": "Action to got online users.",
+        "description": "Get online users after success connection",
+        "tags": [
+          {
+            "name": "Online Users"
+          }
+        ]
+      },
+      "ChatHistory": {
+        "payload": {
+          "required": [],
+          "$ref": "#/components/schemas/ChatMessage",
+          "nullable": false,
+          "x-enum-varnames": [],
+          "#-special-path-#-extras-#-special-#": {},
+          "deprecated": false
+        },
+        "contentType": "application/json",
+        "name": "ChatHistory",
+        "title": "Chat History",
+        "summary": "Action to got chat history.",
+        "description": "Get chat history after success connection",
+        "tags": [
+          {
+            "name": "Chat History"
+          }
+        ]
+      },
+      "NewMessage": {
+        "payload": {
+          "required": [],
+          "$ref": "#/components/schemas/ChatMessage",
+          "nullable": false,
+          "x-enum-varnames": [],
+          "#-special-path-#-extras-#-special-#": {},
+          "deprecated": false
+        },
+        "contentType": "application/json",
+        "name": "NewMessage",
+        "title": "New Message",
+        "summary": "Action to got new messages.",
+        "description": "Get new messages in chat",
+        "tags": [
+          {
+            "name": "New Message"
+          }
+        ]
+      },
+      "UserInfo": {
+        "payload": {
+          "required": [],
+          "$ref": "#/components/schemas/User",
+          "nullable": false,
+          "x-enum-varnames": [],
+          "#-special-path-#-extras-#-special-#": {},
+          "deprecated": false
+        },
+        "contentType": "application/json",
+        "name": "UserInfo",
+        "title": "User Info",
+        "summary": "Action to got user info.",
+        "description": "Get additional info about another user",
+        "tags": [
+          {
+            "name": "User"
+          },
+          {
+            "name": "Additional Info"
+          }
+        ]
+      }
+    }
+  }
+}

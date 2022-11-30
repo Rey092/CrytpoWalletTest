@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     backend_url: str = "http://127.0.0.1:8000"
     # The site name.
     frontend_url: str = "https://google.com"
+    # URL for the Asyncapi Docs
+    asyncapi_docs_url: str = "/chat/asyncapi_docs"
     # quantity of workers for uvicorn
     workers_count: int = 3
     # Enable uvicorn reloading

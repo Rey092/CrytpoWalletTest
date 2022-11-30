@@ -25,3 +25,10 @@ async def get_chat(
     if user is None or user.permission.has_access_chat is False:
         return RedirectResponse("/profile/get")
     return templates.TemplateResponse("chat/list_messages.html", {"request": request})
+
+
+@chat_front_router.get("/asyncapi_docs", response_class=HTMLResponse, include_in_schema=False)
+async def asyncapi_docs(
+    request: Request,
+):
+    return templates.TemplateResponse("chat/asyncapi/index.html", {"request": request})
