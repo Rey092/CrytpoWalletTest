@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import asyncio
+
 import socketio
 from beanie import init_beanie
 from fastapi import FastAPI
@@ -19,8 +21,6 @@ def create_app() -> FastAPI:
     sio_server = socketio.ASGIApp(socketio_server=sio, socketio_path="socket.io")
     app_.mount("/ws", sio_server)  # noqa
 
-    socket_consumer_thread.start()
-
     return app_
 
 
@@ -32,6 +32,8 @@ async def start_mongodb():
     await init_mongodb()
     chat_manager = await get_chat_manager()
     await chat_manager.disconnect_all_users()
+    await asyncio.sleep(15)
+    socket_consumer_thread.start()
 
 
 @app.on_event("shutdown")
