@@ -125,6 +125,10 @@ class Settings(BaseSettings):
     user_email: str
     user_password: str
 
+    # superuser for sqladmin
+    superuser_username: str
+    superuser_password: str
+
     @property
     def db_url(self) -> URL:
         """

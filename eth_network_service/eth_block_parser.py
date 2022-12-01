@@ -12,7 +12,7 @@ from yarl import URL
 class Settings(BaseSettings):
 
     # Variables for RabbitMQ
-    rabbit_host: str = "localhost"
+    rabbit_host: str = "rabbitmq"
     rabbit_port: int = 5672
     rabbit_user: str = "guest"
     rabbit_pass: str = "guest"
@@ -57,6 +57,7 @@ settings = Settings()
 
 
 async def start_parse():
+    await asyncio.sleep(15)
     async with connect(settings.infura_api_url) as websocket:
         await websocket.send(
             '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["newHeads"]}',

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import pathlib
 from typing import List
 
 import toml
+from aio_pika import connect_robust
 from fastapi import FastAPI, Request
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,6 +26,7 @@ from api_service.config.costum_logging import CustomizeLogger
 from api_service.config.db import engine
 from api_service.config.openapi import metadata_tags
 from api_service.config.router import api_router
+from api_service.config.settings import settings
 from services.redis.dependencies import get_redis
 
 
@@ -101,6 +104,12 @@ async def startup():
     await FastAPILimiter.init(redis)
 
     # Start needed threads
+    try:
+        connection = await connect_robust(settings.rabbit_url)
+        await connection.close()
+    except Exception:
+        await asyncio.sleep(10)
+
     if not await redis.get("threads_running"):
         await redis.set("threads_running", 1)
         consumer_thread.start()
