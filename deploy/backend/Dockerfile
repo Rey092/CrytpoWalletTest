@@ -15,6 +15,13 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   # curl
   curl
 
+# tzdata for timzone
+RUN apt-get update -y
+RUN apt-get install -y tzdata
+
+# timezone env with default
+ENV TZ=Europe/Kiev
+
 # Upgrade pip
 RUN pip install --upgrade pip
 RUN pip install setuptools
@@ -26,10 +33,10 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/inst
 ENV PATH "/root/.local/bin:$PATH"
 
 
-COPY ../../poetry.lock pyproject.toml ./
+COPY poetry.lock pyproject.toml ./
 
 
 RUN poetry config virtualenvs.in-project true --local
 RUN poetry install --no-root --only main --no-interaction --no-ansi
 
-COPY ../.. .
+COPY . .

@@ -29,6 +29,8 @@ start_worker:
 
 
 # prod
-
 run-prod:
 	uvicorn api_service.config.app:app --host 0.0.0.0 --workers 2
+
+init-prod:
+	docker exec -it cryptowallettest_api_web_1 poetry run make init
