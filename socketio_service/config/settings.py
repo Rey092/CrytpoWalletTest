@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     mongodb_name: str
 
     # Variables for RabbitMQ
-    rabbit_host: str = "localhost"
+    rabbit_host: str = "rabbitmq"
     rabbit_port: int = 5672
     rabbit_user: str = "guest"
     rabbit_pass: str = "guest"

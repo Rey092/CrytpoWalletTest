@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     debug: bool = True
 
     # Variables for the IBay database
-    ibay_postgres_host: str = "localhost"
+    ibay_postgres_host: str = "db"
     ibay_postgres_port: int = 5432
     ibay_postgres_user: str
     ibay_postgres_password: str
@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     ibay_postgres_echo: bool = False
 
     # Variables for RabbitMQ
-    rabbit_host: str = "localhost"
+    rabbit_host: str = "rabbitmq"
     rabbit_port: int = 5672
     rabbit_user: str = "guest"
     rabbit_pass: str = "guest"

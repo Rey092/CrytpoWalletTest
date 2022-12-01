@@ -29,8 +29,14 @@ start_worker:
 
 
 # prod
+init-prod:
+	docker exec -it cryptowallettest_api_web_1 poetry run make init
+
 run-prod:
 	uvicorn api_service.config.app:app --host 0.0.0.0 --workers 2
 
-init-prod:
-	docker exec -it cryptowallettest_api_web_1 poetry run make init
+run_sio_prod:
+	uvicorn socketio_service.config.app:app --host 0.0.0.0 --reload --port 8002
+
+run_ibay_prod:
+	uvicorn ibay_service.config.app:app --host 0.0.0.0 --reload --port 8001

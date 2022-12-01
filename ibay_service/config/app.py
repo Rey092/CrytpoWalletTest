@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from time import sleep
+
 from fastapi import FastAPI
 
 from ibay_service.apps.order import models
@@ -18,6 +20,7 @@ def create_app() -> FastAPI:
     init_ibay_database()
 
     # start needed threads
+    sleep(15)
     ibay_consumer_thread.start()
     order_handler_thread.start()
 
