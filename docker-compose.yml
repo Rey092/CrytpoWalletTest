@@ -25,6 +25,17 @@ services:
       - rabbitmq
       - db
 
+  nginx:
+    build:
+      context: ./deploy/nginx
+      dockerfile: prod.Dockerfile
+    volumes:
+      - static_volume:/usr/src/app/static
+    ports:
+      - "80:80"
+    depends_on:
+      - api_web
+
   redis:
     image: 'redis:alpine'
 
