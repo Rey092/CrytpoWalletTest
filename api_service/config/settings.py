@@ -57,7 +57,6 @@ class Settings(BaseSettings):
     # Variables for the database
     # postgres_host: str = "localhost"
     postgres_host: str = "db"
-
     postgres_port: int = 5432
     postgres_user: str
     postgres_password: str
