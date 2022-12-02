@@ -1,0 +1,664 @@
+{% extends 'elements/base.html' %}
+
+{% block title %}
+Crypto Wallet|Profile
+{% endblock %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+<div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0" style="display: none;">
+        <div class="content-body">
+            <div class="row">
+                <div class="col-12">
+                    <!-- profile -->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">Профиль</h4>
+                        </div>
+                        <div class="card-body py-2 my-25">
+                            <!-- header section -->
+                            <div class="d-flex">
+                                <a href="#" class="me-25">
+                                    <img src="{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+                                         id="account-upload-img" class="uploadedAvatar rounded me-50"
+                                         alt="profile image" height="100" width="100">
+                                </a>
+                                <!-- upload and reset button -->
+                                <div class="d-flex align-items-end mt-75 ms-1" id="management_file">
+                                    <div>
+                                        <label for="account-upload" id="label-upload"
+                                               class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Загрузить</label>
+                                        <input type="file" id="account-upload" onchange="loadPreviewImage(this)"
+                                               name="upload_image" hidden=""
+                                               accept="image/*">
+                                        <button type="button" id="delete_image" onclick="deleteImage()"
+                                                class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Удалить
+                                        </button>
+                                        <p class="mb-0">Допустимые типы файлов: png, jpg, jpeg.</p>
+                                    </div>
+                                </div>
+                                <!--/ upload and reset button -->
+                            </div>
+                            <!--/ header section -->
+
+                            <!-- form -->
+                            <form class="validate-form mt-2 pt-50" id="profile_update" method="POST"
+                                  novalidate="novalidate">
+                                <div class="row">
+                                    <div class="col-12 col-sm-6 mb-1">
+                                        <label class="form-label" for="username">Имя пользователя</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="username"
+                                               name="username"
+                                               placeholder="John" autocomplete="" data-msg="Username">
+                                    </div>
+                                    <div class="col-12 col-sm-6 mb-1">
+                                        <label class="form-label" for="email">Email</label>
+                                        <input type="email"
+                                               class="form-control"
+                                               id="email"
+                                               name="email"
+                                               autocomplete=""
+                                               placeholder="Email" readonly>
+                                    </div>
+                                    <div class="col-12 col-sm-6 mb-1">
+                                        <label for="new_password" class="form-label">Пароль</label>
+                                        <div class="input-group input-group-merge form-password-toggle">
+                                            <input type="password" class="form-control form-control-merge"
+                                                   id="new_password"
+                                                   autocomplete="new-password"
+                                                   name="new_password"
+                                                   placeholder="············"
+                                                   aria-describedby="password"
+                                                   tabindex="3">
+                                            <span class="input-group-text cursor-pointer">
+                                                <svg
+                                                        xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                        viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                        class="feather feather-eye">
+                                                    <path
+                                                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                                                    </path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 mb-1">
+                                        <label for="new_password2" class="form-label">Повторить пароль</label>
+                                        <div class="input-group input-group-merge form-password-toggle">
+                                            <input type="password" class="form-control form-control-merge"
+                                                   id="new_password2"
+                                                   name="new_password2"
+                                                   autocomplete="new-password"
+                                                   placeholder="············"
+                                                   aria-describedby="password"
+                                                   tabindex="3">
+                                            <span class="input-group-text cursor-pointer"><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="14"
+                                                    height="14" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-eye"><path
+                                                    d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle
+                                                    cx="12" cy="12"
+                                                    r="3"></circle></svg></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit"
+                                                id="profile_save"
+                                                class="btn btn-primary mt-1 me-1 waves-effect waves-float waves-light">
+                                            Сохранить изменения
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <!--/ form -->
+                        </div>
+                    </div>
+                    <!--                    end-->
+
+                    <!-- statistics account  -->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">Статистика</h4>
+                        </div>
+                        <div class="card-body py-2 my-25">
+                            <h4>Сообщения в чате: <span id="messages"></span></h4>
+                            <h4>Кошельки: <span id="wallets"></span></h4>
+                        </div>
+                    </div>
+                    <!--                    end-->
+                    <!--                    wallet-->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">Управление кошельками</h4>
+                        </div>
+                        <div class="card-body py-2 my-25">
+                            <div id="wallets-list">
+
+                            </div>
+                            <div class="col-12 mt-1">
+                                <button class="btn btn-primary mt-1 me-md-2 waves-effect waves-float waves-light"
+                                        data-bs-toggle="modal" data-bs-target="#importWallet">
+                                    Импортировать ETH кошелек
+                                </button>
+                                <button class="btn btn-primary mt-1 waves-effect waves-float waves-light"
+                                        data-bs-toggle="modal" data-bs-target="#addWallet">
+                                    Добавить ETH кошелек
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    end-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addWallet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addNewCardTitle"
+     style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-transparent">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-sm-5 mx-50 pb-5">
+                <h1 class="text-center mb-1">Добавить ETH кошелек</h1>
+                <p class="text-center">Вы действительно хотите добавить новый кошелек?</p>
+                <form id="addNewWallet" class="row gy-1 gx-2 mt-75" onsubmit="return false"
+                      novalidate="novalidate">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
+                            Добавить
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect" data-bs-dismiss="modal"
+                                aria-label="Close">
+                            Отказаться
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="importWallet" tabindex="-1" data-bs-backdrop="static" aria-labelledby="importNew"
+     style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-transparent">
+                <button type="button"
+                        class="btn-close close-import-modal"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-sm-5 mx-50 pb-5">
+                <h1 class="text-center mb-1">Импортировать ETH кошелек</h1>
+                <!-- form -->
+                <form id="importNewWallet" class="row gy-1 gx-2 mt-75" onsubmit="return false"
+                      novalidate="novalidate">
+                    <div class="col-12">
+                        <label class="form-label" for="privateKey"></label>
+                        <div class="input-group input-group-merge">
+                            <input id="privateKey" name="privateKey" class="form-control add-credit-card-mask"
+                                   type="text" placeholder="Enter private key" aria-describedby="modalAddCard2"
+                                   data-msg="Please enter your credit card number">
+                            <span class="input-group-text cursor-pointer p-25" id="modalAddCard2">
+                                                <span class="add-card-type"></span>
+                                            </span>
+
+                        </div>
+                        <div class="text-center mt-2" id="loading_import" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <button type="submit"
+                                class="btn btn-primary me-1 mt-2 waves-effect waves-float waves-light">
+                            Импортировать
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary mt-2 waves-effect close-import-modal"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                            Отказаться
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://cdn.socket.io/3.1.3/socket.io.min.js"
+        integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
+        crossorigin="anonymous"></script>
+
+<script>
+
+    // initial
+    const username = $("#username")
+    const email = $("#email")
+    const new_password = $("#new_password")
+    const new_password2 = $("#new_password2")
+    const messages = $("#messages")
+    const wallets = $("#wallets")
+    const profile_image_preload = $("#account-upload-img")
+    const content = $('.content-wrapper')
+    const user_content = $('.dropdown-user')
+    var delete_image = false
+    var profile_image_def = null
+    var profile_image = null
+    var host_file = "https://cryptowalletbucket.fra1.digitaloceanspaces.com/"
+
+    //
+
+
+    // load profile data
+    $(window).on('load', function () {
+        $.ajax({
+            type: "GET",
+            url: "/api/profile/get",
+            success: function (response) {
+                if ('id' in response) {
+                    if (response.avatar) {
+                        profile_image_preload.attr(
+                            "src",
+                            host_file + response.avatar + ""
+                        )
+                    } else {
+                        $("#delete_image").attr('disabled', 'disabled')
+                    }
+                    username.val(response.username)
+                    email.val(response.email)
+                    messages.html(response.countMessages)
+                    wallets.html(response.wallets.length)
+                    render_wallets(response.wallets)
+                    profile_image_def = profile_image_preload.attr('src')
+
+                }
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+        content.fadeIn(1000)
+    });
+    //
+
+
+    // load preview images
+    function loadPreviewImage(element) {
+        if (element.files[0]) {
+            profile_image_preload.attr("src", URL.createObjectURL(element.files[0]))
+            profile_image = element.files[0]
+        } else {
+            profile_image_preload.attr("src", profile_image_def);
+            profile_image = null
+        }
+    }
+
+    // loads preview images end
+
+
+    // delete image
+    function deleteImage() {
+        delete_image = true
+        profile_image = null
+        profile_image_preload.attr("src",
+            "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}");
+        $("#management_file").html(
+            '<div>\n' +
+            '    <button type="reset" onclick="backImageUpload(true)" class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Отменить удаление\n' +
+            '    </button>\n' +
+            '</div>'
+        )
+    }
+
+    function backImageUpload(flag) {
+        delete_image = false
+        profile_image_preload.attr("src", profile_image_def);
+        if (flag) {
+            $("#management_file").html(
+                '<div>\n' +
+                '    <label for="account-upload" id="label-upload" class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Загрузить</label>\n' +
+                '    <input type="file" id="account-upload" name="upload_image" onchange="loadPreviewImage(this)" hidden="" accept="image/*">\n' +
+                '    <button type="button" onclick="deleteImage()" class="btn btn-sm btn-outline-secondary mb-75 waves-effect"> Удалить\n' +
+                '    </button>\n' +
+                '    <p class="mb-0">Допустимые типы файлов: png, jpg, jpeg.</p>\n' +
+                '</div>'
+            )
+        } else {
+            $("#management_file").html(
+                '<div>\n' +
+                '    <label for="account-upload" id="label-upload" class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Загрузить</label>\n' +
+                '    <input type="file" id="account-upload" name="upload_image" onchange="loadPreviewImage(this)" hidden="" accept="image/*">\n' +
+                '    <button type="button" onclick="deleteImage()" class="btn btn-sm btn-outline-secondary mb-75 waves-effect" disabled> Удалить\n' +
+                '    </button>\n' +
+                '    <p class="mb-0">Допустимые типы файлов: png, jpg, jpeg.</p>\n' +
+                '</div>'
+            )
+        }
+    }
+
+    //
+
+
+    // update profile
+
+    // custom validation method
+    $.validator.addMethod("check_repeated_password", function (value) {
+        if (value.length > 0) {
+            let password = $('#new_password').val()
+            if (password === value) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return true
+        }
+    });
+    //
+
+
+    // validate form for update profile
+    var validator = $("#profile_update").validate({
+        submitHandler: function (e) {
+            content.hide()
+            user_content.hide()
+            let fileData = profile_image
+            let form_data = new FormData()
+            form_data.append('username', username.val())
+            form_data.append('password', new_password.val())
+            form_data.append('repeat_password', new_password2.val())
+            form_data.append('delete', delete_image)
+            if (fileData) {
+                form_data.append('profile_image', fileData)
+            }
+            $.ajax({
+                type: "PUT",
+                url: "/api/profile/update",
+                enctype: 'multipart/form-data',
+                data: form_data,
+                success: function (response) {
+                    toastr.success('Данные профиля успешно обновлены', 'Успех')
+                    if (response.id) {
+                        if (response.avatar) {
+                            $(".round").attr(
+                                "src", host_file + response.avatar + ""
+                            )
+                            $("#account-upload-img").attr(
+                                "src", host_file + response.avatar + ""
+                            )
+                            profile_image_def = host_file + response.avatar + ""
+                            backImageUpload(true)
+                        } else {
+                            $(".round").attr(
+                                "src", "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+                            )
+                            profile_image_def = "{{ url_for('static', path='/app-assets/images/portrait/small/avatar-profile.jpg') }}"
+                            backImageUpload(false)
+                        }
+                        $(".user-name").html(response.username)
+                        new_password.val("")
+                        new_password2.val("")
+                    }
+                },
+                error: function (response) {
+                    $("#account-upload-img").attr(
+                        "src", profile_image_def
+                    )
+                    if (response.status === 401) {
+                        location.reload()
+                    }
+                    if (response.status === 400 || response.status === 422) {
+                        let res = response.responseJSON
+                        if (res.length > 0) {
+                            if (res[0].code === 'format_error') {
+                                toastr.error(
+                                    'Загружаемый файл должен быть в формате [\'png\', \'jpg\', \'jpeg\'].',
+                                    'Ошибка'
+                                )
+                            }
+                            if (res[0].code === 'username_error') {
+                                toastr.error(
+                                    'Имя пользователя должно содержать не менее: от 5 до 40 символов, ' +
+                                    'без специальных символов',
+                                    'Ошибка'
+                                )
+                            }
+                            if (res[0].code === 'password_error') {
+                                toastr.error(
+                                    'Пароль должен содержать как минимум: ' +
+                                    'одну цифру, одну заглавную букву, одну строчную букву, ' +
+                                    'один специальный символ [$@#]',
+                                    'Ошибка'
+                                )
+                            }
+                        } else {
+                            toastr.error(
+                                'Произошла ошибка при попытке обновить профиль, проверьте правильность введенной информации',
+                                'Ошибка'
+                            )
+                        }
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+            content.fadeIn(1000)
+            user_content.fadeIn(1000)
+            profile_image = null;
+            delete_image = false
+        },
+        rules: {
+            username: {
+                required: true,
+                minlength: 5
+            },
+            new_password: {
+                required: false,
+                minlength: 8,
+            },
+            new_password2: {
+                required: function (element) {
+                    return $("#new_password").val().length > 0;
+                },
+                minlength: 8,
+                check_repeated_password: true
+            }
+        },
+        messages: {
+            username: {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 5 символов.",
+            },
+            new_password: {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 8 символов.",
+
+            },
+            new_password2: {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 8 символов.",
+                check_repeated_password: "Пароли не совпадают."
+            },
+        }
+    });
+    //
+
+    // import wallet
+    import_validator = $("#importNewWallet").validate({
+        submitHandler: function () {
+            $("#loading_import").css('display', 'block')
+            $("button").attr('disabled', 'disabled')
+            privateKeyValue = $("#privateKey").val()
+            console.log(privateKeyValue)
+            $.ajax({
+                type: "POST",
+                url: "/api/ethereum/wallets/import",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    privateKey: privateKeyValue,
+
+                }),
+                success: function (response) {
+                    if (response.address) {
+                        $("#loading_import").css('display', 'none')
+                        $("button").removeAttr('disabled')
+                        $("button[type='reset']").trigger('click');
+                        let count = Number(wallets.text())
+                        wallets.html(count + 1)
+                        $("#no_wallets").remove()
+                        $("#wallets-list").append(
+                            "<div class=\"mt-1\">\n" +
+                            "    <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                            "         alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                            "    <a href=\"https://etherscan.io/address/" + response.address + "\"\n" +
+                            "       target=\"_blank\">\n" + response.address + "\n" +
+                            "    </a>\n" +
+                            " </div>"
+                        )
+                        toastr.success('Импортирован новый кошелек', 'Успех')
+                    }
+                },
+                error: function (response) {
+                    $("#loading_import").css('display', 'none')
+                    $("button").removeAttr('disabled')
+                    if (response.status === 401) {
+                        location.reload()
+                    }
+                    if (response.status === 400 || response.status === 422) {
+                        let res = response.responseJSON
+                        if (res.length > 0) {
+                            if (res[0].code === 'private_key_error') {
+                                if (res[0].type === 'Invalid Private Key') {
+                                    toastr.error(
+                                        'Неверный приватный ключ.',
+                                        'Ошибка'
+                                    )
+                                } else {
+                                    toastr.error(
+                                        'Кошелек с таким адресом уже существует для этого пользователя.',
+                                        'Ошибка'
+                                    )
+                                }
+                            } else {
+                                toastr.error(
+                                    'Произошла ошибка при попытке импортировать кошелек',
+                                    'Ошибка'
+                                )
+                            }
+                        }
+                    } else {
+                        toastr.error(
+                            'Произошла ошибка при попытке импортировать кошелек',
+                            'Ошибка'
+                        )
+                    }
+                    if (response.status === 429) {
+                        let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                        toastr.warning('Слишком много запросов. Повторить через ' + time + ' сек.', 'Ограничение запросов')
+                    }
+                }
+            })
+        },
+        rules: {
+            privateKey: {
+                required: true,
+                minlength: 64
+            },
+        },
+        messages: {
+            privateKey: {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 64 символов.",
+            }
+        }
+    });
+
+    $(".close-import-modal").on("click", function () {
+        import_validator.resetForm();
+    })
+    //
+
+
+    $("#addNewWallet").submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "/api/ethereum/wallets/create",
+            success: function (response) {
+                let count = Number(wallets.text())
+                wallets.html(count + 1)
+                $("#no_wallets").remove()
+                $("#wallets-list").append(
+                    "<div class=\"mt-1\">\n" +
+                    "    <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                    "         alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                    "     <a href=\"https://etherscan.io/address/" + response.address + "\"\n" +
+                    "        target=\"_blank\">\n" + response.address + "\n" +
+                    "      </a>\n" +
+                    "</div>"
+                )
+                toastr.success('Добавлен новый кошелек', 'Успех')
+                $("button[type='reset']").trigger('click');
+
+
+            },
+            error: function (response) {
+                if (response.status === 401) {
+                    location.reload()
+                }
+                if (response.status === 429) {
+                    let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                    toastr.warning('Слишком много запросов. Повторить через ' + time + ' сек.', 'Ограничение запросов')
+                }
+            }
+        })
+    });
+
+    function render_wallets(wallets) {
+        if (wallets.length > 0) {
+            for (let wallet of wallets) {
+                $("#wallets-list").append(
+                    "<div class=\"mt-1\">\n" +
+                    "    <img src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\"\n" +
+                    "         alt=\"avatar\" height=\"40\" width=\"40\">\n" +
+                    "     <a href=\"https://etherscan.io/address/" + wallet.address + "\"\n" +
+                    "        target=\"_blank\">\n" + wallet.address + "\n" +
+                    "      </a>\n" +
+                    "</div>"
+                )
+            }
+        } else {
+            $("#wallets-list").html(
+                "<p id='no_wallets'>У вас еще нет кошельков. Вы можете добавить новый или импортировать существующий.</p>"
+            )
+        }
+    }
+
+</script>
+
+{% endblock %}

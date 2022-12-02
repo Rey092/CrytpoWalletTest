@@ -1,4 +1,5 @@
-CREATE USER test_user WITH PASSWORD 'test_password';
+CREATE USER crypto_wallet_admin WITH PASSWORD 'Zaqwerty123#';
 
-CREATE DATABASE test_database_db;
-GRANT ALL PRIVILEGES ON DATABASE test_database_db TO test_user;
+CREATE DATABASE crypto_wallet_ibay_db;
+GRANT ALL PRIVILEGES ON DATABASE crypto_wallet_ibay_db TO crypto_wallet_admin;
+.

@@ -1,10 +1,11 @@
-FROM python:3.10 as base
+FROM python:3.8
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONPATH=/usr/src/app
+
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
   # dependencies for building Python packages
@@ -13,6 +14,13 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   libpq-dev \
   # curl
   curl
+
+# tzdata for timzone
+RUN apt-get update -y
+RUN apt-get install -y tzdata
+
+# timezone env with default
+ENV TZ=Europe/Kiev
 
 # Upgrade pip
 RUN pip install --upgrade pip
@@ -24,7 +32,10 @@ WORKDIR $PYTHONPATH
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
 ENV PATH "/root/.local/bin:$PATH"
 
-COPY pyproject.toml poetry.lock ./
+
+COPY poetry.lock pyproject.toml ./
+
+
 RUN poetry config virtualenvs.in-project true --local
 RUN poetry install --no-root --only main --no-interaction --no-ansi
 

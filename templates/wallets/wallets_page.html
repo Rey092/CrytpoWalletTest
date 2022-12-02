@@ -1,0 +1,415 @@
+{% extends 'elements/base.html' %}
+
+{% block title %}
+Crypto Wallet | My Wallets
+{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/responsive.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', path='/app-assets/vendors/css/tables/datatable/rowGroup.bootstrap5.min.css') }}">
+<style>
+    .trans_row {
+        max-width: 200px;
+        min-width: 160px;
+        overflow: hidden;
+    }
+
+    @media (max-width: 576px) {
+        .eth-image {
+            width: 50px;
+            height: 50px;
+            margin: 15px -15px 0 -10px;
+            padding: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0" style="display: none;">
+        <div class="content-body">
+            <div class="row">
+                <div class="col-12">
+                    <!-- All user's wallets -->
+                    <div class="card">
+                        <div class="card-header border-bottom">
+                            <h4 class="card-title">Кошельки</h4>
+                        </div>
+                        <div id="wallets_list" class="row card-body py-2 my-25">
+                            <!-- Wallets -->
+                            <!-- Wallets end -->
+                        </div>
+                    </div>
+                    <!-- All user's wallets end-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="allTransactions" tabindex="-1" aria-labelledby="addNewCardTitle" style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-transparent">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-sm-5 mx-50 pb-5 table-responsive">
+                <h5 class="text-center">Список транзакций <b>ETH</b> кошелька по адресу <b><span
+                        id="some_address"></span></b></h5>
+                <table class="table dataTable no-footer dtr-column" id="trans_datatable" role="grid"
+                       aria-describedby="DataTables_Table_3_info">
+                    <thead>
+                    <tr>
+                        <th style="min-width: 200px; width: 20%; overflow: hidden">Txn Hash</th>
+                        <th style="min-width: 200px; width: 20%; overflow: hidden">From</th>
+                        <th style="min-width: 200px; width: 20%; overflow: hidden">To</th>
+                        <th>Value</th>
+                        <th style="color: #0d6cb1">Age</th>
+                        <th>Txn Fee</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/responsive.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/tables/datatable/datatables.buttons.min.js') }}"></script>
+
+<script src="{{ url_for('static', path='/app-assets/js/scripts/components/components-popovers.js') }}"></script>
+
+<script src="https://cdn.socket.io/4.5.3/socket.io.min.js"
+        integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi"
+        crossorigin="anonymous">
+</script>
+<script>
+    let wallet_address
+    let validator
+
+
+    // region Render User Wallets---------------------------------------------------------------------------------------
+    //==================================================================================================================
+    // ajax for get all user's wallets
+    $(window).on('load', function () {
+        $.ajax({
+            type: "GET",
+            url: "/api/ethereum/wallets",
+            success: function (response) {
+                render_user_wallets(response)
+
+                // init all popovers on page
+                let popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+                popoverTriggerList.map(function (popoverTriggerEl) {
+                    return new bootstrap.Popover(popoverTriggerEl)
+                })
+                if (!$('#chat_link').hasClass('disabled')) {
+                    $("#chat_link").popover('dispose')
+                }
+            },
+            error: function (response) {}
+        })
+        $('.content-wrapper').fadeIn("normal")
+    });
+
+    // render all wallets for user
+    function render_user_wallets(wallets) {
+        if (wallets.length > 0) {
+            for (let wallet of wallets) {
+                $("#wallets_list").append(
+                    "<div class=\"col-xl-6 col-md-12 col-sm-12\">\n" +
+                    "    <div class=\"card shadow-none border cursor-pointer\">\n" +
+                    "        <div id=\"" + wallet.address + "\" class=\"wallet card-body\">\n" +
+                    "            <div class=\"d-flex\">\n" +
+                    "                <a href=\"#\" class=\"me-25\">\n" +
+                    "                    <img class='eth-image' src=\"{{ url_for('static', path='/app-assets/images/svg/ethereum_logo.svg') }}\" alt=\"avatar\" height=\"90\">\n" +
+                    "                </a>\n" +
+                    "                <div class=\"row\" style=\"font-size: 14px\">\n" +
+                    "                    <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
+                    "                        <p><b>Адрес:</b><span style=\"font-size: calc(8px + 0.4vw)\"> <a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + wallet.address + "\">" + wallet.address + "</a></span></p>\n" +
+                    "                    </div>\n" +
+                    "                    <div class=\"d-flex align-items-top mt-75 ms-1\">\n" +
+                    "                        <p><b>Баланс: </b><span id=\"balance_" + wallet.address + "\" class=\"card-title balance\"> <b>" + wallet.balance + " ETH</b></span></p>\n" +
+                    "                    </div>\n" +
+                    "                </div>\n" +
+                    "            </div>\n" +
+                    "            <div class=\"row align-items-end mt-75 ms-1\" style=\"text-align: center\">\n" +
+                    "                <div class=\"row\">\n" +
+                    "                    <div class=\"col-lg-4 col-md-4\">\n" +
+                    "                        <button onclick='watch_transactions(this.value)' type=\"button\" value=\"" + wallet.address + "\" class=\"btn btn-sm btn-primary waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"modal\" data-bs-target=\"#allTransactions\">Просмотреть транзакции</button>\n" +
+                    "                    </div>\n" +
+                    "                    <div class=\"col-lg-4 col-md-4\">\n" +
+                    "                        <button onclick='get_wallet_address(this.value)' type=\"button\" value=\"" + wallet.address + "\" class=\"btn btn-sm btn-success waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"modal\" data-bs-target=\"#send_transaction_" + wallet.id + "\">Отправить транзакцию</button>\n" +
+                    "                    </div>\n" +
+                    "                    <div class=\"col-lg-4 col-md-4\">\n" +
+                    "                    <a href=\"https://sepoliafaucet.net/\" target='_blank'><button type=\"button\" class=\"btn btn-info waves-effect\" style=\"width: 100%; margin: 2px; height: 35px\" data-bs-toggle=\"popover\" data-bs-content=\"Чтобы запросить средства через Twitter, сделайте твит со своим адресом Ethereum, вставленным в содержимое(окружающий текст не имеет значения). После чего скопируйте и вставьте URL-адрес опубликованного твита в поле ввода Sepolia Faucet и запросите средства! Вы можете запрашивать 0,5 Sepolia ETH (SEP) каждые 24 часа.\" data-bs-trigger=\"hover\" title=\"\" data-bs-original-title=\"Как это работает?\">\n" +
+                    "                        Получить 0.5 ETH\n" +
+                    "                    </button></a>\n" +
+                    "                    </div>\n" +
+                    "                </div>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</div>\n" +
+                    "<div class=\"modal fade \" data-bs-backdrop=\"static\" id=\"send_transaction_" + wallet.id + "\" tabindex=\"-1\" aria-labelledby=\"importTrans\" style=\"display: none;\"\n" +
+                    "     aria-hidden=\"true\">\n" +
+                    "    <div class=\"modal-dialog modal-dialog-centered\">\n" +
+                    "        <div class=\"modal-content\">\n" +
+                    "            <div class=\"modal-header bg-transparent\">\n" +
+                    "                <button type=\"button\" class=\"close-send-modal btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>\n" +
+                    "            </div>\n" +
+                    "            <div class=\"modal-body px-sm-5 mx-50 pb-5\">\n" +
+                    "                <h1 class=\"text-center mb-1\">Отправка <b>ETH</b></h1>\n" +
+                    "                <!-- form -->\n" +
+                    "                <form id=\"form_" + wallet.id + "\" class=\"row gy-1 gx-2 mt-75\" onsubmit=\"return false\"\n" +
+                    "                      novalidate=\"novalidate\">\n" +
+                    "                    <div class=\"col-12\">\n" +
+                    "                        <div class=\"input-group input-group-merge\">\n" +
+                    "                            <input id=\"sender_address_" + wallet.id + "\" name=\"address\" class=\"form-control add-credit-card-mask\"\n" +
+                    "                                   type=\"text\" placeholder=\"Введите адрес получателя\">\n" +
+                    "                        </div>\n" +
+                    "                        <div class=\"input-group input-group-merge mt-75\">\n" +
+                    "                            <input id=\"amount_eth_" + wallet.id + "\" name=\"amount\" class=\"form-control add-credit-card-mask\"\n" +
+                    "                                   type=\"text\" placeholder=\"Колличество ETH\">\n" +
+                    "                        </div>\n" +
+                    "                    </div>\n" +
+                    "                    <div class=\"text-center mt-2\" id=\"loading_import_" + wallet.id + "\" style=\"display: none;\">\n" +
+                    "                        <div class=\"spinner-border text-primary\" role=\"status\">\n" +
+                    "                            <span class=\"visually-hidden\">Loading...</span>\n" +
+                    "                        </div>\n" +
+                    "                    </div>" +
+                    "\n" +
+                    "                    <div class=\"col-12 text-center\">\n" +
+                    "                        <button onclick=\"submit_trans(this.value)\" value=\"" + wallet.id + "\" type=\"submit\" class=\"btn btn-primary me-1 mt-2 waves-effect waves-float waves-light\">\n" +
+                    "                            Отправить\n" +
+                    "                        </button>\n" +
+                    "                        <button onclick=\"close_send_modal()\" type=\"reset\" class=\"close-send-modal btn btn-outline-secondary mt-2 waves-effect\" data-bs-dismiss=\"modal\"\n" +
+                    "                                aria-label=\"Close\">\n" +
+                    "                            Отказаться\n" +
+                    "                        </button>\n" +
+                    "                    </div>\n" +
+                    "                </form>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</div>"
+                )
+            }
+        } else {
+            $("#wallets_list").append(
+                '<h4 class="card-title text-center">У вас ещё нет созданых кошельков... Перейдите в профиль для создания.</h4>'
+            )
+        }
+    }
+
+
+    // region Send Transaction------------------------------------------------------------------------------------------
+    //==================================================================================================================
+    // after click on button get address of this wallet for send transactions
+    function get_wallet_address(value) {
+        wallet_address = value
+    }
+
+    // send transaction on another wallet + validation
+    function submit_trans(value) {
+        validator = $("#form_" + value).validate({
+            submitHandler: function () {
+                $('#loading_import_' + value).css('display', 'block')
+                $("button").attr('disabled', 'disabled')
+                $("input").attr('disabled', 'disabled')
+                const address_to = $('#sender_address_' + value).val()
+                const eth_value = $('#amount_eth_' + value).val()
+                $.ajax({
+                    type: "POST",
+                    url: "/api/ethereum/transactions/send",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        addressFrom: wallet_address,
+                        addressTo: address_to,
+                        value: eth_value
+                    }),
+                    success: function (response) {
+                        $('#loading_import_' + value).css('display', 'none')
+                        $("button").removeAttr('disabled')
+                        $("input").removeAttr('disabled')
+                        $("button[type='reset']").trigger('click');
+                        toastr_options()
+                        let old_wallet_balance = parseFloat($('#balance_' + wallet_address).text())
+                        let new_wallet_balance = (old_wallet_balance - parseFloat(eth_value)).toFixed(8)
+                        $('#balance_' + wallet_address).html("<b>" + new_wallet_balance + " ETH</b>")
+                        toastr.success('Отправка произведена. <a style=\"color: #007aff; font-weight: bold\" target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/' + response.txnHash + '\">Ссылка на транзакцию', 'Успех')
+                    },
+                    error: function (response) {
+                        $('#loading_import_' + value).css('display', 'none')
+                        $("button").removeAttr('disabled')
+                        $("input").removeAttr('disabled')
+                        if (response.status === 400 || response.status === 422) {
+                            let res = response.responseJSON
+                            if (res[0].code === 'address_error') {
+                                toastr.error(
+                                    'Введённый адрес получателя некорректен.',
+                                    'Ошибка'
+                                )
+                            } else if (res[0].code === 'value_error') {
+                                toastr.error(
+                                    'Введённое значение некорректно или превышает баланс кошелька.',
+                                    'Ошибка'
+                                )
+                            } else {
+                                toastr.error(
+                                    'Что-то пошло не так. Перепроверьте баланс вашего кошелька или адрес получателя',
+                                    'Ошибка'
+                                )
+                            }
+                        }
+                        if (response.status === 401) {
+                            location.reload()
+                        }
+                        if (response.status === 429) {
+                            let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                            default_toastr()
+                            toastr.warning('Слишком много запросов. Повторить через ' + time + ' сек.', 'Ограничение запросов')
+                        }
+                    }
+                })
+            },
+            rules: {
+                'address': {
+                    required: true,
+                    minlength: 32
+                },
+                'amount': {
+                    required: true,
+                    min: 0
+                }
+            },
+            messages: {
+                'address': {
+                    required: "Это поле обязательно к заполнению.",
+                    minlength: "Пожалуйста, введите не менее 32(hex) символов."
+                },
+                'amount': {
+                    required: "Это поле обязательно к заполнению.",
+                    min: "Значение некорректно или превышает баланс вашего кошелька."
+                }
+            },
+            errorElement: 'span',
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('error');
+                if ($(element).parent().hasClass('input-group')) {
+                    $(element).parent().addClass('is-invalid');
+                }
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('error');
+                if ($(element).parent().hasClass('input-group')) {
+                    $(element).parent().removeClass('is-invalid');
+                }
+            }
+        })
+    }
+
+    // reset jquery validate for form
+    function close_send_modal() {
+        validator.resetForm()
+    }
+
+    // region Watch Transactions ---------------------------------------------------------------------------------------
+    // =================================================================================================================
+    // watch transactions by wallet
+    function watch_transactions(value) {
+        localStorage.address = value
+        $('#some_address').html(value)
+        $.ajax({
+            type: "GET",
+            url: "/api/ethereum/transactions/" + value,
+            success: function (response) {
+                render_wallet_transaction(response)
+            },
+            error: function (response) {
+                if (response.status === 401) {
+                    location.reload()
+                }
+            }
+        })
+    }
+
+    // init datatable
+    table = $('#trans_datatable').DataTable({
+        "responsive": false,
+        "lengthChange": false,
+        "autoWidth": false,
+        "ordering": true,
+        "searching": false,
+        'columnDefs': [
+            {
+                'orderable': false,
+                'targets': [0, 1, 2, 3, 5, 6]
+            }
+        ],
+        order: [],
+        "language": {
+            "infoFiltered": "(Отфильтровано _MAX_ записей)",
+            "zeroRecords": "Записей не найдено",
+            "info": "Показано с _START_ по _END_ записей из _TOTAL_",
+            "infoEmpty": "Нет записей.",
+            "search": "Поиск:",
+            "paginate": {
+                "previous": "Предыдущая",
+                "last": "Последняя",
+                "next": "Следующая"
+            }
+        }
+    })
+
+    // render transactions in datatable
+    function render_wallet_transaction(transactions) {
+        table.clear().draw()
+        if (transactions.length > 0) {
+            for (let trans of transactions) {
+                table.row.add([
+                    "<a target=\"_blank\" href=\"https://sepolia.etherscan.io/tx/" + trans.txnHash + "\">" + trans.txnHash + "</a>",
+                    "<a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + trans.addressFrom + "\">" + trans.addressFrom + "</a>",
+                    "<a target=\"_blank\" href=\"https://sepolia.etherscan.io/address/" + trans.addressTo + "\">" + trans.addressTo + "</a>",
+                    trans.value + " Ether",
+                    "" + timer(trans.age) + " ago",
+                    "" + trans.txnFee + "<span style='color: lawngreen; font-size: 12px; float: right'> $</span>",
+                    "<span style='color: green'>Success</span>",
+                ]).draw()
+            }
+        }
+        $('td', table.rows().nodes()).addClass('trans_row');
+    }
+
+
+    // socket.io -------------------------------------------------------------------------------------------------------
+    // =================================================================================================================
+    // event for update balance for user wallet
+    socket.on("front_update_wallet_balance", function (data) {
+        ($('.balance')).each(function (index, elem) {
+            if (elem.id === $('#balance_' + data.wallet_address).attr('id')) {
+                $(elem).html("<b>" + data.value + " ETH</b>")
+            }
+        })
+    })
+</script>
+{% endblock %}

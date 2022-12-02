@@ -1,0 +1,66 @@
+<div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow expanded" data-scroll-to-active="true"
+     style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+    <div class="navbar-header expanded">
+        <ul class="nav navbar-nav flex-row">
+            <li class="nav-item me-auto">
+                <a class="navbar-brand" href="#">
+                    <span class="brand-logo">
+                        <img src="{{ url_for('static', path='/app-assets/images/06f15e80-61b4-11e9-8c8f-a273aa4df8c2.png') }}"
+                             alt="logo">
+                    </span>
+                    <h2 class="brand-text" style="color: white">Crypto Wallet</h2>
+                </a></li>
+        </ul>
+    </div>
+    <div class="shadow-bottom"></div>
+    <div class="main-menu-content ps ps--active-y">
+        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation" style="display: none;">
+            <li class="nav-item {% if request.path == '/profile/get' %}active{% endif %}"><a
+                    class="d-flex align-items-center" href="/profile/get">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="feather feather-user">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="menu-title text-truncate" data-i18n="Chat">Профиль</span></a>
+            </li>
+            <li class=" nav-item {% if request.path == '/wallets/' %}active{% endif %}"><a
+                    class="d-flex align-items-center" href="/wallets/">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="feather feather-briefcase">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                <span class="menu-title text-truncate" data-i18n="Chat">Кошельки</span></a>
+            </li>
+            <li class=" nav-item {% if request.path == '/ibay/' %}active{% endif %}"><a
+                    class="d-flex align-items-center" href="/ibay/">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="feather feather-shopping-cart">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span class="menu-title text-truncate" data-i18n="Chat">iBay</span></a>
+            </li>
+            <li class="disabled nav-item {% if request.path == '/chat/messages' %}active{% endif %}"
+                data-bs-toggle="popover"
+                data-bs-content="Чат будет доступен ровно через 1 минуту после регистрации."
+                data-bs-trigger="hover"
+                data-bs-original-title="Временное ограничение"
+                id="chat_link">
+                <a class="d-flex align-items-center" href="/chat/messages">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-message-square">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="menu-title text-truncate" data-i18n="Chat">Чат</span></a>
+            </li>
+        </ul>
+
+    </div>
+</div>

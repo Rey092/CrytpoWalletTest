@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+
+  db:
+    build:
+      context: ./deploy/postgres
+      dockerfile: Dockerfile
+    volumes:
+      - ./deploy/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+
+  api_web:
+    build:
+      context: .
+      dockerfile: deploy/backend/Dockerfile
+    command: poetry run make run-prod
+    ports:
+      - "8000:8000"
+    volumes:
+      - static_volume:/usr/src/app/static
+    depends_on:
+      - rabbitmq
+      - db
+
+  nginx:
+    build:
+      context: ./deploy/nginx
+      dockerfile: prod.Dockerfile
+    volumes:
+      - static_volume:/usr/src/app/static
+    ports:
+      - "80:80"
+    depends_on:
+      - api_web
+
+  redis:
+    image: 'redis:alpine'
+
+  celery:
+    restart: always
+    build:
+      context: .
+      dockerfile: deploy/backend/Dockerfile
+    command: poetry run make start_worker
+    depends_on:
+      - api_web
+      - redis
+
+  rabbitmq:
+    image: rabbitmq:3.9.13-management-alpine
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+
+  eth_web:
+    build:
+      context: .
+      dockerfile: deploy/backend/Dockerfile
+    command: poetry run make run_eth
+    depends_on:
+      - rabbitmq
+
+  mongodb:
+    image: mongo:5.0
+    volumes:
+      - mongo:/data/db
+    env_file:
+      - .env
+    restart: always
+
+  socket_web:
+    build:
+      context: .
+      dockerfile: deploy/backend/Dockerfile
+    command: poetry run make run_sio_prod
+    ports:
+      - "8002:8002"
+    depends_on:
+      - mongodb
+
+  ibay_web:
+    build:
+      context: .
+      dockerfile: deploy/backend/Dockerfile
+    command: poetry run make run_ibay_prod
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+
+
+volumes:
+  static_volume:
+  postgres_data:
+  mongo:

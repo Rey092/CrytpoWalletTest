@@ -1,0 +1,224 @@
+{% extends "elements/base_auth.html" %}
+
+{% block title %}
+Registration
+{% endblock %}
+
+{% block auth %}
+<div class="card mb-0">
+    <div class="card-body">
+        <div class="brand-logo">
+            <h2 class="brand-text text-dark ms-1">Регистрация</h2>
+        </div>
+        <div class="form-error text-center" style="color: red;">
+        </div>
+        <form class="auth-register-form mt-2" id="register_form" method="POST" novalidate="novalidate">
+            <div class="mb-1">
+                <label for="register-email" class="form-label">Email</label>
+                <input type="email" class="form-control"
+                       id="register-email"
+                       name="register-email"
+                       autocomplete="new-password"
+                       placeholder="john@example.com" aria-describedby="register-email" tabindex="2">
+            </div>
+
+            <div class="mb-1">
+                <label for="register-username" class="form-label">Имя</label>
+                <input type="text" class="form-control" id="register-username" name="register-username"
+                       placeholder="John Doe" aria-describedby="register-username" autocomplete="new-password"
+                       tabindex="1">
+            </div>
+
+            <div class="mb-1">
+                <label for="register-password" class="form-label">Пароль</label>
+
+                <div class="input-group input-group-merge form-password-toggle">
+                    <input type="password" class="form-control form-control-merge"
+                           id="register-password"
+                           name="register-password"
+                           placeholder="············"
+                           autocomplete="new-password"
+                           aria-describedby="register-password"
+                           tabindex="3">
+                    <span class="input-group-text cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="14"
+                                                                       height="14" viewBox="0 0 24 24" fill="none"
+                                                                       stroke="currentColor" stroke-width="2"
+                                                                       stroke-linecap="round" stroke-linejoin="round"
+                                                                       class="feather feather-eye"><path
+                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12"
+                                                                                            r="3"></circle></svg></span>
+                </div>
+            </div>
+            <div class="mb-1">
+                <label for="register-password2" class="form-label">Повторите пароль</label>
+
+                <div class="input-group input-group-merge form-password-toggle">
+                    <input type="password" class="form-control form-control-merge" id="register-password2"
+                           name="register-password2" placeholder="············" aria-describedby="register-password"
+                           tabindex="3" autocomplete="on">
+                    <span class="input-group-text cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="14"
+                                                                       height="14" viewBox="0 0 24 24" fill="none"
+                                                                       stroke="currentColor" stroke-width="2"
+                                                                       stroke-linecap="round" stroke-linejoin="round"
+                                                                       class="feather feather-eye"><path
+                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12"
+                                                                                            r="3"></circle></svg></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 waves-effect waves-float waves-light" tabindex="5">
+                Зарегистрироваться
+            </button>
+        </form>
+        <p class="text-center mt-2">
+            <span>У вас уже есть аккаунт?</span>
+            <a href="/auth/login">
+                <span>Войти</span>
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    $.validator.addMethod("check_repeated_password", function (value) {
+        let password = $('#register-password').val()
+        if (password === value) {
+            return true
+        } else {
+            return false
+        }
+    });
+
+
+    let validator = $("#register_form").validate({
+        submitHandler: function () {
+            const email = $('#register-email').val()
+            const username = $('#register-username').val()
+            const password1 = $('#register-password').val()
+            const password2 = $('#register-password2').val()
+            $.ajax({
+                type: "POST",
+                url: "/api/auth/register",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    email: email,
+                    password1: password1,
+                    password2: password2,
+                    username: username
+
+                }),
+                success: function (response) {
+                    if ('id' in response) {
+                        location.reload()
+                    }
+                },
+                error: function (response) {
+                    let form_error = $(".form-error")
+                    if (response.status === 400 || response.status === 422) {
+                        let res = response.responseJSON
+                        if (res.length > 0) {
+                            if (res[0].code === 'email_error') {
+                                form_error.html("")
+                                form_error.html(
+                                    '<span id="login-password-error" class="error">' +
+                                    'Электронная почта уже существует' +
+                                    '</span>'
+                                )
+                            }
+                            if (res[0].code === 'email_error_domain') {
+                                form_error.html("")
+                                form_error.html(
+                                    '<span id="login-password-error" class="error">' +
+                                    'Электронная почта недействительна.' +
+                                    '</span>'
+                                )
+                            }
+                            if (res[0].code === 'password_error') {
+                                form_error.html("")
+                                form_error.html(
+                                    '<span id="login-password-error" class="error">' +
+                                    'Пароль должен содержать как минимум: ' +
+                                    'одну цифру, одну заглавную букву, одну строчную букву, ' +
+                                    'один специальный символ [$@#]' +
+                                    '</span>'
+                                )
+                            }
+                            if (res[0].code === 'username_error') {
+                                form_error.html("")
+                                form_error.html(
+                                    '<span id="login-password-error" class="error">' +
+                                    'Имя пользователя должно содержать не менее: ' +
+                                    'от 5 до 40 символов, без специальных символов' +
+                                    '</span>'
+                                )
+                            }
+                        } else {
+                            form_error.html(
+                                '<span id="login-password-error" class="error">' +
+                                'Произошла ошибка при попытке зарегистрироваться' +
+                                '</span>'
+                            )
+                        }
+                    } else {
+                        form_error.html(
+                            '<span id="login-password-error" class="error">' +
+                            'Произошла ошибка при попытке зарегистрироваться' +
+                            '</span>'
+                        )
+                    }
+                    if (response.status === 429) {
+                        let time = parseInt(response.responseJSON[0].message.match(/\d+/))
+                        form_error.html(
+                            '<span id="login-email-error" class="error">' +
+                            'Слишком много запросов. Повторить через ' + time + ' сек.' +
+                            '</span>'
+                        )
+                    }
+                }
+            })
+        },
+        rules: {
+            'register-email': {
+                required: true,
+                email: true
+            },
+            'register-username': {
+                required: true,
+                minlength: 5
+            },
+            'register-password': {
+                required: true,
+                minlength: 8,
+            },
+            'register-password2': {
+                required: true,
+                minlength: 8,
+                check_repeated_password: true
+            },
+        },
+        messages: {
+            'register-email': {
+                required: "Это поле обязательно к заполнению.",
+                email: "Пожалуйста, введите действительный адрес электронной почты."
+            },
+            'register-username': {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 5 символов."
+            },
+            'register-password': {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 8 символов.",
+            },
+            'register-password2': {
+                required: "Это поле обязательно к заполнению.",
+                minlength: "Пожалуйста, введите не менее 8 символов.",
+                check_repeated_password: "Пароли не совпадают."
+            },
+        }
+    });
+
+</script>
+{% endblock %}

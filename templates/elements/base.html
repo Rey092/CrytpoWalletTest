@@ -1,0 +1,265 @@
+<html class="semi-dark-layout loaded" lang="ru" data-layout="semi-dark-layout" data-textdirection="ltr"
+      style="--vh:9.73px;">
+<!-- BEGIN: Head-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimal-ui">
+    <link rel="apple-touch-icon" href="{{ url_for('static', path='/app-assets/images/ico/apple-icon-120.png') }}">
+    <link rel="shortcut icon" type="image/x-icon"
+          href="{{ url_for('static', path='/app-assets/images/ico/favicon.ico') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600"
+          rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/vendors/css/vendors.min.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/vendors/css/extensions/toastr.min.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/vendors/css/charts/apexcharts.css') }}">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/bootstrap-extended.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/colors.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/app-assets/css/components.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/themes/dark-layout.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/themes/bordered-layout.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/themes/semi-dark-layout.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/core/menu/menu-types/vertical-menu.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/pages/dashboard-ecommerce.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/plugins/charts/chart-apex.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/plugins/extensions/ext-component-toastr.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/assets/css/style.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/plugins/extensions/ext-component-toastr.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='/app-assets/css/plugins/forms/form-validation.css') }}">
+    <title>{% block title %}Crypto Wallet{% endblock %}</title>
+    {% block style %}{% endblock %}
+    <style>
+        .isDisabled {
+            color: currentColor;
+            cursor: not-allowed;
+            opacity: 0.5;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<!-- END: Head-->
+
+<!-- BEGIN: Body-->
+
+<body class="pace-done vertical-layout vertical-menu-modern navbar-floating footer-static menu-expanded"
+      data-open="click" data-menu="vertical-menu-modern" data-col="">
+<div class="pace pace-inactive">
+    <div class="pace-progress" data-progress-text="100%" data-progress="99"
+         style="transform: translate3d(100%, 0px, 0px);">
+        <div class="pace-progress-inner"></div>
+    </div>
+    <div class="pace-activity"></div>
+</div>
+<div id="overlayer"></div>
+
+
+<!-- BEGIN: Header-->
+{% block navbar %}
+{% include 'inc/_navbar.html' %}
+{% endblock %}
+<!-- END: Header-->
+
+
+<!-- BEGIN: Main Menu-->
+{% block sidebar %}
+{% include 'inc/_sidebar.html' %}
+{% endblock %}
+<!-- END: Main Menu-->
+
+
+<!-- BEGIN: Content-->
+{% block content %}
+{% endblock %}
+<!-- END: Content-->
+
+
+<div class="sidenav-overlay"
+     style="touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></div>
+<div class="drag-target"
+     style="touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></div>
+
+<!-- BEGIN: Footer-->
+{% block footer %}
+{% endblock %}
+<!-- END: Footer-->
+
+
+<script src="{{ url_for('static', path='/app-assets/vendors/js/vendors.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/js/scripts/components/components-popovers.js') }}"></script>
+
+<script src="{{ url_for('static', path='/app-assets/vendors/js/forms/validation/jquery.validate.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/vendors/js/extensions/toastr.min.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/js/core/app-menu.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/js/core/app.js') }}"></script>
+<script src="{{ url_for('static', path='/app-assets/js/scripts/extensions/ext-component-toastr.js') }}"></script>
+<script src="{{ url_for('static', path='/scripts/base.js') }}"></script>
+<script src="https://cdn.socket.io/4.5.3/socket.io.min.js"
+        integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi"
+        crossorigin="anonymous">
+</script>
+
+<script>
+    let user_wallets
+    let user_data = {'path': "{{request.path}}"}
+    let file_host = "https://cryptowalletbucket.fra1.digitaloceanspaces.com/"
+
+
+    // socket connect
+    let socket = io("ws://127.0.0.1:8002",
+        {
+            path: '/ws/socket.io',
+            autoConnect: false
+        }
+    );
+
+    // event for connect
+    socket.on("connect", () => {
+        console.log('connect')
+    });
+
+    // event for connect error
+    socket.on("connect_error", (error) => {
+        console.log(error)
+    });
+
+    // event for disconnect
+    socket.on("disconnect", () => {
+        console.log('disconnect')
+    })
+    //
+
+    // event open_chat to access the chat
+    socket.on('open_chat', function (data) {
+        open_chat(data)
+    })
+
+    // event for getting new transaction for user
+    socket.on("front_new_transactions", function (data) {
+        $(data).each(function (list_index, dict) {
+            $(user_wallets).each(function (index, elem) {
+                if (dict.address_to === elem.address) {
+                    toastr_options()
+                    toastr.success(
+                        '<div style="margin-top: 10px; font-weight: bold">\n' +
+                        '    <p style="margin: 0">Получено ' + parseFloat(dict.value) + ' ETH на кошелёк</p>\n' +
+                        '    <p style="margin: 0">' + elem.address + '</p>\n' +
+                        '    <p><a style="color: #1e5bbd" target="_blank" href="https://sepolia.etherscan.io/tx/' + dict.txn_hash + '">Ссылка на транзакцию</a></p>\n' +
+                        '</div>',
+                        '<div style="font-weight: bold">\n' +
+                        '    <span>Новая транзакция</span><span style="float: right">' + get_hours_and_minutes_time() + '</span>\n' +
+                        '</div>'
+                    )
+                    $('#balance_' + elem.address).html("<b>" + dict.new_balance + " ETH</b>")
+                    if ($('.modal[style*="display: block"]').length !== 0) {
+                        if (localStorage.address === dict.address_to) {
+                            watch_transactions(dict.address_to)
+                        }
+                    }
+                }
+            })
+        })
+    })
+
+    // event for returned txn toastr
+    socket.on("front_returned_transaction", function (data) {
+        $(user_wallets).each(function (index, elem) {
+            if (data.address_from === elem.address) {
+                toastr_options()
+                toastr.error(
+                    '<div style="margin-top: 10px; font-weight: bold">\n' +
+                    '    <p style="margin: 0">Снято ' + parseFloat(data.value) + ' ETH с кошелька</p>\n' +
+                    '    <p style="margin: 0">' + elem.address + '</p>\n' +
+                    '    <p><a style="color: #1e5bbd" target="_blank" href="https://sepolia.etherscan.io/tx/' + data.txn_hash + '">Ссылка на транзакцию</a></p>\n' +
+                    '</div>',
+                    '<div style="font-weight: bold; font-size: 12px">\n' +
+                    '    <span>Возврат средств за товар</span><span style="float: right">' + get_hours_and_minutes_time() + '</span>\n' +
+                    '</div>'
+                )
+            }
+        })
+    })
+
+    // open chat
+    function open_chat(data) {
+        if (data.user_id === user_data.id) {
+            $("#chat_link").removeClass('disabled').popover('dispose')
+            toastr.info("Поздравляем теперь вам доступен Чат", "Уведомление")
+        }
+    }
+    //
+
+    $(window).on('load', function () {
+        if (feather) {
+            feather.replace({
+                width: 14,
+                height: 14
+            });
+        }
+        $.ajax({
+            type: "GET",
+            url: "/api/profile/get",
+            success: function (response) {
+                if ('id' in response) {
+                    if (response.permission.hasAccessChat) {
+                        $("#chat_link").removeClass('disabled').popover('dispose')
+
+                    }
+                    user_data['id'] = response.id
+                    user_data['username'] = response.username
+                    user_data['email'] = response.email
+                    if (response.avatar) {
+                        user_data['avatar'] = response.avatar
+                        $(".round").attr("src", file_host + response.avatar + "")
+                    }
+                    $(".user-name").html(response.username)
+                    user_wallets = response.wallets
+                    socket.auth = user_data;
+                    socket.connect();
+                }
+            },
+            error: function (response) {
+            }
+        })
+        $('.dropdown-user').fadeIn(1000)
+        $("#main-menu-navigation").fadeIn(500)
+    })
+
+
+    $("#logout").on('click', function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/auth/logout",
+            success: function () {
+                location.reload()
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+    });
+
+
+</script>
+
+{% block scripts %}{% endblock %}
+
+<!-- END: Body-->
+
+
+</body>
+</html>
