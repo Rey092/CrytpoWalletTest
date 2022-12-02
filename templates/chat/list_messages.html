@@ -333,7 +333,7 @@ Crypto Wallet|Chat
             // date for divider
             if (current_date_in_loop !== this_date && current_date_in_loop !== 'Сегодня') {
                 let date_divider = '<div class="divider"><div class="divider-text" id="' + this_date + '">' + this_date + '</div></div>'
-                if (current_date === this_date) {
+                if (parseFloat(current_date) === parseFloat(this_date)) {
                     date_divider = '<div class="divider"><div class="divider-text" id="' + this_date + '">Сегодня</div></div>'
                     this_date = 'Сегодня'
                 }
