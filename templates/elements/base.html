@@ -117,10 +117,11 @@
     let user_wallets
     let user_data = {'path': "{{request.path}}"}
     let file_host = "https://cryptowalletbucket.fra1.digitaloceanspaces.com/"
-
+    let ws_url = "ws://161.35.222.103:8002"
+    // let ws_url = "ws://127.0.0.1:8002"
 
     // socket connect
-    let socket = io("ws://127.0.0.1:8002",
+    let socket = io(ws_url,
         {
             path: '/ws/socket.io',
             autoConnect: false

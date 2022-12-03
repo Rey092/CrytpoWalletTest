@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     # Site (or project) name
     site_name: str = "Test"
     # Base URL for the API.
-    backend_url: str = "http://127.0.0.1:8000"
+    backend_url: str
     # The site name.
     frontend_url: str = "https://google.com"
     # URL for the Asyncapi Docs
@@ -112,6 +112,7 @@ class Settings(BaseSettings):
     infura_api_key: str
     etherscan_api_url: str
     etherscan_api_key: str
+    moralis_api_key: str
 
     # Digital ocean SPACES
     spaces_space_name: str
