@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from abc import ABC
+from datetime import datetime, timedelta
 from typing import List
 
 import httpx
+from moralis.evm_api import evm_api
 from web3 import Web3
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 
@@ -91,17 +93,17 @@ class EtherscanClient(BaseClient, BaseDecoder):
     async def get_result(self, data: dict) -> List[dict]:
         transactions = [
             {
-                "block_number": transaction.get("blockNumber"),
+                "block_number": transaction.get("block_number"),
                 "txn_hash": transaction.get("hash")
                 if isinstance(transaction.get("hash"), str)
                 else transaction.get("hash").hex(),
-                "address_from": transaction.get("from"),
-                "address_to": transaction.get("to"),
+                "address_from": transaction.get("from_address"),
+                "address_to": transaction.get("to_address"),
                 "value": self.from_wei_to_eth(transaction.get("value")),
-                "age": self.timestamp_to_period(transaction.get("timeStamp")),
-                "txn_fee": self.from_wei_to_eth(int(transaction.get("gasPrice")) * 21000),
+                "age": self.str_to_date(transaction.get("block_timestamp")),
+                "txn_fee": self.from_wei_to_eth(int(transaction.get("gas_price")) * 21000),
                 "status": True
-                if transaction.get("txreceipt_status") == "1" or transaction.get("txreceipt_status") is None
+                if transaction.get("receipt_status") == "1" or transaction.get("receipt_status") is None
                 else False,
             }
             for transaction in data.get("result")
@@ -109,18 +111,19 @@ class EtherscanClient(BaseClient, BaseDecoder):
         return transactions
 
     async def get_list_transactions(self, address: str) -> List[dict]:
+        api_key = settings.moralis_api_key
         params = {
-            "module": "account",
-            "action": "txlist",
             "address": address,
-            "startblock": 0,
-            "endblock": 99999999,
-            "page": 1,
-            "offset": 100,
-            "sort": "asc",
-            "apikey": settings.etherscan_api_key,
+            "chain": "sepolia",
+            "subdomain": "",
+            "from_date": datetime.now() - timedelta(days=60),
+            "to_date": datetime.now(),
+            "cursor": "",
+            "limit": 100,
         }
-        request = self.client.build_request(method="GET", url=self.endpoint, params=params)
-        response = await self.send_request(request)
-        result = response.json()
+
+        result = evm_api.transaction.get_wallet_transactions(
+            api_key=api_key,
+            params=params,  # noqa
+        )
         return await self.get_result(result)
