@@ -93,6 +93,26 @@ class EtherscanClient(BaseClient, BaseDecoder):
     async def get_result(self, data: dict) -> List[dict]:
         transactions = [
             {
+                "block_number": transaction.get("blockNumber"),
+                "txn_hash": transaction.get("hash")
+                if isinstance(transaction.get("hash"), str)
+                else transaction.get("hash").hex(),
+                "address_from": transaction.get("from"),
+                "address_to": transaction.get("to"),
+                "value": self.from_wei_to_eth(transaction.get("value")),
+                "age": self.timestamp_to_period(transaction.get("timeStamp")),
+                "txn_fee": self.from_wei_to_eth(int(transaction.get("gasPrice")) * 21000),
+                "status": True
+                if transaction.get("txreceipt_status") == "1" or transaction.get("txreceipt_status") is None
+                else False,
+            }
+            for transaction in data.get("result")
+        ]
+        return transactions
+
+    async def get_result_txn(self, data: dict) -> List[dict]:
+        transactions = [
+            {
                 "block_number": transaction.get("block_number"),
                 "txn_hash": transaction.get("hash")
                 if isinstance(transaction.get("hash"), str)
@@ -126,4 +146,4 @@ class EtherscanClient(BaseClient, BaseDecoder):
             api_key=api_key,
             params=params,  # noqa
         )
-        return await self.get_result(result)
+        return await self.get_result_txn(result)
