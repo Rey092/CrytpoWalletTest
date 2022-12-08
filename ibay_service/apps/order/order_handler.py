@@ -28,11 +28,12 @@ class OrderHandler:
         print("======== Order Handler is active ========")
 
         chance = [True, False]
+        db = SessionLocal()
 
         while True:
             await asyncio.sleep(5)
-            db = SessionLocal()
             order = await self.get_order_with_delivery_status(db)
+            print(f"{order} -- ORDER WITH DELIVERY STATUS")
 
             if order:
                 if random.choice(chance):
@@ -59,5 +60,4 @@ class OrderHandler:
 
 
 order_handler = OrderHandler(OrderDatabase(OrderIBay), Producer())
-
 order_handler_thread = Thread(target=asyncio.run, args=(order_handler.complete_or_failed_order(),))
