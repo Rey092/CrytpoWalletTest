@@ -242,7 +242,7 @@ Crypto Wallet|Chat
                 if (user.avatar) {
                     src = file_host + user.avatar
                 }
-                let li = '<li class="user-profile-toggle' + " " + data.auth.id + '" onclick="getProfile(this)" id="' + data.sid + '"></li>'
+                let li = '<li class="user-profile-toggle' + " " + user.id + '" onclick="getProfile(this)" id="' + user.sid + '"></li>'
                 let username = '<div class="chat-info">\n' +
                     '<h5 class="mb-0">' + user.username + '</h5>\n' +
                     '</div>'
