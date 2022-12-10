@@ -121,7 +121,8 @@
     // let ws_url = "ws://127.0.0.1:8002"
 
     // socket connect
-    let socket = io(ws_url,
+    let socket = io(
+        ws_url,
         {
             path: '/ws/socket.io',
             autoConnect: false

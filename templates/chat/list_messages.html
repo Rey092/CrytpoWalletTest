@@ -242,7 +242,7 @@ Crypto Wallet|Chat
                 if (user.avatar) {
                     src = file_host + user.avatar
                 }
-                let li = '<li class="user-profile-toggle" onclick="getProfile(this)" id="' + user.sid + '"></li>'
+                let li = '<li class="user-profile-toggle' + " " + data.auth.id + '" onclick="getProfile(this)" id="' + data.sid + '"></li>'
                 let username = '<div class="chat-info">\n' +
                     '<h5 class="mb-0">' + user.username + '</h5>\n' +
                     '</div>'
@@ -262,25 +262,30 @@ Crypto Wallet|Chat
 
     // add or remove users from active chat
     function renderUsers(data, user_data, connect) {
+        let chat_list = $(".chat-list-users")
         if (connect) {
             let src = def_profile_image
             if (data.auth.avatar) {
                 src = file_host + data.auth.avatar
             }
             if (data.auth.id !== user_data.id) {
-                $(".no-users").css('display', 'none')
-                let li = '<li class="user-profile-toggle' + " " + data.auth.id + '" onclick="getProfile(this)" id="' + data.sid + '"></li>'
-                let username = ' <div class="chat-info">\n' +
-                    '<h5 class="mb-0">' + data.auth.username + '</h5>\n' +
-                    '</div>'
-                let avatar = '<span class="avatar">\n' +
-                    '<img src=' + src + '\n' +
-                    '     height="42"\n' +
-                    '     width="42" alt="Generic placeholder image"/>\n' +
-                    '     <span class="avatar-status-online"></span>\n' +
-                    '</span>'
-                $(".chat-list-users").append(li)
-                $(".user-profile-toggle:last-child").append(avatar).append(username)
+                if (chat_list.find("." + data.auth.id).length > 0) {
+                    $("." + data.auth.id).attr('id', data.sid)
+                } else {
+                    $(".no-users").css('display', 'none')
+                    let li = '<li class="user-profile-toggle' + " " + data.auth.id + '" onclick="getProfile(this)" id="' + data.sid + '"></li>'
+                    let username = ' <div class="chat-info">\n' +
+                        '<h5 class="mb-0">' + data.auth.username + '</h5>\n' +
+                        '</div>'
+                    let avatar = '<span class="avatar">\n' +
+                        '<img src=' + src + '\n' +
+                        '     height="42"\n' +
+                        '     width="42" alt="Generic placeholder image"/>\n' +
+                        '     <span class="avatar-status-online"></span>\n' +
+                        '</span>'
+                    chat_list.append(li)
+                    $(".user-profile-toggle:last-child").append(avatar).append(username)
+                }
             }
 
         } else {
